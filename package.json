@@ -1,0 +1,20 @@
+{
+  "name": "shop_app",
+  "version": "1.0.0",
+  "description": "research and development of an online fashion store system",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "client-install": "cd shop && npm install",
+    "server-install": "cd server && npm install",
+    "install": "concurrently \"npm run client-install\" \"npm run server-install\"",
+    "client": "cd shop && npm run dev",
+    "server": "cd server && npm run dev",
+    "start": "concurrently \"npm run client\" \"npm run server\""
+  },
+  "dependencies": {
+    "concurrently": "^9.2.0"
+  }
+}
