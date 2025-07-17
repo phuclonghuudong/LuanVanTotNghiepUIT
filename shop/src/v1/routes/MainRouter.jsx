@@ -1,8 +1,16 @@
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import HomeScreen from "../screens/pages/HomeScreen";
+import MainLayout from "../screens/pages/MainLayout";
+
 const MainRouter = () => {
   return (
-    <div className="text-red-800 flex justify-center items-center mx-auto">
-      MainRouter
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<MainLayout />}>
+          <Route index element={<HomeScreen />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 };
 
