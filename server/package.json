@@ -10,7 +10,8 @@
     "build": "npx prisma generate",
     "prisma:merge": "node prisma/scripts/merge-prisma.js",
     "prisma:dev": "npm run prisma:merge && prisma generate",
-    "prisma:migrate": "npm run prisma:merge && prisma migrate dev"
+    "prisma:migrate": "npm run prisma:merge && prisma migrate dev",
+    "prisma:studio": "npx prisma studio"
   },
   "keywords": [],
   "author": "",

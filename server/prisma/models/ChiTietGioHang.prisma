@@ -1,0 +1,11 @@
+model ChiTietGioHang {
+  id              Int             @id @default(autoincrement())
+  gioHangId       Int
+  chiTietSanPhamId Int
+  soLuong         Int
+  donGia          Int
+  tongTien        Int
+
+  gioHang         GioHang        @relation(fields: [gioHangId], references: [id])
+  chiTietSanPham  ChiTietSanPham @relation(fields: [chiTietSanPhamId], references: [id])
+}

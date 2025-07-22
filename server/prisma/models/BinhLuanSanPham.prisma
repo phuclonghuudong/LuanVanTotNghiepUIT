@@ -1,0 +1,11 @@
+model BinhLuanSanPham {
+  id          Int        @id @default(autoincrement())
+  noiDung     String     @db.Text
+  thoiGian    DateTime   @default(now())
+  trangThai   Int        @db.TinyInt
+  sanPhamId   Int
+  khachHangId Int
+
+  sanPham     SanPham    @relation(fields: [sanPhamId], references: [id])
+  khachHang   KhachHang  @relation(fields: [khachHangId], references: [id])
+}

@@ -1,0 +1,18 @@
+model TinTuc {
+  id          Int       @id @default(autoincrement())
+  tieuDe      String    @db.VarChar(255)
+  slug        String    @db.VarChar(150) @unique                       // Đường dẫn SEO
+  luotXem     Int       @default(0)                                   // Đếm lượt xem
+  noiDung     String    @db.Text                                      // Nội dung chính
+  hinhAnh     String?   @db.VarChar(255)                              // URL ảnh đại diện
+  ghiChu      String?   @db.Text
+  trangThai   Int       @db.TinyInt                                   // 0: Ẩn, 1: Hiện
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Foreign key
+  nhanVienId  Int
+  nhanVien    NhanVien  @relation(fields: [nhanVienId], references: [id])
+
+  @@index([nhanVienId])
+}
