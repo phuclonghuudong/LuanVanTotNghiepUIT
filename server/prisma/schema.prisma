@@ -11,26 +11,41 @@ datasource db {
 model BinhLuanSanPham {
   id          Int        @id @default(autoincrement())
   noiDung     String     @db.Text
-  thoiGian    DateTime   @default(now())
+  parentId    Int?
   trangThai   Int        @db.TinyInt
   sanPhamId   Int
   khachHangId Int
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
   sanPham     SanPham    @relation(fields: [sanPhamId], references: [id])
   khachHang   KhachHang  @relation(fields: [khachHangId], references: [id])
+
+  parent       BinhLuanSanPham? @relation("ParentComment", fields: [parentId], references: [id])
+  replies      BinhLuanSanPham[] @relation("ParentComment")
+
+  @@index([sanPhamId])
+  @@index([khachHangId])
+  @@index([parentId])
 }
 
 model ChiTietGioHang {
-  id              Int             @id @default(autoincrement())
-  gioHangId       Int
-  chiTietSanPhamId Int
-  soLuong         Int
-  donGia          Int
-  tongTien        Int
+  id                 Int              @id @default(autoincrement())
+  gioHangId          Int
+  chiTietSanPhamId   Int
+  soLuong            Int              @default(1)
+  donVi              Int              // Nếu "đơn vị" là số lượng quy đổi thì nên giải thích thêm
+  giaBanTaiThoiDiem  Decimal          @db.Decimal(12, 2)  // Lưu giá bán tại thời điểm thêm vào giỏ
+  thanhTien          Decimal          @db.Decimal(12, 2)  // = soLuong * giaBanTaiThoiDiem
 
-  gioHang         GioHang        @relation(fields: [gioHangId], references: [id])
-  chiTietSanPham  ChiTietSanPham @relation(fields: [chiTietSanPhamId], references: [id])
+  gioHang            GioHang          @relation(fields: [gioHangId], references: [id])
+  chiTietSanPham     ChiTietSanPham   @relation(fields: [chiTietSanPhamId], references: [id])
+
+  @@index([gioHangId])
+  @@index([chiTietSanPhamId])
+  @@unique([gioHangId, chiTietSanPhamId])
 }
+
 
 model ChiTietHoaDon {
   id                   Int       @id @default(autoincrement())
@@ -478,7 +493,7 @@ model ThuongHieu {
 model TinTuc {
   id          Int       @id @default(autoincrement())
   tieuDe      String    @db.VarChar(255)
-  slug        String    @db.VarChar(150) @unique                       // Đường dẫn SEO
+  slugTinTuc        String    @db.VarChar(150) @unique                       // Đường dẫn SEO
   luotXem     Int       @default(0)                                   // Đếm lượt xem
   noiDung     String    @db.Text                                      // Nội dung chính
   hinhAnh     String?   @db.VarChar(255)                              // URL ảnh đại diện

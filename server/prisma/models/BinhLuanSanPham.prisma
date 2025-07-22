@@ -1,11 +1,20 @@
 model BinhLuanSanPham {
   id          Int        @id @default(autoincrement())
   noiDung     String     @db.Text
-  thoiGian    DateTime   @default(now())
+  parentId    Int?
   trangThai   Int        @db.TinyInt
   sanPhamId   Int
   khachHangId Int
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
   sanPham     SanPham    @relation(fields: [sanPhamId], references: [id])
   khachHang   KhachHang  @relation(fields: [khachHangId], references: [id])
+
+  parent       BinhLuanSanPham? @relation("ParentComment", fields: [parentId], references: [id])
+  replies      BinhLuanSanPham[] @relation("ParentComment")
+
+  @@index([sanPhamId])
+  @@index([khachHangId])
+  @@index([parentId])
 }
