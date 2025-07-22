@@ -1,0 +1,29 @@
+model TaiKhoan {
+  id             Int       @id @default(autoincrement())
+  tenDangNhap    String    @db.VarChar(100) @unique
+  matKhau        String    @db.VarChar(255)                     // Mã hóa mật khẩu
+  loaiTaiKhoan   Int                                          // 0: Admin, 1: Nhân viên, 2: Khách hàng, v.v.
+  soDienThoai    String    @db.VarChar(20) @unique
+  email          String   @db.VarChar(255) @unique
+  emailXacThuc   String?   @db.Text
+  otpXacThuc     String?   @db.Text
+  otpHetHan      DateTime?                                     // Thời gian hết hạn OTP
+  refreshToken   String?   @db.Text
+  trangThai      Int       @db.TinyInt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Foreign key
+  quyenId        Int
+
+  // Quan hệ
+  quyen          Quyen @relation(fields: [quyenId], references: [id])
+
+  // Nếu liên kết với KhachHang hoặc NhanVien
+  khachHang      KhachHang? 
+  nhanVien       NhanVien?
+
+  @@index([quyenId])
+
+
+}

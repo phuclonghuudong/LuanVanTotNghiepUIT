@@ -1,0 +1,27 @@
+model ChiTietHoaDon {
+  id                   Int       @id @default(autoincrement())
+  soLuong              Int                                         // Số lượng mua
+  giaBanTaiThoiDiem    Decimal?  @db.Decimal(10, 2)                // Giá bán tại thời điểm mua
+  phanTramGiam         Decimal?  @db.Decimal(5, 2)                 // % giảm giá (nếu có)
+  giaSauGiam           Decimal?  @db.Decimal(10, 2)                // Giá sau khi giảm
+  donViTinh            String?   @db.VarChar(50)                   // Đơn vị tính
+  ghiChu               String?   @db.VarChar(255)                  // Ghi chú thêm
+  trangThai            Int       @db.TinyInt                       
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  // Foreign keys
+  hoaDonId             Int
+  chiTietSanPhamId     Int
+  chiTietKhuyenMaiId   Int?      
+
+  // Relations
+  hoaDon               HoaDon              @relation(fields: [hoaDonId], references: [id])
+  chiTietSanPham       ChiTietSanPham      @relation(fields: [chiTietSanPhamId], references: [id])
+  chiTietKhuyenMai     ChiTietKhuyenMai?   @relation(fields: [chiTietKhuyenMaiId], references: [id])
+  
+  // Indexes
+  @@index([hoaDonId])
+  @@index([chiTietSanPhamId])
+  @@index([chiTietKhuyenMaiId])
+}

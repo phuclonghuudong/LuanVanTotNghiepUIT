@@ -1,0 +1,20 @@
+model DiaChi {
+  id             Int       @id @default(autoincrement())
+  diaChi         String    @db.VarChar(255)     // Địa chỉ cụ thể
+  soDienThoai    String    @db.VarChar(20)      // SĐT người nhận
+  tenNguoiNhan   String    @db.VarChar(100)     // Tên người nhận
+  isMain         Boolean   @default(false)      // Có phải địa chỉ chính không
+  ghiChu         String?   @db.Text
+  trangThai      Int       @db.TinyInt          // Trạng thái sử dụng (1: đang dùng, 0: ngừng)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Foreign key
+  khachHangId    Int
+
+  // Quan hệ
+  khachHang      KhachHang @relation(fields: [khachHangId], references: [id])
+
+  @@index([khachHangId])
+
+}
