@@ -2,73 +2,74 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const getAllList = async () => {
-  return await prisma.loaisanpham.findMany({
+  return await prisma.loaiSanPham.findMany({
     orderBy: {
-      id_loai: "asc",
+      id: "asc",
     },
   });
 };
 
 const getDetailById = async (value) => {
-  return await prisma.loaisanpham.findUnique({
+  return await prisma.loaiSanPham.findUnique({
     where: {
-      id_loai: Number(value),
+      id: Number(value),
     },
   });
 };
 
 const findLoaiSanPhamByTenLoai = async (value) => {
-  return await prisma.loaisanpham.findUnique({
+  return await prisma.loaiSanPham.findUnique({
     where: {
-      tenloai: value,
+      tenLoai: value,
     },
   });
 };
+
 const findLoaiSanPhamBySlugLoai = async (value) => {
-  return await prisma.loaisanpham.findUnique({
+  return await prisma.loaiSanPham.findUnique({
     where: {
-      slugloai: value,
+      slugLoai: value,
     },
   });
 };
 
 const checkTenLoaiExistsExcludeId = async (value, id) => {
-  return await prisma.loaisanpham.findFirst({
+  return await prisma.loaiSanPham.findFirst({
     where: {
-      tenloai: value,
+      tenLoai: value,
       NOT: {
-        id_loai: Number(id),
+        id: Number(id),
       },
     },
   });
 };
 const checkSlugLoaiExistsExcludeId = async (value, id) => {
-  return await prisma.loaisanpham.findFirst({
+  return await prisma.loaiSanPham.findFirst({
     where: {
-      slugloai: value,
+      slugLoai: value,
       NOT: {
-        id_loai: Number(id),
+        id: Number(id),
       },
     },
   });
 };
 
 const createLoaiSanPham = async (data) => {
-  return await prisma.loaisanpham.create({
+  return await prisma.loaiSanPham.create({
     data: {
-      tenloai: data.tenloai,
-      slugloai: data.slugloai,
-      mota: data.mota,
-      hinhanh: data.hinhanh,
-      trangthai: data.trangthai ?? 1,
+      tenLoai: data.tenLoai,
+      slugLoai: data.slugLoai,
+      moTa: data.moTa,
+      hinhAnh: data.hinhAnh,
+      trangThai: data.trangThai ?? 1,
     },
   });
 };
 
 const updateLoaiSanPham = async (id, data) => {
-  return await prisma.loaisanpham.update({
+  return await prisma.loaiSanPham.update({
     where: {
-      id_loai: Number(id),
+      id: Number(id),
     },
     data: {
       ...data,
@@ -77,12 +78,12 @@ const updateLoaiSanPham = async (id, data) => {
 };
 
 const deleteLoaiSanPham = async (data) => {
-  return await prisma.loaisanpham.update({
+  return await prisma.loaiSanPham.update({
     where: {
-      id_loai: Number(id),
+      id: Number(id),
     },
     data: {
-      trangthai: -1,
+      trangThai: -1,
     },
   });
 };

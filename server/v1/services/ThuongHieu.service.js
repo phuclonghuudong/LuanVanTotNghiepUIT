@@ -2,73 +2,73 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const getAllList = async () => {
-  return await prisma.thuonghieu.findMany({
+  return await prisma.thuongHieu.findMany({
     orderBy: {
-      id_thuonghieu: "asc",
+      id: "asc",
     },
   });
 };
 
 const getDetailById = async (value) => {
-  return await prisma.thuonghieu.findUnique({
+  return await prisma.thuongHieu.findUnique({
     where: {
-      id_thuonghieu: Number(value),
+      id: Number(value),
     },
   });
 };
 
 const findThuongHieuByTenThuongHieu = async (value) => {
-  return await prisma.thuonghieu.findUnique({
+  return await prisma.thuongHieu.findUnique({
     where: {
-      tenthuonghieu: value,
+      tenThuongHieu: value,
     },
   });
 };
 const findThuongHieuBySlugThuongHieu = async (value) => {
-  return await prisma.thuonghieu.findUnique({
+  return await prisma.thuongHieu.findUnique({
     where: {
-      slugthuonghieu: value,
+      slugThuongHieu: value,
     },
   });
 };
 
 const checkTenThuongHieuExistsExcludeId = async (value, id) => {
-  return await prisma.thuonghieu.findFirst({
+  return await prisma.thuongHieu.findFirst({
     where: {
-      tenthuonghieu: value,
+      tenThuongHieu: value,
       NOT: {
-        id_thuonghieu: Number(id),
+        id: Number(id),
       },
     },
   });
 };
 const checkSlugThuongHieuExistsExcludeId = async (value, id) => {
-  return await prisma.thuonghieu.findFirst({
+  return await prisma.thuongHieu.findFirst({
     where: {
-      slugthuonghieu: value,
+      slugThuongHieu: value,
       NOT: {
-        id_thuonghieu: Number(id),
+        id: Number(id),
       },
     },
   });
 };
 
 const createThuongHieu = async (data) => {
-  return await prisma.thuonghieu.create({
+  return await prisma.thuongHieu.create({
     data: {
-      tenthuonghieu: data.tenthuonghieu,
-      slugthuonghieu: data.slugthuonghieu,
-      mota: data.mota,
-      hinhanh: data.hinhanh,
-      trangthai: data.trangthai ?? 1,
+      tenThuongHieu: data.tenThuongHieu,
+      slugThuongHieu: data.slugThuongHieu,
+      moTa: data.moTa,
+      hinhAnh: data.hinhAnh,
+      trangThai: data.trangThai ?? 1,
     },
   });
 };
 
 const updateThuongHieu = async (id, data) => {
-  return await prisma.thuonghieu.update({
+  return await prisma.thuongHieu.update({
     where: {
-      id_thuonghieu: Number(id),
+      id: Number(id),
     },
     data: {
       ...data,
@@ -77,12 +77,12 @@ const updateThuongHieu = async (id, data) => {
 };
 
 const deleteThuongHieu = async (data) => {
-  return await prisma.thuonghieu.update({
+  return await prisma.thuongHieu.update({
     where: {
-      id_thuonghieu: Number(id),
+      id: Number(id),
     },
     data: {
-      trangthai: -1,
+      trangThai: -1,
     },
   });
 };

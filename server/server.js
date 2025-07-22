@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const helmet = require("helmet");
 const compression = require("compression");
+const errorMain = require("./v1/utils/errorMain");
 
 const app = express();
 const PORT = 2410;
@@ -40,6 +41,8 @@ app.use("/", mainRouter);
 app.get("/", (req, res) => {
   res.send("Hello Hacker!");
 });
+
+app.use(errorMain);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
