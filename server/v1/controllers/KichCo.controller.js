@@ -1,9 +1,9 @@
-const LoaiSanPhamService = require("../services/LoaiSanPham.service");
+const KichCoService = require("../services/KichCo.service");
 const { responseHandler } = require("../utils/responseHandler");
 
 const getAllList = async (req, res, next) => {
   try {
-    const result = await LoaiSanPhamService.getAllList();
+    const result = await KichCoService.getAllList();
     if (!result)
       return responseHandler(res, 404, "KHÔNG TỒN TẠI DATA!", null, true);
 
@@ -19,20 +19,20 @@ const getDetailById = async (req, res, next) => {
     if (!id)
       return responseHandler(res, 400, "KHÔNG TÌM THẤY DATA!", null, true);
 
-    const result = await LoaiSanPhamService.getDetailById(id);
+    const result = await KichCoService.getDetailById();
     if (!result)
       return responseHandler(res, 404, "KHÔNG TỒN TẠI DATA!", null, true);
 
-    responseHandler(res, 200, "CHI TIẾT LOẠI SẢN PHẨM", result);
+    responseHandler(res, 200, "CHI TIẾT MÀU SẮC", result);
   } catch (error) {
     next(error);
   }
 };
 
-const createLoaiSanPham = async (req, res, next) => {
-  const { tenLoai, slugLoai, hinhAnh, moTa, trangThai } = req.body;
+const create = async (req, res, next) => {
+  const { tenKichCo, maKichCo, moTa, trangThai } = req.body;
   try {
-    if (!tenLoai?.trim() || !slugLoai?.trim()) {
+    if (!tenKichCo || !maKichCo) {
       return responseHandler(
         res,
         400,
@@ -41,19 +41,16 @@ const createLoaiSanPham = async (req, res, next) => {
         true
       );
     }
-    const checkExistTenLoai =
-      await LoaiSanPhamService.findLoaiSanPhamByTenLoai(tenLoai);
-    const checkExistSlugLoai =
-      await LoaiSanPhamService.findLoaiSanPhamBySlugLoai(slugLoai);
 
-    if (checkExistTenLoai || checkExistSlugLoai) {
-      return responseHandler(res, 409, "LOẠI SẢN PHẨM ĐÃ TỒN TẠI!", null, true);
+    const checkExistTen = await KichCoService.findByTen(tenKichCo);
+    const checkExistMa = await KichCoService.findByMa(maKichCo);
+    if (checkExistTen || checkExistMa) {
+      return responseHandler(res, 409, "DỮ LIỆU ĐÃ TỒN TẠI!", null, true);
     }
 
-    const result = await LoaiSanPhamService.createLoaiSanPham({
-      tenLoai: tenLoai,
-      slugLoai: slugLoai.trim(),
-      hinhAnh,
+    const result = await KichCoService.createKichCo({
+      tenKichCo,
+      maKichCo,
       moTa,
       trangThai: Number(trangThai),
     });
@@ -67,18 +64,19 @@ const createLoaiSanPham = async (req, res, next) => {
   }
 };
 
-const updateLoaiSanPham = async (req, res, next) => {
-  const { tenLoai, slugLoai, hinhAnh, moTa, trangThai } = req.body;
+const update = async (req, res, next) => {
+  const { tenKichCo, maKichCo, moTa, trangThai } = req.body;
   const { id } = req.params;
 
   if (!id) return responseHandler(res, 400, "KHÔNG TÌM THẤY DATA!", null, true);
   try {
-    const findById = await LoaiSanPhamService.getDetailById(id);
+    const findById = await KichCoService.getDetailById(id);
+
     const idUpdate = findById?.id;
     if (!idUpdate)
       return responseHandler(res, 404, "KHÔNG TỒN TẠI DATA!", null, true);
 
-    if (!tenLoai?.trim() || !slugLoai?.trim()) {
+    if (!tenKichCo || !maKichCo) {
       return responseHandler(
         res,
         400,
@@ -87,19 +85,22 @@ const updateLoaiSanPham = async (req, res, next) => {
         true
       );
     }
-    const checkExistTenLoai =
-      await LoaiSanPhamService.checkTenLoaiExistsExcludeId(tenLoai, idUpdate);
-    const checkExistSlugLoai =
-      await LoaiSanPhamService.checkSlugLoaiExistsExcludeId(slugLoai, idUpdate);
 
-    if (checkExistTenLoai || checkExistSlugLoai) {
-      return responseHandler(res, 409, "LOẠI SẢN PHẨM ĐÃ TỒN TẠI!", null, true);
+    const checkExistTen = await KichCoService.checkTenExistsExcludeId(
+      tenKichCo,
+      idUpdate
+    );
+    const checkExistMa = await KichCoService.checkMaExistsExcludeId(
+      maKichCo,
+      idUpdate
+    );
+    if (checkExistTen || checkExistMa) {
+      return responseHandler(res, 409, "DỮ LIỆU ĐÃ TỒN TẠI!", null, true);
     }
 
-    const result = await LoaiSanPhamService.updateLoaiSanPham(idUpdate, {
-      tenLoai: tenLoai,
-      slugLoai: slugLoai.trim(),
-      hinhAnh,
+    const result = await KichCoService.updateKichCo(idUpdate, {
+      tenKichCo,
+      maKichCo,
       moTa,
       trangThai: Number(trangThai),
     });
@@ -116,6 +117,6 @@ const updateLoaiSanPham = async (req, res, next) => {
 module.exports = {
   getAllList,
   getDetailById,
-  createLoaiSanPham,
-  updateLoaiSanPham,
+  create,
+  update,
 };

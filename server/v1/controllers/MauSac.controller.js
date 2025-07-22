@@ -1,9 +1,9 @@
-const LoaiSanPhamService = require("../services/LoaiSanPham.service");
+const MauSacService = require("../services/MauSac.service");
 const { responseHandler } = require("../utils/responseHandler");
 
 const getAllList = async (req, res, next) => {
   try {
-    const result = await LoaiSanPhamService.getAllList();
+    const result = await MauSacService.getAllList();
     if (!result)
       return responseHandler(res, 404, "KHÔNG TỒN TẠI DATA!", null, true);
 
@@ -19,20 +19,20 @@ const getDetailById = async (req, res, next) => {
     if (!id)
       return responseHandler(res, 400, "KHÔNG TÌM THẤY DATA!", null, true);
 
-    const result = await LoaiSanPhamService.getDetailById(id);
+    const result = await MauSacService.getDetailById();
     if (!result)
       return responseHandler(res, 404, "KHÔNG TỒN TẠI DATA!", null, true);
 
-    responseHandler(res, 200, "CHI TIẾT LOẠI SẢN PHẨM", result);
+    responseHandler(res, 200, "CHI TIẾT MÀU SẮC", result);
   } catch (error) {
     next(error);
   }
 };
 
-const createLoaiSanPham = async (req, res, next) => {
-  const { tenLoai, slugLoai, hinhAnh, moTa, trangThai } = req.body;
+const create = async (req, res, next) => {
+  const { tenMauSac, maMauSac, hexCode, moTa, trangThai } = req.body;
   try {
-    if (!tenLoai?.trim() || !slugLoai?.trim()) {
+    if (!tenMauSac || !maMauSac || !hexCode) {
       return responseHandler(
         res,
         400,
@@ -41,19 +41,18 @@ const createLoaiSanPham = async (req, res, next) => {
         true
       );
     }
-    const checkExistTenLoai =
-      await LoaiSanPhamService.findLoaiSanPhamByTenLoai(tenLoai);
-    const checkExistSlugLoai =
-      await LoaiSanPhamService.findLoaiSanPhamBySlugLoai(slugLoai);
 
-    if (checkExistTenLoai || checkExistSlugLoai) {
-      return responseHandler(res, 409, "LOẠI SẢN PHẨM ĐÃ TỒN TẠI!", null, true);
+    const checkExistTen = await MauSacService.findMauSacByTenMau(tenMauSac);
+    const checkExistMa = await MauSacService.findMauSacByMaMau(maMauSac);
+    const checkExistHexCode = await MauSacService.findMauSacByHexCode(hexCode);
+    if (checkExistTen || checkExistMa || checkExistHexCode) {
+      return responseHandler(res, 409, "MÀU SẮC ĐÃ TỒN TẠI!", null, true);
     }
 
-    const result = await LoaiSanPhamService.createLoaiSanPham({
-      tenLoai: tenLoai,
-      slugLoai: slugLoai.trim(),
-      hinhAnh,
+    const result = await MauSacService.createMauSac({
+      tenMauSac,
+      maMauSac,
+      hexCode: hexCode.trim(),
       moTa,
       trangThai: Number(trangThai),
     });
@@ -67,18 +66,19 @@ const createLoaiSanPham = async (req, res, next) => {
   }
 };
 
-const updateLoaiSanPham = async (req, res, next) => {
-  const { tenLoai, slugLoai, hinhAnh, moTa, trangThai } = req.body;
+const update = async (req, res, next) => {
+  const { tenMauSac, maMauSac, hexCode, moTa, trangThai } = req.body;
   const { id } = req.params;
 
   if (!id) return responseHandler(res, 400, "KHÔNG TÌM THẤY DATA!", null, true);
   try {
-    const findById = await LoaiSanPhamService.getDetailById(id);
+    const findById = await MauSacService.getDetailById(id);
+
     const idUpdate = findById?.id;
     if (!idUpdate)
       return responseHandler(res, 404, "KHÔNG TỒN TẠI DATA!", null, true);
 
-    if (!tenLoai?.trim() || !slugLoai?.trim()) {
+    if (!tenMauSac || !maMauSac || !hexCode) {
       return responseHandler(
         res,
         400,
@@ -87,19 +87,27 @@ const updateLoaiSanPham = async (req, res, next) => {
         true
       );
     }
-    const checkExistTenLoai =
-      await LoaiSanPhamService.checkTenLoaiExistsExcludeId(tenLoai, idUpdate);
-    const checkExistSlugLoai =
-      await LoaiSanPhamService.checkSlugLoaiExistsExcludeId(slugLoai, idUpdate);
 
-    if (checkExistTenLoai || checkExistSlugLoai) {
-      return responseHandler(res, 409, "LOẠI SẢN PHẨM ĐÃ TỒN TẠI!", null, true);
+    const checkExistTen = await MauSacService.checkTenMauExistsExcludeId(
+      tenMauSac,
+      idUpdate
+    );
+    const checkExistMa = await MauSacService.checkMaMauExistsExcludeId(
+      maMauSac,
+      idUpdate
+    );
+    const checkExistHexCode = await MauSacService.checkHexCodeExistsExcludeId(
+      hexCode,
+      idUpdate
+    );
+    if (checkExistTen || checkExistMa || checkExistHexCode) {
+      return responseHandler(res, 409, "MÀU ĐÃ TỒN TẠI!", null, true);
     }
 
-    const result = await LoaiSanPhamService.updateLoaiSanPham(idUpdate, {
-      tenLoai: tenLoai,
-      slugLoai: slugLoai.trim(),
-      hinhAnh,
+    const result = await MauSacService.updateMauSac(idUpdate, {
+      tenMauSac,
+      maMauSac,
+      hexCode: hexCode.trim(),
       moTa,
       trangThai: Number(trangThai),
     });
@@ -116,6 +124,6 @@ const updateLoaiSanPham = async (req, res, next) => {
 module.exports = {
   getAllList,
   getDetailById,
-  createLoaiSanPham,
-  updateLoaiSanPham,
+  create,
+  update,
 };

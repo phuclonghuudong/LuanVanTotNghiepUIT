@@ -30,9 +30,9 @@ const getDetailById = async (req, res, next) => {
 };
 
 const createThuongHieu = async (req, res, next) => {
-  const { tenthuonghieu, slugthuonghieu, hinhanh, mota, trangthai } = req.body;
+  const { tenThuongHieu, slugThuongHieu, hinhAnh, moTa, trangThai } = req.body;
   try {
-    if (!tenthuonghieu?.trim() || !slugthuonghieu?.trim()) {
+    if (!tenThuongHieu?.trim() || !slugThuongHieu?.trim()) {
       return responseHandler(
         res,
         400,
@@ -42,20 +42,20 @@ const createThuongHieu = async (req, res, next) => {
       );
     }
     const checkExistTen =
-      await ThuongHieuService.findThuongHieuByTenThuongHieu(tenthuonghieu);
+      await ThuongHieuService.findThuongHieuByTenThuongHieu(tenThuongHieu);
     const checkExistSlug =
-      await ThuongHieuService.findThuongHieuBySlugThuongHieu(slugthuonghieu);
+      await ThuongHieuService.findThuongHieuBySlugThuongHieu(slugThuongHieu);
 
     if (checkExistTen || checkExistSlug) {
       return responseHandler(res, 409, "THƯƠNG HIỆU ĐÃ TỒN TẠI!", null, true);
     }
 
     const result = await ThuongHieuService.createThuongHieu({
-      tenthuonghieu: tenthuonghieu,
-      slugthuonghieu: slugthuonghieu.trim(),
-      hinhanh,
-      mota,
-      trangthai: Number(trangthai),
+      tenThuongHieu: tenThuongHieu,
+      slugThuongHieu: slugThuongHieu.trim(),
+      hinhAnh,
+      moTa,
+      trangThai: Number(trangThai),
     });
     if (!result) {
       return responseHandler(res, 409, "THÊM MỚI THẤT BẠI!", null, true);
@@ -68,17 +68,17 @@ const createThuongHieu = async (req, res, next) => {
 };
 
 const updateThuongHieu = async (req, res, next) => {
-  const { tenthuonghieu, slugthuonghieu, hinhanh, mota, trangthai } = req.body;
+  const { tenThuongHieu, slugThuongHieu, hinhAnh, moTa, trangThai } = req.body;
   const { id } = req.params;
 
   if (!id) return responseHandler(res, 400, "KHÔNG TÌM THẤY DATA!", null, true);
   try {
     const findById = await ThuongHieuService.getDetailById(id);
-    const idUpdate = findById?.id_thuonghieu;
+    const idUpdate = findById?.id;
     if (!idUpdate)
       return responseHandler(res, 404, "KHÔNG TỒN TẠI DATA!", null, true);
 
-    if (!tenthuonghieu?.trim() || !slugthuonghieu?.trim()) {
+    if (!tenThuongHieu?.trim() || !slugThuongHieu?.trim()) {
       return responseHandler(
         res,
         400,
@@ -89,12 +89,12 @@ const updateThuongHieu = async (req, res, next) => {
     }
     const checkExistTen =
       await ThuongHieuService.checkTenThuongHieuExistsExcludeId(
-        tenthuonghieu,
+        tenThuongHieu,
         idUpdate
       );
     const checkExistSlug =
       await ThuongHieuService.checkTenThuongHieuExistsExcludeId(
-        slugthuonghieu,
+        slugThuongHieu,
         idUpdate
       );
 
@@ -103,11 +103,11 @@ const updateThuongHieu = async (req, res, next) => {
     }
 
     const result = await ThuongHieuService.updateThuongHieu(idUpdate, {
-      tenthuonghieu: tenthuonghieu,
-      slugthuonghieu: slugthuonghieu.trim(),
-      hinhanh,
-      mota,
-      trangthai: Number(trangthai),
+      tenThuongHieu: tenThuongHieu,
+      slugThuongHieu: slugThuongHieu.trim(),
+      hinhAnh,
+      moTa,
+      trangThai: Number(trangThai),
     });
     if (!result) {
       return responseHandler(res, 409, "CẬP NHẬT THẤT BẠI!", null, true);
