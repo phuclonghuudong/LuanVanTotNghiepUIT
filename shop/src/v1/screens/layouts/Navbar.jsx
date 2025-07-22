@@ -7,7 +7,7 @@ const Menu= [
   {
   id:1,
   name:'Trang chủ',
-  link:"/home"
+  link:"/"
   },
   {
   id:2,
@@ -18,7 +18,7 @@ const Menu= [
 ]
 const Navbar = () => {
   return (
-    <header className='h-[70px]'>
+    <header className='h-[70px] px-[10px]'>
       <div className='container h-full mx-auto xl:px-[50px] '>
         <div className='flex items-center h-full'>
           <div className='w-1/4 md:w-1/3 xl:hidden'>
@@ -26,17 +26,17 @@ const Navbar = () => {
               <IoMenuOutline fontSize={'30px'} />
             </a>
           </div>
-          <div class="md:w-1/3 w-1/2 xl:w-1/4 flex justify-center xl:justify-start"> 
+          <div className="md:w-1/3 w-1/2 xl:w-1/4 flex justify-center xl:justify-start"> 
               <a href="index.html" className="justify-center">
-                  <img src={logo} alt="logo" class="logo"/>
+                  <img src={logo} alt="logo" className="logo"/>
               </a>
           </div>
-          <div class="hidden xl:block xl:w-1/2">
+          <div className="hidden xl:block xl:w-1/2">
               <nav>
                 <ul className='flex items-center gap-5 justify-center'>
                   {
                   Menu.map((data)=>(
-                    <li>
+                    <li key={data.id}>
                       <a 
                       href={data.link}
                       className='inline-block hover:text-red-700 hover:text-semibold hover:text-xl text-xl font-semibold duration-200'
@@ -46,7 +46,7 @@ const Navbar = () => {
                 </ul>
               </nav>
           </div>
-          <div class="xl:w-1/4 md:w-1/3 w-1/4">
+          <div className="xl:w-1/4 md:w-1/3 w-1/4">
             <ul className='flex items-center gap-4 justify-end'>
               <li>
                 <a href="#"><IoSearch fontSize={'25px'}/></a>

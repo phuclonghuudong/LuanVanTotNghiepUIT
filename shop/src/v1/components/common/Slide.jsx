@@ -29,7 +29,7 @@ const ImageList = [
 
 ];
 const Slide = () => {
-    var settings = {
+    let settings = {
     dots: false,
     infinite: true,
     speed: 800,
@@ -71,7 +71,7 @@ const Slide = () => {
                   data-aos="fade-up"
                   data-aos-duration="500"
                   data-aos-deplay="300"
-                  ><button className='bg-gradient-to-r from-[#fea928] to-[#ed8900] hover:scale-105 duration-200 text-white py-2 px-4 rounded-full'>Order Now</button></div>
+                  ><button className='bg-gradient-to-r from-[#fea928] to-[#ed8900] hover:scale-110 duration-200 text-white py-2 px-4 rounded-full cursor-pointer'>Order Now</button></div>
               </div>
               {/* imgae section */}
               <div className='order-1 sm:order-2'>
