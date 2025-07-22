@@ -1,5 +1,9 @@
+import Slide from "../../components/common/Slide";
+
 const HomeScreen = () => {
-  return <div className="flex-1 h-screen bg-red-200">HomeScreen</div>;
+  return (
+    <Slide/>
+  );
 };
 
 export default HomeScreen;
