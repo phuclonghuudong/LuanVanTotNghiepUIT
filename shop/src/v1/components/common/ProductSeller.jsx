@@ -3,21 +3,20 @@ import { Link } from "react-router";
 import { FaStar } from 'react-icons/fa6';
 
 const ProductSeller = ({data}) => {
-    console.log(data);
    
   return (
     <div>
-            <div className='grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 place-items-center gap-2'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center gap-3'>
                 {/* Card section */}
                 {
                     data.map((item,index)=>(
                         <div
                         data-aos="fade-up"
                         data-aos-delay={item.aosDelay}
-                        className=''
+                        className='overflow-hidden'
                         key={index}>
                             <img src={item.image} alt={item.title} 
-                            className='h-[220px] w-[220px] object-cover rounded-md'
+                            className='h-full object-cover rounded-md'
                             />
                             <div>
                                 <h3 className='font-semibold'>{item.title}</h3>

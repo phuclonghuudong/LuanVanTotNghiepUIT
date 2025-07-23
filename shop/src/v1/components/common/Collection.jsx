@@ -56,7 +56,7 @@ const CollectionData=[
     id:8,
     name:"New in",
     image:Image8,
-    quantity:"12 items"
+    quantity:"11 items"
   },
 ]
 const Collection=()=> {

@@ -19,21 +19,21 @@ const CardCarousel = ({title,data}) => {
     }
   return (
     <>
-    <div className='w-full max-w-7xl mx-auto my-12  px-4'>
-        <div className='flex justify-between items-center mb-6 px-4'>
+    <div className='w-full max-w-[1280px] mx-auto my-12 px-4'>
+        <div className='flex justify-between items-center mb-6 '>
             <h2 className='text-xl sm:text-3xl md:text-4xl font-bold text-black'>{title}</h2>
             <Link to='/products'>
             <span className='text-lg text-black hover:text-red-600 font-bold underline'>View All Collection</span>
             </Link>
         </div>
-        <div className='relative pt-4 px-4 mx-auto'>
+        <div className='pt-4 w-full mx-auto'>
             <Slider {...settings}>
                 {data.map((data)=>(
                   <div className='flex flex-col bg-white overflow-hidden'>
-                      <div className='relative h-70 w-70 overflow-hidden'>
-                        <a href="#" className="block">
+                      <div className='relative h-full px-1 overflow-hidden'>
+                        <div className=' mx-auto text-center'>
                             <img className="rounded-full overflow-hidden object-cover w-full h-full"   src={data.image} alt="collection-img"/>
-                        </a>
+                        </div>
                       </div>
                       <div className="flex flex-col pt-2  justify-items-center justify-center">
                           <div className='flex items-center text-center justify-center'>
