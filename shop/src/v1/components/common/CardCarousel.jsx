@@ -7,6 +7,8 @@ const CardCarousel = ({title,data}) => {
     dots: true,
     infinite: false,
     speed: 500,
+    autoplay:true,
+    autoplaySpeed :4000,
     slidesToShow: 4,
     slidesToScroll: 1,
     responsive:[
@@ -16,17 +18,18 @@ const CardCarousel = ({title,data}) => {
     ],
     }
   return (
-    <div className='w-full max-w-7xl px-4 mx-auto my-12'>
-        <div className='flex justify-between items-center mb-6'>
+    <>
+    <div className='w-full max-w-7xl mx-auto my-12  px-4'>
+        <div className='flex justify-between items-center mb-6 px-4'>
             <h2 className='text-xl sm:text-3xl md:text-4xl font-bold text-black'>{title}</h2>
             <Link to='/products'>
             <span className='text-lg text-black hover:text-red-600 font-bold underline'>View All Collection</span>
             </Link>
         </div>
-        <div className='relative mx-auto pt-4'>
+        <div className='relative pt-4 px-4 mx-auto'>
             <Slider {...settings}>
                 {data.map((data)=>(
-                  <div className='flex flex-col px-2 mx-auto bg-white overflow-hidden'>
+                  <div className='flex flex-col bg-white overflow-hidden'>
                       <div className='relative h-70 w-70 overflow-hidden'>
                         <a href="#" className="block">
                             <img className="rounded-full overflow-hidden object-cover w-full h-full"   src={data.image} alt="collection-img"/>
@@ -49,6 +52,7 @@ const CardCarousel = ({title,data}) => {
 
         </div>
     </div>
+    </>
   )
 }
 
