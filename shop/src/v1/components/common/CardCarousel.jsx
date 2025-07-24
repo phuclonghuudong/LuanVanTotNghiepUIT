@@ -31,9 +31,9 @@ const CardCarousel = ({title,data}) => {
                 {data.map((data)=>(
                   <div className='flex flex-col bg-white overflow-hidden'>
                       <div className='relative h-full px-1 overflow-hidden'>
-                        <a href="#" className="block">
+                        <div>
                             <img className="rounded-full overflow-hidden object-cover w-full h-full"   src={data.image} alt="collection-img"/>
-                        </a>
+                        </div>
                       </div>
                       <div className="flex flex-col pt-2  justify-items-center justify-center">
                           <div className='flex items-center text-center justify-center'>

@@ -5,7 +5,7 @@ import { FaStar } from 'react-icons/fa6';
 const ProductSeller = ({data}) => {
    
   return (
-    <div>
+    <div className='w-full max-w-7xl mx-auto px-1'>
             <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center gap-3'>
                 {/* Card section */}
                 {
