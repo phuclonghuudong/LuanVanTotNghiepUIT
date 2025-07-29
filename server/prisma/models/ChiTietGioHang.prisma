@@ -1,0 +1,16 @@
+model ChiTietGioHang {
+  id                 Int              @id @default(autoincrement())
+  gioHangId          Int
+  chiTietSanPhamId   Int
+  soLuong            Int              @default(1)
+  donVi              Int              // Nếu "đơn vị" là số lượng quy đổi thì nên giải thích thêm
+  giaBanTaiThoiDiem  Decimal          @db.Decimal(12, 2)  // Lưu giá bán tại thời điểm thêm vào giỏ
+  thanhTien          Decimal          @db.Decimal(12, 2)  // = soLuong * giaBanTaiThoiDiem
+
+  gioHang            GioHang          @relation(fields: [gioHangId], references: [id])
+  chiTietSanPham     ChiTietSanPham   @relation(fields: [chiTietSanPhamId], references: [id])
+
+  @@index([gioHangId])
+  @@index([chiTietSanPhamId])
+  @@unique([gioHangId, chiTietSanPhamId])
+}

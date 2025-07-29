@@ -1,0 +1,9 @@
+model Quyen {
+  id        Int        @id @default(autoincrement())
+  tenQuyen  String     @db.VarChar(100)
+  maQuyen  String     @db.VarChar(100)
+  moTa      String?
+  trangThai Int        @db.TinyInt
+
+  taiKhoans TaiKhoan[]
+}

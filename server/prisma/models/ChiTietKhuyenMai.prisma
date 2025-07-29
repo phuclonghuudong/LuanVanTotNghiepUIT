@@ -1,0 +1,26 @@
+model ChiTietKhuyenMai {
+  id                  Int       @id @default(autoincrement())               
+  loaiGia             String    @db.VarChar(50)                       // Loại giảm: theo % hoặc theo tiền
+  phanTramGiam        Float?                                          // Phần trăm giảm (nếu có)
+  giaKhuyenMai        Decimal?  @db.Decimal(10, 2)                    // Giá khuyến mãi cố định
+  soLuongToiThieu     Int?                                            // Số lượng tối thiểu để áp dụng giảm
+  giaGiamTheoSoLuong  Decimal?  @db.Decimal(10, 2)                    // Số tiền giảm theo số lượng
+  giaGocLucKhuyenMai  Decimal?  @db.Decimal(10, 2)                    // Ghi lại giá gốc lúc giảm
+  trangThai           Int       @db.TinyInt                          
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  // Foreign keys
+  khuyenMaiId         Int
+  chiTietSanPhamId    Int
+
+  // Relations
+  khuyenMai           KhuyenMai        @relation(fields: [khuyenMaiId], references: [id])
+  chiTietSanPham      ChiTietSanPham   @relation(fields: [chiTietSanPhamId], references: [id])
+
+  // Indexes
+  @@index([khuyenMaiId])
+  @@index([chiTietSanPhamId])
+
+  chiTietHoaDon   ChiTietHoaDon[]
+}

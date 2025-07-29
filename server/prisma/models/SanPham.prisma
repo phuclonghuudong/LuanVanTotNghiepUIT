@@ -1,0 +1,28 @@
+model SanPham {
+  id           Int       @id @default(autoincrement())
+  tenSanPham          String    @db.VarChar(50) @unique
+  maSanPham           String    @db.VarChar(50) @unique
+  slugSanPham        String    @db.VarChar(100) @unique
+  luotXem      Int?      @db.TinyInt
+  hinhAnh      String?   @db.Text
+  moTa         String?   @db.Text
+  trangThai    Int       @db.TinyInt
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Foreign key
+  thuongHieuId Int
+  loaiSanPhamId    Int
+
+  // Relations
+  thuongHieu   ThuongHieu @relation(fields: [thuongHieuId], references: [id])
+  loaiSanPham      LoaiSanPham    @relation(fields: [loaiSanPhamId], references: [id])
+
+  @@index([loaiSanPhamId])
+  @@index([thuongHieuId])
+
+  binhLuanSanPham  BinhLuanSanPham[]
+  chiTietSanPham   ChiTietSanPham[]
+  hinhAnhSanPham   HinhAnhSanPham[]
+  danhGiaSanPham   DanhGiaSanPham[]
+}

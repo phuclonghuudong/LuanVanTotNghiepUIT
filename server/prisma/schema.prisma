@@ -1,0 +1,531 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model BinhLuanSanPham {
+  id          Int        @id @default(autoincrement())
+  noiDung     String     @db.Text
+  parentId    Int?
+  trangThai   Int        @db.TinyInt
+  sanPhamId   Int
+  khachHangId Int
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  sanPham     SanPham    @relation(fields: [sanPhamId], references: [id])
+  khachHang   KhachHang  @relation(fields: [khachHangId], references: [id])
+
+  parent       BinhLuanSanPham? @relation("ParentComment", fields: [parentId], references: [id])
+  replies      BinhLuanSanPham[] @relation("ParentComment")
+
+  @@index([sanPhamId])
+  @@index([khachHangId])
+  @@index([parentId])
+}
+
+model ChiTietGioHang {
+  id                 Int              @id @default(autoincrement())
+  gioHangId          Int
+  chiTietSanPhamId   Int
+  soLuong            Int              @default(1)
+  donVi              Int              // Nếu "đơn vị" là số lượng quy đổi thì nên giải thích thêm
+  giaBanTaiThoiDiem  Decimal          @db.Decimal(12, 2)  // Lưu giá bán tại thời điểm thêm vào giỏ
+  thanhTien          Decimal          @db.Decimal(12, 2)  // = soLuong * giaBanTaiThoiDiem
+
+  gioHang            GioHang          @relation(fields: [gioHangId], references: [id])
+  chiTietSanPham     ChiTietSanPham   @relation(fields: [chiTietSanPhamId], references: [id])
+
+  @@index([gioHangId])
+  @@index([chiTietSanPhamId])
+  @@unique([gioHangId, chiTietSanPhamId])
+}
+
+
+model ChiTietHoaDon {
+  id                   Int       @id @default(autoincrement())
+  soLuong              Int                                         // Số lượng mua
+  giaBanTaiThoiDiem    Decimal?  @db.Decimal(10, 2)                // Giá bán tại thời điểm mua
+  phanTramGiam         Decimal?  @db.Decimal(5, 2)                 // % giảm giá (nếu có)
+  giaSauGiam           Decimal?  @db.Decimal(10, 2)                // Giá sau khi giảm
+  donViTinh            String?   @db.VarChar(50)                   // Đơn vị tính
+  ghiChu               String?   @db.VarChar(255)                  // Ghi chú thêm
+  trangThai            Int       @db.TinyInt                       
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  // Foreign keys
+  hoaDonId             Int
+  chiTietSanPhamId     Int
+  chiTietKhuyenMaiId   Int?      
+
+  // Relations
+  hoaDon               HoaDon              @relation(fields: [hoaDonId], references: [id])
+  chiTietSanPham       ChiTietSanPham      @relation(fields: [chiTietSanPhamId], references: [id])
+  chiTietKhuyenMai     ChiTietKhuyenMai?   @relation(fields: [chiTietKhuyenMaiId], references: [id])
+  
+  // Indexes
+  @@index([hoaDonId])
+  @@index([chiTietSanPhamId])
+  @@index([chiTietKhuyenMaiId])
+}
+
+
+model ChiTietKhuyenMai {
+  id                  Int       @id @default(autoincrement())               
+  loaiGia             String    @db.VarChar(50)                       // Loại giảm: theo % hoặc theo tiền
+  phanTramGiam        Float?                                          // Phần trăm giảm (nếu có)
+  giaKhuyenMai        Decimal?  @db.Decimal(10, 2)                    // Giá khuyến mãi cố định
+  soLuongToiThieu     Int?                                            // Số lượng tối thiểu để áp dụng giảm
+  giaGiamTheoSoLuong  Decimal?  @db.Decimal(10, 2)                    // Số tiền giảm theo số lượng
+  giaGocLucKhuyenMai  Decimal?  @db.Decimal(10, 2)                    // Ghi lại giá gốc lúc giảm
+  trangThai           Int       @db.TinyInt                          
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  // Foreign keys
+  khuyenMaiId         Int
+  chiTietSanPhamId    Int
+
+  // Relations
+  khuyenMai           KhuyenMai        @relation(fields: [khuyenMaiId], references: [id])
+  chiTietSanPham      ChiTietSanPham   @relation(fields: [chiTietSanPhamId], references: [id])
+
+  // Indexes
+  @@index([khuyenMaiId])
+  @@index([chiTietSanPhamId])
+
+  chiTietHoaDon   ChiTietHoaDon[]
+}
+
+
+model ChiTietSanPham {
+  id                Int       @id @default(autoincrement())
+  maBarCode         String    @db.VarChar(50) @unique
+  maChiTiet        String    @db.VarChar(50) @unique
+  slugChiTiet      String    @db.VarChar(100) @unique
+  giaBan            Decimal?  @db.Decimal(10, 2)   // giá bán
+  giaNhap           Decimal?  @db.Decimal(10, 2)   // giá nhập
+  giaVonTB          Decimal?  @db.Decimal(10, 2)   // giá vốn trung bình
+  moTa              String?   @db.Text
+  trangThai         Int       @db.TinyInt
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Foreign keys
+  sanPhamId         Int
+  mauSacId          Int
+  kichCoId          Int
+
+  // Relations
+  sanPham           SanPham   @relation(fields: [sanPhamId], references: [id])
+  mauSac            MauSac    @relation(fields: [mauSacId], references: [id])
+  kichCo            KichCo    @relation(fields: [kichCoId], references: [id])
+
+  @@index([sanPhamId])
+  @@index([mauSacId])
+  @@index([kichCoId])
+
+  chiTietGioHang        ChiTietGioHang[]
+  chiTietKhuyenMai      ChiTietKhuyenMai[]
+  chiTietHoaDon         ChiTietHoaDon[]
+  hinhAnh               HinhAnhChiTietSanPham[]
+  tonKho                TonKho[] 
+}
+
+
+model DanhGiaSanPham {
+  id           Int       @id @default(autoincrement())
+  soSao        Int?      @db.TinyInt
+  noiDung      String?   @db.Text
+  trangThai    Int       @db.TinyInt
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Foreign key
+  khachHangId Int
+  sanPhamId    Int
+
+  // Relations
+  khachHang   KhachHang @relation(fields: [khachHangId], references: [id])
+  sanPham     SanPham    @relation(fields: [sanPhamId], references: [id])
+
+  @@index([khachHangId])
+  @@index([sanPhamId])
+}
+
+
+model DiaChi {
+  id             Int       @id @default(autoincrement())
+  diaChi         String    @db.VarChar(255)     // Địa chỉ cụ thể
+  soDienThoai    String    @db.VarChar(20)      // SĐT người nhận
+  tenNguoiNhan   String    @db.VarChar(100)     // Tên người nhận
+  isMain         Boolean   @default(false)      // Có phải địa chỉ chính không
+  ghiChu         String?   @db.Text
+  trangThai      Int       @db.TinyInt          // Trạng thái sử dụng (1: đang dùng, 0: ngừng)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Foreign key
+  khachHangId    Int
+
+  // Quan hệ
+  khachHang      KhachHang @relation(fields: [khachHangId], references: [id])
+
+  @@index([khachHangId])
+
+}
+
+
+model GioHang {
+  id             Int       @id @default(autoincrement())
+  tongTienGoc    Decimal   @db.Decimal(12, 2)                         // Tổng tiền chưa giảm
+  tongGiaGiam    Decimal   @db.Decimal(12, 2)                         // Tổng số tiền giảm giá
+  ngayCapNhat    DateTime  @default(now())                           // Ngày cập nhật giỏ hàng
+  ghiChu         String?   @db.Text
+  trangThai      Int       @db.TinyInt                               // 0: tạm, 1: đã đặt hàng, v.v.
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Foreign key
+  khachHangId    Int
+
+  // Quan hệ
+  khachHang      KhachHang @relation(fields: [khachHangId], references: [id])
+
+  @@index([khachHangId])
+
+  chiTietGioHang      ChiTietGioHang[]
+}
+
+
+model HinhAnhChiTietSanPham {
+  id         Int      @id @default(autoincrement())
+  duongDan   String   @db.Text                      // URL hoặc path ảnh
+  isMain     Boolean  @default(false)               // Là ảnh chính?
+  moTa       String?  @db.VarChar(255)              // alt ảnh
+  trangThai  Int      @db.TinyInt                   // 1: hoạt động, 0: ẩn, -1: xóa?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Foreign key
+  chiTietSanPhamId   Int
+  chiTietSanPham    ChiTietSanPham  @relation(fields: [chiTietSanPhamId ], references: [id])
+
+  @@index([chiTietSanPhamId ])
+}
+
+
+model HinhAnhSanPham {
+  id         Int      @id @default(autoincrement())
+  duongDan   String   @db.Text                      // URL hoặc path ảnh
+  isMain     Boolean  @default(false)               // Là ảnh chính?
+  moTa       String?  @db.VarChar(255)              // alt ảnh
+  trangThai  Int      @db.TinyInt                   // 1: hoạt động, 0: ẩn, -1: xóa?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Foreign key
+  sanPhamId  Int
+  sanPham    SanPham  @relation(fields: [sanPhamId], references: [id])
+
+  @@index([sanPhamId])
+
+}
+
+
+model HoaDon {
+  id                  Int       @id @default(autoincrement())
+  maHoaDon            String    @db.VarChar(50) @unique // Mã hóa đơn duy nhất
+  ngayLap             DateTime  @default(now())         // Ngày lập hóa đơn
+  tongTien            Decimal?  @db.Decimal(10, 2)      // Tổng tiền thanh toán sau giảm
+  tongTienGoc         Decimal?  @db.Decimal(10, 2)      // Tổng tiền gốc
+  tongGiamGia         Decimal?  @db.Decimal(10, 2)      // Tổng tiền được giảm
+  hinhThucThanhToan   String?   @db.VarChar(50)     // Hình thức thanh toán (tiền mặt, chuyển khoản, v.v.)
+  ngayGiaoHangDuKien  DateTime?                         // Dự kiến giao hàng
+  ngayGiao            DateTime?                         // Ngày giao thực tế
+  daGiaoHang          Boolean   @default(false)         // Đã giao hay chưa
+  ghiChu              String?  @db.VarChar(255) 
+  trangThai           Int       @db.TinyInt                                
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  // Foreign key
+  khachHangId         Int
+  nhanVienId         Int
+  khuyenMaiId         Int? 
+
+  // Relations
+  khachHang           KhachHang  @relation(fields: [khachHangId], references: [id])
+  nhanVien            NhanVien  @relation(fields: [nhanVienId], references: [id])
+  khuyenMai           KhuyenMai?          @relation(fields: [khuyenMaiId], references: [id])
+  chiTietHoaDon      ChiTietHoaDon[]     
+                
+
+  // Indexes
+  @@index([khachHangId])
+  @@index([khuyenMaiId])
+}
+
+
+model KhachHang {
+  id             Int       @id @default(autoincrement())
+  hoTen          String    @db.VarChar(100)                    // Thêm nếu cần
+  ngaySinh       DateTime                                      // Không dùng default
+  gioiTinh       Int                                           // 0: Nam, 1: Nữ, v.v.
+  diemTichLuy    Int                                           // Tổng điểm tích lũy
+  diaChi         String?   @db.VarChar(255)                    // Địa chỉ dạng text
+  avatar         String?   @db.Text
+  trangThai      Int       @db.TinyInt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Foreign key
+  taiKhoanId     Int    @unique
+
+  // Quan hệ
+  taiKhoan       TaiKhoan @relation(fields: [taiKhoanId], references: [id])
+
+  @@index([taiKhoanId])
+
+  binhLuanSanPham   BinhLuanSanPham[]
+  gioHang           GioHang[]
+  danhGiaSanPham    DanhGiaSanPham[]
+  diaChis            DiaChi[]
+  hoaDon            HoaDon[]
+}
+
+
+model KhuyenMai {
+  id           Int       @id @default(autoincrement())
+  tenKhuyenMai          String    @db.VarChar(50) @unique
+  slugKhuyenMai        String    @db.VarChar(100) @unique
+  hinhAnh      String?   @db.Text
+  moTa         String?   @db.Text
+  ngayBatDau      DateTime?                                            // Ngày bắt đầu khuyến mãi
+  ngayKetThuc     DateTime?                                           // Ngày kết thúc khuyến mãi
+  trangThai    Int       @db.TinyInt
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Foreign key
+  loaiKhuyenMaiId    Int
+
+  // Relations
+  loaiKhuyenMai      LoaiKhuyenMai    @relation(fields: [loaiKhuyenMaiId], references: [id])
+
+  @@index([loaiKhuyenMaiId])
+
+  chiTietKhuyenMai   ChiTietKhuyenMai[]
+  hoaDon   HoaDon[]
+}
+
+
+model KichCo {
+  id  Int      @id @default(autoincrement())             // INT AUTO_INCREMENT PRIMARY KEY
+  tenKichCo  String   @db.VarChar(50) @unique                   // VARCHAR(50) NOT NULL
+  maKichCo  String   @db.VarChar(100) @unique                   // VARCHAR(50) NOT NULL
+  moTa        String?  @db.Text                                   // TEXT NULL
+  trangThai   Int      @db.TinyInt                                // TINYINT NOT NULL
+  createdAt   DateTime @default(now())                            // DATETIME DEFAULT CURRENT_TIMESTAMP
+  updatedAt   DateTime @updatedAt                                 // DATETIME DEFAULT CURRENT_TIMESTAMP ON
+
+  chiTietSanPham ChiTietSanPham[]
+}
+
+
+model LoaiKhuyenMai{
+  id  Int      @id @default(autoincrement())           // INT AUTO_INCREMENT PRIMARY KEY
+  tenKhuyenMai  String   @db.VarChar(50) @unique                 // VARCHAR(50) NOT NULL
+  moTa        String?  @db.Text                                   // TEXT NULL
+  trangThai   Int      @db.TinyInt                                // TINYINT NOT NULL
+  createdAt   DateTime @default(now())                            // DATETIME DEFAULT CURRENT_TIMESTAMP
+  updatedAt   DateTime @updatedAt                                 // DATETIME DEFAULT CURRENT_TIMESTAMP ON 
+
+  khuyenMai KhuyenMai[]
+}
+
+
+model LoaiSanPham {
+  id  Int      @id @default(autoincrement())           // INT AUTO_INCREMENT PRIMARY KEY
+  tenLoai  String   @db.VarChar(50) @unique                 // VARCHAR(50) NOT NULL
+  slugLoai  String   @db.VarChar(100) @unique               // VARCHAR(50) NOT NULL
+  hinhAnh     String?   @db.Text                                  // TEXT NULL
+  moTa        String?  @db.Text                                   // TEXT NULL
+  trangThai   Int      @db.TinyInt                                // TINYINT NOT NULL
+  createdAt   DateTime @default(now())                            // DATETIME DEFAULT CURRENT_TIMESTAMP
+  updatedAt   DateTime @updatedAt                                 // DATETIME DEFAULT CURRENT_TIMESTAMP ON 
+
+  sanPham SanPham[]
+}
+
+
+model MauSac {
+  id  Int      @id @default(autoincrement())             // INT AUTO_INCREMENT PRIMARY KEY
+  tenMauSac  String   @db.VarChar(50) @unique                   // VARCHAR(50) NOT NULL
+  maMauSac  String   @db.VarChar(100) @unique                   // VARCHAR(50) NOT NULL
+  hexCode     String   @db.VarChar(100) @unique                // VARCHAR(50) NOT NULL
+  moTa        String?  @db.Text                                   // TEXT NULL
+  trangThai   Int      @db.TinyInt                                // TINYINT NOT NULL
+  createdAt   DateTime @default(now())                            // DATETIME DEFAULT CURRENT_TIMESTAMP
+  updatedAt   DateTime @updatedAt                                 // DATETIME DEFAULT CURRENT_TIMESTAMP ON 
+
+  chiTietSanPham ChiTietSanPham[]
+}
+
+
+model NhanVien {
+  id             Int       @id @default(autoincrement())
+  hoTen          String    @db.VarChar(100)                    
+  ngaySinh       DateTime                                      // Không dùng default
+  gioiTinh       Int                                           // 0: Nam, 1: Nữ, v.v.
+  CCCD    Int                                                  // CCCD
+  diaChi         String?   @db.VarChar(255)                    // Địa chỉ dạng text
+  avatar         String?   @db.Text
+  trangThai      Int       @db.TinyInt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Foreign key
+  taiKhoanId     Int  @unique
+
+  // Quan hệ
+  taiKhoan       TaiKhoan @relation(fields: [taiKhoanId], references: [id])
+
+  @@index([taiKhoanId])
+
+  tinTuc  TinTuc[]
+  hoaDon   HoaDon[]
+}
+
+
+model Quyen {
+  id        Int        @id @default(autoincrement())
+  tenQuyen  String     @db.VarChar(100)
+  maQuyen  String     @db.VarChar(100)
+  moTa      String?
+  trangThai Int        @db.TinyInt
+
+  taiKhoans TaiKhoan[]
+}
+
+
+model SanPham {
+  id           Int       @id @default(autoincrement())
+  tenSanPham          String    @db.VarChar(50) @unique
+  maSanPham           String    @db.VarChar(50) @unique
+  slugSanPham        String    @db.VarChar(100) @unique
+  luotXem      Int?      @db.TinyInt
+  hinhAnh      String?   @db.Text
+  moTa         String?   @db.Text
+  trangThai    Int       @db.TinyInt
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Foreign key
+  thuongHieuId Int
+  loaiSanPhamId    Int
+
+  // Relations
+  thuongHieu   ThuongHieu @relation(fields: [thuongHieuId], references: [id])
+  loaiSanPham      LoaiSanPham    @relation(fields: [loaiSanPhamId], references: [id])
+
+  @@index([loaiSanPhamId])
+  @@index([thuongHieuId])
+
+  binhLuanSanPham  BinhLuanSanPham[]
+  chiTietSanPham   ChiTietSanPham[]
+  hinhAnhSanPham   HinhAnhSanPham[]
+  danhGiaSanPham   DanhGiaSanPham[]
+}
+
+
+model TaiKhoan {
+  id             Int       @id @default(autoincrement())
+  tenDangNhap    String    @db.VarChar(100) @unique
+  matKhau        String    @db.VarChar(255)                     // Mã hóa mật khẩu
+  loaiTaiKhoan   Int                                          // 0: Admin, 1: Nhân viên, 2: Khách hàng, v.v.
+  soDienThoai    String    @db.VarChar(20) @unique
+  email          String   @db.VarChar(255) @unique
+  emailXacThuc   String?   @db.Text
+  otpXacThuc     String?   @db.Text
+  otpHetHan      DateTime?                                     // Thời gian hết hạn OTP
+  refreshToken   String?   @db.Text
+  trangThai      Int       @db.TinyInt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Foreign key
+  quyenId        Int
+
+  // Quan hệ
+  quyen          Quyen @relation(fields: [quyenId], references: [id])
+
+  // Nếu liên kết với KhachHang hoặc NhanVien
+  khachHang      KhachHang? 
+  nhanVien       NhanVien?
+
+  @@index([quyenId])
+
+
+}
+
+
+model ThuongHieu {
+  id  Int      @id @default(autoincrement())           // INT AUTO_INCREMENT PRIMARY KEY
+  tenThuongHieu  String   @db.VarChar(50) @unique                 // VARCHAR(50) NOT NULL
+  slugThuongHieu  String   @db.VarChar(100) @unique               // VARCHAR(50) NOT NULL
+  hinhAnh     String?   @db.Text                                  // TEXT NULL
+  moTa        String?  @db.Text                                   // TEXT NULL
+  trangThai   Int      @db.TinyInt                                // TINYINT NOT NULL
+  createdAt   DateTime @default(now())                            // DATETIME DEFAULT CURRENT_TIMESTAMP
+  updatedAt   DateTime @updatedAt                                 // DATETIME DEFAULT CURRENT_TIMESTAMP ON 
+  
+  sanPham SanPham[]
+}
+
+
+model TinTuc {
+  id          Int       @id @default(autoincrement())
+  tieuDe      String    @db.VarChar(255)
+  slugTinTuc        String    @db.VarChar(150) @unique                       // Đường dẫn SEO
+  luotXem     Int       @default(0)                                   // Đếm lượt xem
+  noiDung     String    @db.Text                                      // Nội dung chính
+  hinhAnh     String?   @db.VarChar(255)                              // URL ảnh đại diện
+  ghiChu      String?   @db.Text
+  trangThai   Int       @db.TinyInt                                   // 0: Ẩn, 1: Hiện
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Foreign key
+  nhanVienId  Int
+  nhanVien    NhanVien  @relation(fields: [nhanVienId], references: [id])
+
+  @@index([nhanVienId])
+}
+
+
+model TonKho {
+  id                 Int       @id @default(autoincrement())
+  ngayCapNhat        DateTime  @default(now())               // Ngày cập nhật tồn kho
+  soLuongTon         Int                                     // Tổng số lượng còn trong kho
+  soLuongKhaDung     Int                                     // Số lượng có thể bán (không bị đặt trước, v.v.)
+  giaBan             Decimal?  @db.Decimal(10, 2)            // Giá bán tại thời điểm tồn kho (nếu cần lưu)
+  ghiChu             String?   @db.Text
+  trangThai          Int       @db.TinyInt
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  // Foreign key
+  chiTietSanPhamId   Int
+
+  // Quan hệ
+  chiTietSanPham     ChiTietSanPham @relation(fields: [chiTietSanPhamId], references: [id])
+
+  @@index([chiTietSanPhamId])
+}
