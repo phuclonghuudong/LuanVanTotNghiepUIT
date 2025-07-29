@@ -3,7 +3,7 @@ import React from 'react'
 const TopNavbar = () => {
   return (
       <div className='bg-black'>
-        <div className='container mx-auto xl:px-[50px] flex  items-center xl:justify-between justify-center min-h-[45px]  text-white'>
+        <div className='container w-full max-w-7xl mx-auto  flex  items-center xl:justify-between justify-center min-h-[45px]  text-white'>
             <div>
                 <ul className='flex items-center justify-between gap-3'>
                     <li>335-666-6688</li>
