@@ -5,9 +5,9 @@ import Slide from "../../components/common/Slide";
 const HomeScreen = () => {
   return (
     <>
-      <Slide/>
-      <Collection/>
-      <Seller/>
+      <Slide />
+      <Collection />
+      <Seller />
     </>
   );
 };
