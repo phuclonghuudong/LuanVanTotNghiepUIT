@@ -18,8 +18,9 @@ const Menu= [
 ]
 const Navbar = () => {
   return (
-    <header className='h-[70px] px-[10px]'>
-      <div className='container h-full mx-auto xl:px-[50px] '>
+    <header className='h-[70px]'>
+      <div className='container w-full max-w-7xl h-full mx-auto '>
+
         <div className='flex items-center h-full'>
           <div className='w-1/4 md:w-1/3 xl:hidden'>
             <a href="#">
