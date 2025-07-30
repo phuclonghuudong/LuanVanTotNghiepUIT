@@ -1,14 +1,14 @@
-import React from 'react'
-import TopNavbar from './TopNavbar'
-import Navbar from './Navbar';
+import React from "react";
+import TopNavbar from "./TopNavbar";
+import Navbar from "./Navbar";
 
 const Header = () => {
   return (
     <>
-        <TopNavbar/>
-        <Navbar/>
+      <TopNavbar />
+      <Navbar />
     </>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

@@ -7,7 +7,7 @@ const MainRouter = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<MainLayout />}>
-          <Route  index element={<HomeScreen />} />
+          <Route index element={<HomeScreen />} />
         </Route>
       </Routes>
     </BrowserRouter>
