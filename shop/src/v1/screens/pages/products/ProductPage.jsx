@@ -17,6 +17,7 @@ const ProductPage = () => {
       sale: 25,
       image: "https://placehold.co/300x300",
       hoverImage: "https://placehold.co/300x300/orange/white",
+      colors: ["#000000", "#8C8C8C"],
     },
     {
       name: "Basic T-shirt",
@@ -24,6 +25,7 @@ const ProductPage = () => {
       price: 19.99,
       image: "https://placehold.co/300x300",
       hoverImage: "https://placehold.co/300x300/orange/white",
+      colors: ["#FFFFFF", "#000000"],
     },
     {
       name: "Casual Jeans",
@@ -31,6 +33,7 @@ const ProductPage = () => {
       price: 39.99,
       image: "https://placehold.co/300x300",
       hoverImage: "https://placehold.co/300x300/orange/white",
+      colors: ["#4267B2", "#9CA3AF"],
     },
     {
       name: "Sneakers",
@@ -38,6 +41,7 @@ const ProductPage = () => {
       price: 59.99,
       image: "https://placehold.co/300x300",
       hoverImage: "https://placehold.co/300x300/orange/white",
+      colors: ["#4B5563", "#9CA3AF"],
     },
     {
       name: "Hoodie Jacket",
@@ -45,6 +49,7 @@ const ProductPage = () => {
       price: 49.99,
       image: "https://placehold.co/300x300",
       hoverImage: "https://placehold.co/300x300/orange/white",
+      colors: ["#FFB6C1", "#FFD700"],
     },
     {
       name: "Summer Dress",
@@ -53,6 +58,7 @@ const ProductPage = () => {
       sale: 20,
       image: "https://placehold.co/300x300",
       hoverImage: "https://placehold.co/300x300/orange/white",
+      colors: ["#4B5563", "#9CA3AF"],
     },
   ];
   return (

@@ -25,7 +25,7 @@ const ProductGrid = ({ products }) => {
             </button>
           </div>
           {/* Image full */}
-          <div className='relative  aspect-[4/5] overflow-hidden rounded-md'>
+          <div className='relative  aspect-[4/5] overflow-hidden rounded-tl-md rounded-tr-md'>
             <img
               src={product.image}
               alt={product.name}
@@ -44,13 +44,27 @@ const ProductGrid = ({ products }) => {
             </button>
           </div>
           {/* Name + Price */}
-          <div className='mt-3 ml-3'>
+          <div className='m-3'>
             <h3 className='text-sm font-semibold leading-tight'>{product.name}</h3>
             <div className='flex items-center gap-2'>
               {product?.oldPrice && <span className='text-sm line-through text-gray-400'>$ {product?.oldPrice}</span>}
               <span className='text-base font-bold text-black'>${product.price}</span>
             </div>
           </div>
+          {/* Colors */}
+          {product.colors && (
+            <div className='flex items-center gap-2 my-2 mx-3'>
+              {product.colors.map((color, idx) => (
+                <span
+                  key={idx}
+                  className={`w-5 h-5 rounded-full border-2  transition-all ${
+                    idx === 0 ? "border-black" : "border-transparent hover:border-black"
+                  }`}
+                  style={{ backgroundColor: color }}
+                ></span>
+              ))}
+            </div>
+          )}
         </div>
       ))}
     </div>
