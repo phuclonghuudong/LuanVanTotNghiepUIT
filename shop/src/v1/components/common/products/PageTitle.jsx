@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import ImageTitle from "../../../assets/section/page-title.jpg";
 const PageTitle = ({ title, breadcrumb = [] }) => {
   return (
@@ -9,9 +10,9 @@ const PageTitle = ({ title, breadcrumb = [] }) => {
             <li key={index} className='flex items-center gap-1'>
               {index > 0 && <span className='icon icon-arrRight' />}
               {item.href ? (
-                <a href={item.href} className='underline hover:text-black'>
+                <Link to={item.href} className='underline hover:text-black'>
                   {item.label}
-                </a>
+                </Link>
               ) : (
                 <span>{item.label}</span>
               )}
