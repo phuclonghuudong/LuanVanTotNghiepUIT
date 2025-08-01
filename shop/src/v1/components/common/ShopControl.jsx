@@ -5,7 +5,7 @@ const ShopControl = () => {
     <>
       <div className='flex flex-wrap gap-4 items-center justify-between mb-6'>
         <div className='flex gap-4'>
-          <button className='flex items-center gap-4 border rounded px-4 py-2 text-sm'>
+          <button className='flex items-center gap-4 border rounded px-4 py-2 text-sm cursor-pointer'>
             <FiFilter />
             <span className='font-bold'>Filters</span>
           </button>

@@ -8,13 +8,15 @@ const HeadingSection = () => {
     { label: "On Sale", path: "/products/on-sale", active: false },
   ];
   return (
-    <div className="w-full max-w-7xl mx-auto my-12  px-4">
-      <div className="flex gap-4 justify-center">
+    <div className='w-full max-w-7xl mx-auto my-12  px-4'>
+      <div className='flex gap-4 justify-center'>
         {tabs.map((tab, index) => (
           <Link
             to={tab.path}
             key={index}
-            className={`text-xl sm:text-3xl md:text-4xl font-semibold  ${tab.active === true ? "text-black underline" : "text-gray-600"}`}
+            className={`text-xl sm:text-3xl md:text-4xl font-semibold  ${
+              tab.active === true ? "text-black underline" : "text-gray-600"
+            }`}
           >
             {tab.label}
           </Link>
