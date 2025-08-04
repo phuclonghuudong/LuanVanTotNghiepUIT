@@ -29,7 +29,7 @@ const Navbar = () => {
             </a>
           </div>
           <div className='md:w-1/3 w-1/2 xl:w-1/4 flex justify-center xl:justify-start'>
-            <a href='index.html' className='justify-center'>
+            <a href='/' className='justify-center'>
               <img src={logo} alt='logo' className='logo' />
             </a>
           </div>

@@ -1,9 +1,9 @@
 // import { useState } from "react";
 // import ProductGrid from "./ProductGrid";
 // import Pagination from "./Pagination";
-import PageTitle from "./../../../components/common/products/PageTitle";
 import ShopControl from "../../../components/common/ShopControl";
 import ProductGrid from "../../../components/common/products/ProductGrid";
+import PageTitle from "./../../../components/common/PageTitle";
 
 const ProductPage = () => {
   //   const [layout, setLayout] = useState("grid");
@@ -63,7 +63,13 @@ const ProductPage = () => {
   ];
   return (
     <>
-      <PageTitle title='Women' breadcrumb={[{ label: "Homepage", href: "/" }, { label: "Women" }]} />
+      <PageTitle
+        title='Women'
+        withBackground={true}
+        breadcrumbAlign='center'
+        breadcrumb={[{ label: "Homepage", href: "/" }, { label: "Women" }, { label: "Register" }]}
+      />
+
       <section className='py-10'>
         <div className='max-w-screen-xl mx-auto px-4'>
           <ShopControl />

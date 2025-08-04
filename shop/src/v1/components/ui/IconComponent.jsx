@@ -1,4 +1,4 @@
-const IconComponent = ({ icon: Icon, size = 18, color = "gray", onClick, className = "", ...props }) => {
+const IconComponent = ({ icon: Icon, size = 18, color = "none", onClick, className = "", ...props }) => {
   const colorClasses = {
     none: "bg-white text-black",
     white: "bg-white text-black hover:bg-black hover:text-white",
@@ -12,7 +12,7 @@ const IconComponent = ({ icon: Icon, size = 18, color = "gray", onClick, classNa
   const styleClass = colorClasses[color] || colorClasses["none"];
 
   return (
-    <button onClick={onClick} className={` p-2 transition-all duration-300  ${styleClass} ${className}`} {...props}>
+    <button onClick={onClick} className={`p-2 transition-all duration-300  ${styleClass} ${className}`} {...props}>
       {Icon && <Icon size={size} />}
     </button>
   );

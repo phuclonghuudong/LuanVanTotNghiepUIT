@@ -16,9 +16,9 @@ const ProductGrid = ({ products }) => {
           )}
           {/* Icon buttons */}
           <div className='absolute top-2 right-2 flex flex-col items-center justify-center gap-2 z-10 transition-all'>
-            <IconComponent icon={IoMdHeartEmpty} color='gray' size={18} />
-            <IconComponent icon={BiGitCompare} color='gray' size={18} />
-            <IconComponent icon={IoEyeOutline} color='gray' size={18} />
+            <IconComponent icon={IoMdHeartEmpty} color='gray' size={18} className='rounded-full' />
+            <IconComponent icon={BiGitCompare} color='gray' size={18} className='rounded-full overflow-hidden' />
+            <IconComponent icon={IoEyeOutline} color='gray' size={18} className='rounded-full' />
           </div>
           {/* Image full */}
           <div className='relative  aspect-[4/5] overflow-hidden rounded-tl-md rounded-tr-md'>

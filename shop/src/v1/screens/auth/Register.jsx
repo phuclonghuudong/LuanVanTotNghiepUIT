@@ -1,4 +1,3 @@
-import PageTitle from "../../components/common/products/PageTitle";
 import ButtonComponent from "../../components/ui/ButtonComponent";
 import IconComponent from "../../components/ui/IconComponent";
 import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
@@ -6,10 +5,6 @@ import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
 const Register = () => {
   return (
     <div>
-      <PageTitle
-        title='Women'
-        breadcrumb={[{ label: "Homepage", href: "/" }, { label: "Pages" }, { label: "Register" }]}
-      />
       <div className='flex items-center justify-center bg-gray-50 py-5'>
         <div className='w-full max-w-md bg-white p-8 rounded-lg shadow-md'>
           <h2 className='text-2xl font-bold text-center mb-6'>Create Account</h2>
