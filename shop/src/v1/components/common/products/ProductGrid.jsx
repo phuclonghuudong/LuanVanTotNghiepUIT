@@ -3,6 +3,7 @@ import { IoEyeOutline } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
 import IconComponent from "../../ui/IconComponent";
 import ButtonComponent from "../../ui/ButtonComponent";
+import { Link } from "react-router-dom";
 const ProductGrid = ({ products }) => {
   return (
     <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
@@ -46,7 +47,9 @@ const ProductGrid = ({ products }) => {
           </div>
           {/* Name + Price */}
           <div className='m-3'>
-            <h3 className='text-sm font-semibold leading-tight'>{product.name}</h3>
+            <h3 className='text-sm font-semibold leading-tight'>
+              <Link to='/product/detail-1'>{product.name}</Link>
+            </h3>
             <div className='flex items-center gap-2'>
               {product?.oldPrice && <span className='text-sm line-through text-gray-400'>$ {product?.oldPrice}</span>}
               <span className='text-base font-bold text-black'>${product.price}</span>

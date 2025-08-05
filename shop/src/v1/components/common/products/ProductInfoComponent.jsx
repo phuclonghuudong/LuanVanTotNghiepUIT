@@ -110,10 +110,9 @@ const ProductInfoComponent = ({ product }) => {
 
       {/* Action Buttons */}
       <div className='flex gap-3 mt-4'>
-        <ButtonComponent title='Add to cart' color='gray' className='w-sm' />
+        <ButtonComponent title={`Add to Cart - $${(price * quantity).toFixed(2)}`} color='black' className='w-full' />
         <IconComponent icon={FaCompass} size={25} />
         <IconComponent icon={FaHeart} size={20} />
-        {/* <ButtonComponent title={`Add to Cart - $ ${(price * quantity).toFixed(2)}`} color='black' /> */}
       </div>
     </div>
   );
