@@ -83,7 +83,7 @@ const Seller = () => {
     aosDelay: item.aosDelay,
   }));
   return (
-    <div className=" mx-auto px-4">
+    <div className=' mx-auto px-4'>
       <HeadingSection />
       <ProductSeller data={products} />
     </div>
