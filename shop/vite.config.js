@@ -7,5 +7,8 @@ export default defineConfig({
   content: [
     "./src/**/*.{js,jsx,ts,tsx}", // ← rất quan trọng
   ],
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(),
+  build: {
+    outDir: "dist",
+  },],
 });
