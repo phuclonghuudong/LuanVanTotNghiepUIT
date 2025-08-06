@@ -9,35 +9,42 @@ const ImageGalleryComponent = ({ images = [] }) => {
 
   const [nav1, setNav1] = useState(null);
   const [nav2, setNav2] = useState(null);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
 
   useEffect(() => {
     setNav1(slider1.current);
     setNav2(slider2.current);
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
     <div className='flex flex-col md:flex-row gap-4 w-full'>
       {/* Thumbnails */}
-      <div className='md:w-24 md:flex md:flex-col flex-row gap-y-2 overflow-y-auto md:overflow-y-auto md:overflow-x-hidden justify-between '>
+      <div className='w-full md:w-24 md:order-1 order-2 flex md:flex-col flex-row gap-y-2 overflow-x-hidden overflow-y-auto md:overflow-y-auto md:overflow-x-hidden'>
         <Slider
           asNavFor={nav1}
           ref={slider2}
-          slidesToShow={5}
+          slidesToShow={isDesktop ? 4 : 3}
           swipeToSlide
           focusOnSelect
-          vertical
-          className='thumb-slider'
+          vertical={isDesktop}
+          className='thumb-slider w-full'
         >
           {images.map((img, idx) => (
-            <div key={idx} className='h-full rounded-md'>
-              <img src={img} alt={`thumb-${idx}`} className='w-full h-30 object-cover rounded-md' />
+            <div key={idx} className='w-9 md:w-full md:h-full rounded-md gap-2'>
+              <img src={img} alt={`thumb-${idx}`} className='p-1 w-full  md:w-full md:h-30 object-cover rounded-md ' />
             </div>
           ))}
         </Slider>
       </div>
 
       {/* Main Image */}
-      <div className='md:flex-1 overflow-hidden'>
+      <div className='md:flex-1 md:order-2 order-1 overflow-hidden'>
         <Slider asNavFor={nav2} ref={slider1} arrows={false} className='main-slider'>
           {images.map((img, idx) => (
             <div key={idx} className='h-full w-full'>
