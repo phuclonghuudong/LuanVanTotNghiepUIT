@@ -22,11 +22,11 @@ const ProductDetail = () => {
     reviews: 134,
   };
   return (
-    <div className=' bg-white'>
+    <div className=" bg-white">
       <PageTitle
         withBackground={false}
-        breadcrumbAlign='left'
-        breadcrumb={[{ label: "Homepage", href: "/" }, { label: "Women" }, { label: "Leather boots with tall leg" }]}
+        breadcrumbAlign="left"
+        breadcrumb={[{label: "Homepage", href: "/"}, {label: "Women"}, {label: "Leather boots with tall leg"}]}
       />
       <section className='max-w-screen-xl mx-auto px-4 py-3 grid grid-cols-1 md:grid-cols-2 gap-8 items-start'>
         {/* Gallery */}
@@ -38,6 +38,7 @@ const ProductDetail = () => {
         <div className='w-full h-full'>
           <ProductInfoComponent product={product} />
         </div>
+
       </section>
 
       {/* <ProductStickyBar product={product} /> */}
