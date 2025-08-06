@@ -28,9 +28,17 @@ const ProductDetail = () => {
         breadcrumbAlign="left"
         breadcrumb={[{label: "Homepage", href: "/"}, {label: "Women"}, {label: "Leather boots with tall leg"}]}
       />
-      <section className="max-w-screen-xl mx-auto px-4 py-3 grid grid-cols-1 md:grid-cols-2 gap-8">
-        <ImageGalleryComponent images={images} />
-        <ProductInfoComponent product={product} />
+      <section className='max-w-screen-xl mx-auto px-4 py-3 grid grid-cols-1 md:grid-cols-2 gap-8 items-start'>
+        {/* Gallery */}
+        <div className='w-full h-full'>
+          <ImageGalleryComponent images={images} />
+        </div>
+
+        {/* Info */}
+        <div className='w-full h-full'>
+          <ProductInfoComponent product={product} />
+        </div>
+
       </section>
 
       {/* <ProductStickyBar product={product} /> */}
