@@ -5,9 +5,15 @@ import Slide from "../../components/common/Slide";
 const HomeScreen = () => {
   return (
     <>
-      <Slide />
-      <Collection />
-      <Seller />
+      <div className='w-full overflow-hidden'>
+        <Slide />
+      </div>
+      <div className='w-full overflow-hidden'>
+        <Collection />
+      </div>
+      <div className='w-full overflow-hidden'>
+        <Seller />
+      </div>
     </>
   );
 };

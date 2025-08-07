@@ -4,7 +4,7 @@ import Footer from "../layouts/Footer";
 
 const MainLayout = () => {
   return (
-    <main>
+    <main className='w-full'>
       <Header />
       <Outlet />
       <Footer />

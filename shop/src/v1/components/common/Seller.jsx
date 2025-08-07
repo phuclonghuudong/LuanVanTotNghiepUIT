@@ -1,91 +1,88 @@
 import React from "react";
 import HeadingSection from "./HeadingSection";
-import ProductSeller from "./ProductSeller";
-import Image1 from "../../assets/products/women-2.jpg";
-import Image2 from "../../assets/products/women-3.jpg";
-import Image3 from "../../assets/products/women-4.jpg";
-import Image4 from "../../assets/products/women-5.jpg";
-import Image5 from "../../assets/products/women-6.jpg";
-import Image6 from "../../assets/products/women-7.jpg";
+import ProductGrid from "./products/ProductGrid";
 
 const Seller = () => {
-  const ProductData = [
+  const products = [
     {
-      id: 1,
-      image: Image1,
-      title: "Women Ethnic",
-      rating: 5.0,
-      color: "white",
-      aosDelay: "0",
+      name: "Polarized sunglasses",
+      category: "Accessories",
+      price: 79.99,
+      oldPrice: 98.0,
+      sale: 25,
+      image: "https://placehold.co/300x300",
+      hoverImage: "https://placehold.co/300x300/orange/white",
+      colors: ["#000000", "#8C8C8C"],
     },
     {
-      id: 2,
-      image: Image2,
-      title: "Women western",
-      rating: 5.0,
-      color: "red",
-      aosDelay: "200",
+      name: "Basic T-shirt",
+      category: "Tops",
+      price: 19.99,
+      image: "https://placehold.co/300x300",
+      hoverImage: "https://placehold.co/300x300/orange/white",
+      colors: ["#FFFFFF", "#000000"],
     },
     {
-      id: 3,
-      image: Image3,
-      title: "Goggles",
-      rating: 5.0,
-      color: "red",
-      aosDelay: "400",
+      name: "Casual Jeans",
+      category: "Bottoms",
+      price: 39.99,
+      image: "https://placehold.co/300x300",
+      hoverImage: "https://placehold.co/300x300/orange/white",
+      colors: ["#4267B2", "#9CA3AF"],
     },
     {
-      id: 4,
-      image: Image4,
-      title: "Goggles as",
-      rating: 5.0,
-      color: "red",
-      aosDelay: "600",
+      name: "Sneakers",
+      category: "Footwear",
+      price: 59.99,
+      image: "https://placehold.co/300x300",
+      hoverImage: "https://placehold.co/300x300/orange/white",
+      colors: ["#4B5563", "#9CA3AF"],
     },
     {
-      id: 5,
-      image: Image5,
-      title: "The new brand",
-      rating: 5.0,
-      color: "red",
-      aosDelay: "800",
+      name: "Hoodie Jacket",
+      category: "Outerwear",
+      price: 49.99,
+      image: "https://placehold.co/300x300",
+      hoverImage: "https://placehold.co/300x300/orange/white",
+      colors: ["#FFB6C1", "#FFD700"],
     },
     {
-      id: 6,
-      image: Image6,
-      title: "The new collection cool",
-      rating: 4.0,
-      color: "green",
-      aosDelay: "900",
+      name: "Summer Dress",
+      category: "Dresses",
+      price: 29.99,
+      sale: 20,
+      image: "https://placehold.co/300x300",
+      hoverImage: "https://placehold.co/300x300/orange/white",
+      colors: ["#4B5563", "#9CA3AF"],
     },
     {
-      id: 7,
-      image: Image2,
-      title: "The new collection fresh",
-      rating: 4.0,
-      color: "yellow",
-      aosDelay: "1000",
+      name: "Polarized sunglasses",
+      category: "Accessories",
+      price: 79.99,
+      oldPrice: 98.0,
+      sale: 19,
+      image: "https://placehold.co/300x300",
+      hoverImage: "https://placehold.co/300x300/orange/white",
+      colors: ["#000000", "#8C8C8C"],
     },
     {
-      id: 8,
-      image: Image3,
-      title: "Goggles New Womem",
-      rating: 5.0,
-      color: "red",
-      aosDelay: "1100",
+      name: "Polarized sunglasses",
+      category: "Accessories",
+      price: 79.99,
+      oldPrice: 98.0,
+      sale: 21,
+      image: "https://placehold.co/300x300",
+      hoverImage: "https://placehold.co/300x300/orange/white",
+      colors: ["#000000", "#8C8C8C"],
     },
   ];
-  const products = ProductData.map((item) => ({
-    title: item.title,
-    image: item.image,
-    rating: item.rating,
-    color: item.color,
-    aosDelay: item.aosDelay,
-  }));
+
   return (
-    <div className=' mx-auto px-4'>
-      <HeadingSection />
-      <ProductSeller data={products} />
+    <div className='mx-auto px-4 py-10'>
+      <div className='max-w-screen-xl mx-auto'>
+        <HeadingSection />
+        <ProductGrid products={products} />
+      </div>
     </div>
   );
 };
