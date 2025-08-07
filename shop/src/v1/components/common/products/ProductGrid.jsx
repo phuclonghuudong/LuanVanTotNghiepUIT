@@ -4,11 +4,17 @@ import { IoMdHeartEmpty } from "react-icons/io";
 import IconComponent from "../../ui/IconComponent";
 import ButtonComponent from "../../ui/ButtonComponent";
 import { Link } from "react-router-dom";
+const delayProduct = [0, 200, 300, 400, 500, 600, 700, 800];
 const ProductGrid = ({ products }) => {
   return (
     <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
       {products.map((product, index) => (
-        <div key={index} className='relative group shadow-md hover:shadow-md transition-all'>
+        <div
+          data-aos='fade-up'
+          data-aos-delay={delayProduct[index]}
+          key={index}
+          className='relative group shadow-md hover:shadow-md transition-all'
+        >
           {/* Sale Badge */}
           {product.sale && (
             <span className='absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-[2px] z-10 rounded-full'>

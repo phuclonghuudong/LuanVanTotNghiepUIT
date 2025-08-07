@@ -8,7 +8,7 @@ const HeadingSection = () => {
     { label: "On Sale", path: "/products/on-sale", active: false },
   ];
   return (
-    <div className='w-full max-w-7xl mx-auto my-12  px-4'>
+    <div className='w-full max-w-7xl mx-auto pb-12'>
       <div className='flex gap-4 justify-center'>
         {tabs.map((tab, index) => (
           <Link
