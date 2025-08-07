@@ -54,7 +54,9 @@ const Navbar = () => {
               <IconComponent icon={IoSearch} size={25} color='none' className='cursor-pointer' />
               <div className='relative group'>
                 <IconComponent icon={FiUser} size={25} color='none' className='hidden md:block cursor-pointer' />
+
                 <div className='hidden md:block absolute top-[55px] md:-right-20 text-center p-5 bg-white rounded-lg shadow-lg z-20 w-[300px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden'>
+
                   <Link
                     to='/auth/login'
                     className='block text-center py-2 font-medium bg-black text-white rounded-lg hover:bg-gray-800'
