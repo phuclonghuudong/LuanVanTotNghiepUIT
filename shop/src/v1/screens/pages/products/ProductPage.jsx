@@ -64,14 +64,14 @@ const ProductPage = () => {
   return (
     <>
       <PageTitle
-        title='Women'
+        title="Women"
         withBackground={true}
-        breadcrumbAlign='center'
-        breadcrumb={[{ label: "Homepage", href: "/" }, { label: "Women" }, { label: "Register" }]}
+        breadcrumbAlign="center"
+        breadcrumb={[{ label: "Homepage", href: "/" }, { label: "Women" }]}
       />
 
-      <section className='py-10'>
-        <div className='max-w-screen-xl mx-auto px-4'>
+      <section className="py-10">
+        <div className="max-w-screen-xl mx-auto px-4">
           <ShopControl />
           <ProductGrid products={products} />
           {/* 

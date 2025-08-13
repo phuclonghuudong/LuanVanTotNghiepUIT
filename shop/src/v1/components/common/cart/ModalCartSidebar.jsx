@@ -63,7 +63,7 @@ const ModalCartSidebar = ({ isOpen, onClose }) => {
               {[1, 2].map((item) => (
                 <div key={item} className="flex gap-4 items-center border-b pb-4">
                   <img
-                    src="/images/products/womens/women-1.jpg"
+                    src="https://placehold.co/300x300/orange/white"
                     alt="cart"
                     className="w-20 h-20 object-cover rounded"
                   />

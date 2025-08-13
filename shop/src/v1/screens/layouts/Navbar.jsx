@@ -1,54 +1,65 @@
-// import React, { useState } from "react";
+import React from "react";
 import { IoMenuOutline, IoSearch } from "react-icons/io5";
 import logo from "../../assets/logo/logo.svg";
 import { FiHeart, FiUser } from "react-icons/fi";
 import { HiOutlineShoppingBag } from "react-icons/hi";
 import IconComponent from "../../components/ui/IconComponent";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 const Menu = [
   {
     id: 1,
-    name: "Trang chủ",
+    name: "TRANG CHỦ",
     link: "/",
   },
   {
     id: 2,
-    name: "Sản phẩm",
+    name: "SẢN PHẨM",
     link: "/products",
   },
+  {
+    id: 3,
+    name: "BỘ SƯU TẬP",
+    link: "/collection",
+  },
+  {
+    id: 4,
+    name: "GIỎ HÀNG",
+    link: "/cart",
+  },
+  {
+    id: 5,
+    name: "GIỚI THIỆU",
+    link: "/about",
+  },
+  {
+    id: 6,
+    name: "LIÊN HỆ",
+    link: "/contact",
+  },
 ];
-const Navbar = ({ onCartClick }) => {
-  // const [showMenu, setShowMenu] = useState(false);
+const Navbar = ({ onCartClick, onMenuClick }) => {
   return (
-    <header className="h-[70px]">
+    <header className="h-[70px] px-2">
       <div className="container w-full max-w-7xl h-full mx-auto ">
         <div className="flex items-center h-full">
           <div className="w-1/4 md:w-1/3 xl:hidden">
-            <a href="#">
-              <IoMenuOutline fontSize={"30px"} />
-            </a>
+            <IoMenuOutline size={30} onClick={onMenuClick} />
           </div>
           <div className="md:w-1/3 w-1/2 xl:w-1/4 flex justify-center xl:justify-start">
-            <a href="/" className="justify-center">
+            <Link to="/" className="justify-center">
               <img src={logo} alt="logo" className="logo" />
-            </a>
+            </Link>
           </div>
           <div className="hidden xl:block xl:w-1/2">
-            <nav>
-              <ul className="flex items-center gap-5 justify-center">
-                {Menu.map((data) => (
-                  <li key={data.id}>
-                    <a
-                      href={data.link}
-                      className="inline-block hover:text-red-700 hover:text-semibold hover:text-xl text-xl font-semibold duration-200"
-                    >
-                      {data.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
+            <ul className="flex items-center gap-5 justify-center">
+              {Menu.map((data) => (
+                <NavLink to={data.link} key={data.id} className="flex flex-col items-center gap-1">
+                  <p>{data.name}</p>
+                  <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
+                </NavLink>
+              ))}
+            </ul>
           </div>
           <div className="xl:w-1/4 md:w-1/3 w-1/4">
             <div className="flex items-center gap-1 justify-end">
@@ -72,12 +83,12 @@ const Navbar = ({ onCartClick }) => {
                 </div>
               </div>
               <IconComponent icon={FiHeart} size={25} color="none" className="hidden md:block cursor-pointer" />
-              <IconComponent
-                icon={HiOutlineShoppingBag}
-                size={25}
-                color="none"
-                className="hidden md:block cursor-pointer"
-              />
+              <div className="hidden sm:block cursor-pointer relative group" onClick={onCartClick}>
+                <IconComponent icon={HiOutlineShoppingBag} size={25} color="none" className="cursor-pointer" />
+                <span className="absolute top-2 right-1 rounded-full bg-red-500 w-4 h-4 md:text-base flex items-center text-white justify-center font-bold">
+                  1
+                </span>
+              </div>
             </div>
           </div>
         </div>
