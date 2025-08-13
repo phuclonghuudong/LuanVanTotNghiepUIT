@@ -1,12 +1,24 @@
-import React from "react";
+// import React, { useState } from "react";
 import TopNavbar from "./TopNavbar";
 import Navbar from "./Navbar";
 
-const Header = () => {
+const Menu = [
+  {
+    id: 1,
+    name: "Trang chủ",
+    link: "/",
+  },
+  {
+    id: 2,
+    name: "Sản phẩm",
+    link: "/products",
+  },
+];
+const Header = ({ onCartClick, onMenuClick }) => {
   return (
     <>
       <TopNavbar />
-      <Navbar />
+      <Navbar onCartClick={onCartClick} onMenuClick={onMenuClick} />
     </>
   );
 };
