@@ -1,0 +1,36 @@
+model Order {
+    order_id        Int         @id @default (autoincrement())
+    order_code      String      @db.VarChar(20)             // Mã đơn hàng
+    total_price     Decimal     @db.Decimal(10,2)           // Tổng tiền sau KM
+    total_cost      Decimal     @db.Decimal(10,2)           // Tổng giá vốn tại thời điểm
+    total_discount  Decimal     @db.Decimal(10,2)           // Tổng khuyến mãi
+    coupon_code     String      @db.VarChar(50)             // Mã giảm giá áp dụng
+    shipping_fee    Decimal     @db.Decimal(10,2)           // Phí vận chuyển
+    recipient_name  String      @db.VarChar(50)             // Tên người nhận
+    recipient_phone String      @db.VarChar(50)             // Số điện thoại người nhận
+    shipping_address    String      @db.VarChar(250)        // Địa chỉ nhận hàng
+    note            String      @db.Text
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    customer_id    Int
+    customer   Customer @relation(fields: [customer_id], references: [customer_id])
+    promotion_id    Int
+    promotion   Promotion @relation(fields: [promotion_id], references: [promotion_id])
+    shipping_id    Int
+    shipping   ShippingMethod @relation(fields: [shipping_id], references: [shipping_id])
+    payment_id    Int
+    payment   Payment @relation(fields: [payment_id], references: [payment_id])
+    
+  
+    @@index([customer_id])
+    @@index([promotion_id])
+    @@index([shipping_id])
+    @@index([payment_id])
+
+    couponUsageHistory  CouponUsageHistory[]
+    orderDetail         OrderDetail[]
+    returnOrder         ReturnOrder[]
+    orderConfirmation   OrderConfirmation[]
+}

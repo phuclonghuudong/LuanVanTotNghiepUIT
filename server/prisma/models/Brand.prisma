@@ -1,0 +1,12 @@
+model Brand {
+  brand_id        Int         @id @default(autoincrement())           
+  brand_name      String      @db.VarChar(100) @unique                 
+  brand_slug      String      @db.VarChar(100) @unique               
+  description     String?     @db.Text                                  
+  image_url       String?     @db.Text                                   
+  status          Int         @db.TinyInt                                
+  createdAt       DateTime    @default(now())                            
+  updatedAt       DateTime    @updatedAt                                 
+  
+  product Product[]
+}

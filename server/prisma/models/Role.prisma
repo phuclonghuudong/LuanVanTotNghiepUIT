@@ -1,0 +1,13 @@
+model Role {
+  role_id           Int       @id @default(autoincrement())           
+  role_name         String    @db.VarChar(100) @unique                 
+  role_slug         String    @db.VarChar(100) @unique               
+  description       String   @db.Text                                  
+  is_system         Boolean                                      
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+  account Account[]
+  rolePermissionAction  RolePermissionAction[]
+}

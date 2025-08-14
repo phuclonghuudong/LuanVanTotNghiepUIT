@@ -1,0 +1,30 @@
+model Customer {
+    customer_id     Int         @id @default (autoincrement())
+    fullname        String      @db.VarChar(100)
+    gender          Int?         @db.TinyInt
+    birthday        DateTime?    @db.DateTime
+    points          Int?        @default(0)
+    address         String?      @db.VarChar(100)
+    avatar          String?      @db.Text
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    account_id    Int    @unique
+    account   Account @relation(fields: [account_id], references: [account_id])
+    group_id    Int
+    group   CustomerGroup @relation(fields: [group_id], references: [group_id])
+  
+    @@index([account_id])
+    @@index([group_id])
+
+    productReview   ProductReview[]
+    productComment  ProductComment[]
+    addressFK         Address[]
+    couponUsageHistory  CouponUsageHistory[]
+    order           Order[]
+    returnOrder     ReturnOrder[]
+    cart            Cart[]
+    contact         Contact[]
+    favorite        FavoriteProduct[]
+}

@@ -1,0 +1,21 @@
+model ProductComment {
+    comment_id      Int         @id @default (autoincrement())
+    parent_id       Int?      
+    content         String      @db.VarChar(255)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+
+    product_id      Int
+    product   Product @relation(fields: [product_id], references: [product_id])
+    customer_id     Int
+    customer   Customer @relation(fields: [customer_id], references: [customer_id])
+    personnel_id    Int
+    personnel   Personnel @relation(fields: [personnel_id], references: [personnel_id])
+  
+
+    @@index([product_id])
+    @@index([customer_id])
+    @@index([personnel_id])
+}

@@ -1,0 +1,13 @@
+model ImgProduct {
+    img_id Int      @id         @default (autoincrement())
+    image_url       String      @db.VarChar(255)
+    is_main         Boolean?     @default(false)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+
+    product_id      Int
+    product   Product @relation(fields: [product_id], references: [product_id])
+    @@index([product_id])
+}

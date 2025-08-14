@@ -1,0 +1,10 @@
+model Action {
+  action_id         Int       @id @default(autoincrement())           
+  action_name       String    @db.VarChar(100) @unique                 
+  description       String?   @db.Text                                  
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+  rolePermissionAction  RolePermissionAction[]  
+}

@@ -1,0 +1,27 @@
+model Product {
+    product_id          Int         @id @default (autoincrement())
+    product_name        String      @db.VarChar(100)     @unique
+    product_slug        String      @db.VarChar(100)     @unique
+    product_sku         String      @db.VarChar(50)      @unique
+    views               Int
+    description         String      @db.Text
+    status              Int         @db.TinyInt                                
+    createdAt           DateTime    @default(now())                            
+    updatedAt           DateTime    @updatedAt  
+
+
+    category_id         Int
+    category   Category @relation(fields: [category_id], references: [category_id])
+    brand_id            Int
+    brand   Brand @relation(fields: [brand_id], references: [brand_id])
+  
+
+    @@index([category_id])
+    @@index([brand_id])
+
+    productVariant  ProductVariant[]
+    productComment  ProductComment[]
+    productReview   ProductReview[]
+    imgProductFK    ImgProduct[]
+    favorite        FavoriteProduct[]
+}

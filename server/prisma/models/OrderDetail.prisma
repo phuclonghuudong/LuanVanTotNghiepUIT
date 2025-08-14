@@ -1,0 +1,19 @@
+model OrderDetail {
+    order_detail_id          Int         @id @default (autoincrement())
+    quantity        Int         
+    price_sell      Decimal     @db.Decimal(10,2)   // Giá trước khuyến mãi
+    discount        Decimal     @db.Decimal(10,2)   // Tổng giảm giá                           
+    final_price     Decimal     @db.Decimal(10,2)   // Tổng giảm giá x số lượng                        
+    cost_price      Decimal     @db.Decimal(10,2)   // Giá vốn tại thời điểm bán                         
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    order_id    Int
+    order   Order @relation(fields: [order_id], references: [order_id])
+    variant_id    Int
+    variant   ProductVariant @relation(fields: [variant_id], references: [variant_id])
+  
+    @@index([order_id])
+    @@index([variant_id])
+}

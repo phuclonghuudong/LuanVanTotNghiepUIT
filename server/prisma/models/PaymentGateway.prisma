@@ -1,0 +1,17 @@
+model PaymentGateway {
+  gateway_id        Int         @id @default(autoincrement())           
+  gateway_name      String      @db.VarChar(100)   @unique                         
+  gateway_code      String      @db.VarChar(100)   @unique
+  merchant_id       String      @db.VarChar(100)   @unique
+  merchant_key      String      @db.VarChar(255)   @unique
+  config            String      @db.Text 
+  is_active         Boolean
+  fee_percentage    Decimal     @db.Decimal(10,2)
+  fee_fixed         Decimal     @db.Decimal(10,2)
+  description       String      @db.Text                        
+  note              String      @db.Text                        
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+}

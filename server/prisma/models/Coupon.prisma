@@ -1,0 +1,21 @@
+model Coupon {
+  coupon_id         Int         @id @default(autoincrement())           
+  code              String      @db.VarChar(50)  @unique       // Mã code áp dụng
+  max_uses          Int         @default(0)           // Số lần sử dụng
+  min_order_value   Int         @default(0)           // Giá trị tối thiểu khi sử dụng
+  used_count        Int         @default(0)           // Số lượng đã sử dụng
+  user_restriction  String?      @db.VarChar(100)     // Giới hạn người dùng
+  expiry_date       DateTime                          // Hạn sử dụng mã
+  usage_limit_per_customer  Int     @default(0)       // Giới hạn sử dụng cho mõi khách hàng
+  is_public         Boolean         @default(false)   // Mã công khai hay chỉ private               
+  status            Int           @db.TinyInt                                
+  createdAt         DateTime      @default(now())                            
+  updatedAt         DateTime      @updatedAt                                 
+  
+  promotion_id      Int
+  promotion   Promotion @relation(fields: [promotion_id], references: [promotion_id])
+    
+  @@index([promotion_id])
+
+  couponUsageHistory  CouponUsageHistory[]
+}

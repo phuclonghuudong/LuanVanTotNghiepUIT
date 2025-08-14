@@ -1,0 +1,19 @@
+model CouponUsageHistory {
+  history_id        Int           @id @default(autoincrement())           
+  used_at           Int           @default(0)         // Số lần sử dụng
+  discount_value    Decimal       @db.Decimal(10,2)   // Giá trị giảm giá đã dùng             
+  status            Int           @db.TinyInt                                
+  createdAt         DateTime      @default(now())                            
+  updatedAt         DateTime      @updatedAt                                 
+  
+  coupon_id      Int
+  coupon   Coupon @relation(fields: [coupon_id], references: [coupon_id])
+  customer_id      Int
+  customer   Customer @relation(fields: [customer_id], references: [customer_id])
+  order_id      Int
+  order   Order @relation(fields: [order_id], references: [order_id])
+    
+  @@index([coupon_id])
+  @@index([customer_id])
+  @@index([order_id])
+}

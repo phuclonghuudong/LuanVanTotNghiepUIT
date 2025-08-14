@@ -1,0 +1,17 @@
+model CartItem {
+    item_id          Int         @id @default (autoincrement())
+    quantity        Int?
+    price_at_time   Decimal?     @db.Decimal(10,2)
+    promotion_price Decimal?     @db.Decimal(10,2)                          
+    is_active       Boolean?     @default(false)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    cart_id    Int
+    cart   Cart @relation(fields: [cart_id], references: [cart_id])
+    variant_id    Int
+    productVariant   ProductVariant @relation(fields: [variant_id], references: [variant_id])
+  
+    @@index([variant_id])
+}

@@ -1,0 +1,15 @@
+model PromotionDetail {
+  detail_id        Int         @id @default(autoincrement())                        
+  status            Int           @db.TinyInt                                
+  createdAt         DateTime      @default(now())                            
+  updatedAt         DateTime      @updatedAt                                 
+  
+  promotion_id      Int
+  promotion   Promotion @relation(fields: [promotion_id], references: [promotion_id])
+  variant_id      Int
+  variant   ProductVariant @relation(fields: [variant_id], references: [variant_id])
+    
+  @@index([promotion_id])
+  @@index([variant_id])
+
+}

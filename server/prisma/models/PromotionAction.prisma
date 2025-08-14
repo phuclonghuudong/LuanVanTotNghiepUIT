@@ -1,0 +1,15 @@
+model PromotionAction {
+  action_id       Int         @id @default(autoincrement())           
+  action_type     String      @db.VarChar(255)   @unique                 
+  action_value    String      @db.VarChar(255)                 
+  status          Int           @db.TinyInt                                
+  createdAt       DateTime      @default(now())                            
+  updatedAt       DateTime      @updatedAt                                 
+  
+  promotion_id      Int
+  promotion   Promotion @relation(fields: [promotion_id], references: [promotion_id])
+    
+  @@index([promotion_id])
+
+  
+}
