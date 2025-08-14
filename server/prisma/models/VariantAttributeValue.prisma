@@ -1,0 +1,15 @@
+model VariantAttributeValue {
+    id              Int         @id @default (autoincrement())
+    custom_value    String      @db.VarChar(100)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    attribute_id    Int
+    attribute   Attribute @relation(fields: [attribute_id], references: [attribute_id])
+    value_id        Int
+    attributeValue   AttributeValue @relation(fields: [value_id], references: [value_id])
+  
+    @@index([attribute_id])
+    @@index([value_id])
+}

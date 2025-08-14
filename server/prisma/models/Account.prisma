@@ -1,0 +1,22 @@
+model Account {
+    account_id      Int        @id @default (autoincrement())
+    username        String     @db.VarChar(100)  @unique
+    password        String     @db.VarChar(100)  
+    phone           String     @db.VarChar(15)   @unique
+    email           String     @db.VarChar(100)  @unique 
+    verify_email    String?    @db.VarChar(100)
+    verify_otp      Int?
+    expired_otp     DateTime?        
+    refresh_token   String?    @db.Text
+    status          Int        @db.TinyInt                                
+    createdAt       DateTime   @default(now())                            
+    updatedAt       DateTime   @updatedAt  
+
+    role_id    Int
+    role   Role @relation(fields: [role_id], references: [role_id])
+  
+    @@index([role_id])
+
+    personnel Personnel[]
+    customer Customer[]
+}

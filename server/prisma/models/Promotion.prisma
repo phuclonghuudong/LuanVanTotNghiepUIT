@@ -1,0 +1,20 @@
+model Promotion {
+  promotion_id        Int         @id @default(autoincrement())           
+  promotion_name      String      @db.VarChar(100) @unique                 
+  promotion_slug      String      @db.VarChar(100) @unique               
+  description     String?         @db.Text 
+  start_date      DateTime                                 
+  end_date        DateTime  
+  is_active       Boolean
+  priority        Int?                              
+  promotion_type  String        @db.VarChar(100)                                   
+  status          Int           @db.TinyInt                                
+  createdAt       DateTime      @default(now())                            
+  updatedAt       DateTime      @updatedAt                                 
+  
+  promotionRule     PromotionRule[]
+  promotionAction   PromotionAction[]
+  promotionCoupon   Coupon[]
+  promotionDetail   PromotionDetail[]
+  order             Order[]
+}

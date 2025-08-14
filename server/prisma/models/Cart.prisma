@@ -1,0 +1,18 @@
+model Cart {
+    cart_id          Int         @id @default (autoincrement())
+    total_price     Decimal?     @db.Decimal(10,2)
+    total_cost      Decimal?     @db.Decimal(10,2)
+    total_discount  Decimal?     @db.Decimal(10,2)
+    coupon_code     String?      @db.VarChar(50)                           
+    note            String?      @db.VarChar(250)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    customer_id    Int
+    customer   Customer @relation(fields: [customer_id], references: [customer_id])
+  
+    @@index([customer_id])
+
+    cartItem        CartItem[]
+}

@@ -1,0 +1,19 @@
+model ReturnOrderDetail {
+    return_detail_id          Int         @id @default (autoincrement())
+    quantity        Int         @db.TinyInt     
+    unit            String       @db.VarChar(50)                           
+    refund_price    Decimal     @db.Decimal(10,2)
+    restock         Boolean     
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    return_id    Int
+    returnOrder   ReturnOrder @relation(fields: [return_id], references: [return_id])
+    variant_id    Int
+    productVariant   ProductVariant @relation(fields: [variant_id], references: [variant_id])
+    
+  
+    @@index([return_id])
+    @@index([variant_id])
+}

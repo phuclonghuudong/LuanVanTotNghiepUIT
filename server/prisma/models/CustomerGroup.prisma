@@ -1,0 +1,10 @@
+model CustomerGroup {
+    group_id        Int         @id @default (autoincrement())
+    group_name      String      @db.VarChar(100)     @unique
+    description     String?      @db.VarChar(255)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    customers Customer[]
+}

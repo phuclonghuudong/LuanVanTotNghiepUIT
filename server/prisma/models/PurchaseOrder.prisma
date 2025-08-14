@@ -1,0 +1,16 @@
+model PurchaseOrder {
+    po_id          Int         @id @default (autoincrement())
+    supplier_name   String      @db.VarChar(100)                          
+    note            String      @db.VarChar(100)                          
+    total_price     Decimal     @db.Decimal(10,2)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    personnel_id    Int
+    personnel   Personnel @relation(fields: [personnel_id], references: [personnel_id])
+  
+    @@index([personnel_id])
+
+    purchaseOrderDetail PurchaseOrderDetail[]
+}
