@@ -8,6 +8,7 @@ import ButtonComponent from "./../ui/ButtonComponent";
 import { FiHeart, FiPhone, FiUser } from "react-icons/fi";
 import { TfiClose } from "react-icons/tfi";
 import { MdArrowOutward, MdOutlineMail } from "react-icons/md";
+import { HiOutlineShoppingBag } from "react-icons/hi";
 const Menu = [
   {
     id: 1,
@@ -93,20 +94,26 @@ const MenuScreenMobile = ({ isOpen, onClose }) => {
               <Link to="/wishlist" onClick={onClose}>
                 <ButtonComponent icon={FiHeart} title="Wishlist" rounded="sm" />
               </Link>
-              <Link to="auth/login">
+              <Link to="auth/login" onClick={onClose}>
                 <ButtonComponent icon={FiUser} title="Login" rounded="sm" />
+              </Link>
+              <Link to="/cart" onClick={onClose} className="relative">
+                <ButtonComponent icon={HiOutlineShoppingBag} title="Cart" rounded="sm" />
+                <span className="absolute -top-1 -right-1 rounded-full bg-red-500 w-4 h-4 md:text-base flex items-center text-white justify-center font-bold">
+                  1
+                </span>
               </Link>
             </div>
             <div className="footer mt-4">
               <div className="footer-logo mb-4">
-                <Link to="/">
+                <Link to="/" onClick={onClose}>
                   <img src={logo} alt="" className="object-contain" />
                 </Link>
               </div>
               <div className="footer-address mb-4">
                 <p>549 Oak St.Crystal Lake, IL 60014</p>
 
-                <Link to="/" className="flex gap-2 mt-2 items-center text-[15px]">
+                <Link to="/" className="flex gap-2 mt-2 items-center text-[15px]" onClick={onClose}>
                   GET DIRECTION <IconComponent icon={MdArrowOutward} />
                 </Link>
               </div>

@@ -6,8 +6,6 @@ import ProductGrid from "../../../components/common/products/ProductGrid";
 import PageTitle from "./../../../components/common/PageTitle";
 
 const ProductPage = () => {
-  //   const [layout, setLayout] = useState("grid");
-  //   const [sort, setSort] = useState("best-selling");
   const products = [
     {
       name: "Polarized sunglasses",
