@@ -78,8 +78,8 @@ const Seller = () => {
   ];
 
   return (
-    <div className='mx-auto px-4 py-10'>
-      <div className='max-w-screen-xl mx-auto'>
+    <div data-aos="fade-up" className="mx-auto px-4 py-10">
+      <div className="max-w-screen-xl mx-auto">
         <HeadingSection />
         <ProductGrid products={products} />
       </div>

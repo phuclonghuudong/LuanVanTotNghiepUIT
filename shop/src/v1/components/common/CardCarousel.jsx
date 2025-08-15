@@ -1,7 +1,8 @@
 import React from "react";
-import { Link } from "react-router";
 import Slider from "react-slick";
 import { MdArrowOutward } from "react-icons/md";
+import { Link } from "react-router-dom";
+import IconComponent from "../ui/IconComponent";
 const CardCarousel = ({ title, data }) => {
   let settings = {
     dots: true,
@@ -19,37 +20,40 @@ const CardCarousel = ({ title, data }) => {
   };
   return (
     <>
-      <div className='w-full max-w-7xl mx-auto my-12  px-4'>
-        <div className='flex justify-between items-center mb-6'>
-          <h2 className='text-xl sm:text-3xl md:text-4xl font-bold text-black'>{title}</h2>
-          <Link to='/products'>
-            <span className='text-lg text-black hover:text-red-600 font-bold underline'>View All Collection</span>
+      <div data-aos="fade-up" className="w-full max-w-7xl mx-auto my-12  px-4">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl sm:text-3xl md:text-4xl font-bold text-black">{title}</h2>
+          <Link to="/products">
+            <span className="text-lg text-black hover:text-red-600 font-bold underline">View All Collection</span>
           </Link>
         </div>
-        <div className='pt-4 px-3 w-full mx-auto'>
+        <div className="pt-4 px-3 w-full mx-auto">
           <Slider {...settings}>
             {data.map((data) => (
-              <div className='flex flex-col bg-white overflow-hidden'>
-                <div className='relative h-full px-1 overflow-hidden'>
+              <div className="flex flex-col bg-white overflow-hidden">
+                <div className="relative h-full px-1 overflow-hidden">
                   <div>
                     <img
-                      className='rounded-full overflow-hidden object-cover w-full h-full'
+                      className="rounded-full overflow-hidden object-cover w-full h-full"
                       src={data.image}
-                      alt='collection-img'
+                      alt="collection-img"
                     />
                   </div>
                 </div>
-                <div className='flex flex-col pt-2  justify-items-center justify-center'>
-                  <div className='flex items-center text-center justify-center'>
-                    <a href='#' className='flex items-center gap-1  group'>
-                      <h6 className='text-lg text-black font-semibold hover:text-red-600 duration-200'>{data.name}</h6>
-                      <MdArrowOutward
+                <div className="flex flex-col pt-2  justify-items-center justify-center">
+                  <div className="flex items-center text-center justify-center">
+                    <Link className="flex items-center gap-1 group">
+                      <h6 className="text-lg text-black font-semibold group-hover:text-[red] duration-500">
+                        {data.name}
+                      </h6>
+                      <IconComponent
+                        icon={MdArrowOutward}
                         size={20}
-                        className='hidden group-hover:flex text-red-600 transition-opacity duration-200'
+                        className="opacity-0 hidden group-hover:opacity-100 group-hover:flex text-red-600 transition-opacity duration-400"
                       />
-                    </a>
+                    </Link>
                   </div>
-                  <div className='flex text-gray-600 text-center items-center justify-center'>{data.quantity}</div>
+                  <div className="flex text-gray-600 text-center items-center justify-center">{data.quantity}</div>
                 </div>
               </div>
             ))}

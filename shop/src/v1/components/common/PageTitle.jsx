@@ -6,10 +6,11 @@ import { FaChevronRight } from "react-icons/fa";
 const PageTitle = ({ title, breadcrumb = [], withBackground = true, breadcrumbAlign = "center" }) => {
   return (
     <div
+      data-aos="fade-up"
       className={clsx(withBackground ? "bg-cover bg-center py-8" : "py-6", "w-full")}
       style={withBackground ? { backgroundImage: `url(${ImageTitle})` } : {}}
     >
-      <div className='max-w-screen-xl mx-auto px-4'>
+      <div className="max-w-screen-xl mx-auto px-4">
         <h1 className={clsx("text-3xl font-semibold mb-2", breadcrumbAlign === "left" ? "text-left" : "text-center")}>
           {title}
         </h1>
@@ -21,10 +22,10 @@ const PageTitle = ({ title, breadcrumb = [], withBackground = true, breadcrumbAl
           )}
         >
           {breadcrumb.map((item, index) => (
-            <li key={index} className='flex items-center gap-1'>
-              {index > 0 && <FaChevronRight className='text-xs' />}
+            <li key={index} className="flex items-center gap-1">
+              {index > 0 && <FaChevronRight className="text-xs" />}
               {item.href ? (
-                <Link to={item.href} className='hover:text-black underline underline-offset-2'>
+                <Link to={item.href} className="hover:text-black underline underline-offset-2">
                   {item.label}
                 </Link>
               ) : (
