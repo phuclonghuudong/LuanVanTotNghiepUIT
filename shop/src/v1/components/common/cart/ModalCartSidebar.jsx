@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import ButtonComponent from "./../../ui/ButtonComponent";
 import { IoCloseOutline } from "react-icons/io5";
+import { Link } from "react-router-dom";
 
 const ModalCartSidebar = ({ isOpen, onClose }) => {
   // Lock scroll on mount
@@ -25,7 +26,7 @@ const ModalCartSidebar = ({ isOpen, onClose }) => {
 
       {/* Modal Content */}
       <div className="relative bg-white w-full sm:w-[90%] md:w-[45%] max-w-screen-xl h-full overflow-y-auto shadow-lg z-10">
-        <div className="grid grid-cols-1 md:grid-cols-[30%_70%] h-full">
+        <div className="grid grid-cols-1 md:grid-cols-[35%_65%] h-full">
           {/* LEFT: You May Also Like */}
           <div className="border-r w-full max-h-screen flex flex-col">
             {/* Tiêu đề cố định khi cuộn */}
@@ -33,7 +34,7 @@ const ModalCartSidebar = ({ isOpen, onClose }) => {
 
             {/* Danh sách sản phẩm - cuộn độc lập */}
             <div className="overflow-y-auto px-4 py-3 space-y-4">
-              {[1, 2, 3, 4, 5, 6, 7].map((item) => (
+              {[1, 2, 3, 4].map((item) => (
                 <div key={item} className="flex flex-col gap-2 items-center">
                   <img
                     src="https://placehold.co/300x300/orange/white"
@@ -53,15 +54,15 @@ const ModalCartSidebar = ({ isOpen, onClose }) => {
           {/* RIGHT: Cart Content */}
           <div className="p-4 flex flex-col justify-between h-full">
             {/* Header */}
-            <div className="flex justify-between items-center border-b pb-3 mb-4">
+            <div className="flex justify-between items-center border-b pb-3 mb-3">
               <h2 className="text-xl font-semibold">Shopping Cart</h2>
               <ButtonComponent icon={IoCloseOutline} onClick={onClose} className="text-xl hover:text-red-500" />
             </div>
 
             {/* Cart Items */}
-            <div className="space-y-4 overflow-y-auto flex-1 max-h-[400px]">
-              {[1, 2].map((item) => (
-                <div key={item} className="flex gap-4 items-center border-b pb-4">
+            <div className="space-y-3 overflow-y-auto flex-1 max-h-[400px] mb-3">
+              {[1, 2, 3, 4].map((item) => (
+                <div key={item} className="flex gap-4 items-center">
                   <img
                     src="https://placehold.co/300x300/orange/white"
                     alt="cart"
@@ -71,7 +72,7 @@ const ModalCartSidebar = ({ isOpen, onClose }) => {
                     <p className="font-medium">Product name</p>
                     <p className="text-sm text-gray-500">XL / Blue</p>
                   </div>
-                  <p className="font-semibold">$60.00</p>
+                  <p className="font-semibold">60.000 vnđ</p>
                 </div>
               ))}
             </div>
@@ -79,18 +80,20 @@ const ModalCartSidebar = ({ isOpen, onClose }) => {
             {/* Subtotal + Checkout */}
             <div className="pt-6 border-t space-y-4">
               <div className="flex justify-between text-lg font-semibold">
-                <span>Subtotal:</span>
-                <span>$120.00</span>
+                <span>Tổng cộng:</span>
+                <span>120.000 vnđ</span>
               </div>
               <div className="space-y-2">
-                <ButtonComponent
-                  title="View Cart"
-                  className="w-full border border-black py-2 rounded hover:bg-black hover:text-white transition"
-                />
-                <ButtonComponent
-                  title="Checkout"
-                  className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition"
-                />
+                <Link to="/cart" onClick={onClose}>
+                  <ButtonComponent title="Xem giỏ hàng" color="black" className="w-full transition" />
+                </Link>
+                <Link to="/place-order" onClick={onClose}>
+                  <ButtonComponent
+                    title="Thanh toán"
+                    color="gray"
+                    className="w-full bg-gray-800 text-white py-2 rounded  transition"
+                  />
+                </Link>
               </div>
             </div>
           </div>

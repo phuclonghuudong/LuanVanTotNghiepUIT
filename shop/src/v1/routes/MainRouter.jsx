@@ -4,6 +4,9 @@ import MainLayout from "../screens/pages/MainLayout";
 import ProductPage from "../screens/pages/products/ProductPage";
 import AuthRouter from "./AuthRouter";
 import ProductDetail from "../screens/pages/products/ProductDetail";
+import Cart from "../screens/pages/cart/Cart";
+import PlaceOrder from "../screens/pages/order/PlaceOrder";
+import Orders from "../screens/pages/order/Orders";
 
 const MainRouter = () => {
   return (
@@ -13,7 +16,9 @@ const MainRouter = () => {
         <Route path="/products" element={<ProductPage />} />
         <Route path="/product/detail-1" element={<ProductDetail />} />
         <Route path="/collection" element={<AuthRouter />} />
-        <Route path="/cart" element={<AuthRouter />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/orders" element={<Orders />} />
+        <Route path="/place-order" element={<PlaceOrder />} />
         <Route path="/about" element={<AuthRouter />} />
         <Route path="/contact" element={<AuthRouter />} />
         <Route path="/auth/*" element={<AuthRouter />} />
