@@ -28,17 +28,17 @@ const ProductGrid = ({ products }) => {
             <IconComponent icon={IoEyeOutline} color="gray" size={18} className="rounded-full" />
           </div>
           {/* Image full */}
-          <div className="relative  aspect-[4/5] overflow-hidden rounded-tl-md rounded-tr-md duration-500">
+          <div className="relative  aspect-[4/5] overflow-hidden rounded-tl-md rounded-tr-md duration-700">
             <img
               src={product.image}
               alt={product.name}
-              className="w-full h-full object-cover group-hover:opacity-0 transition-all"
+              className="w-full h-full object-cover group-hover:opacity-0 transition-all duration-700"
             />
             {product.hoverImage && (
               <img
                 src={product.hoverImage}
                 alt={`${product.name} hover`}
-                className="w-full h-full object-cover absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-all"
+                className="w-full h-full object-cover absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-all duration-700"
               />
             )}
             {/* Add to cart */}

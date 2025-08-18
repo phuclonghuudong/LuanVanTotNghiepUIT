@@ -15,7 +15,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 a.active hr {
-  display: block;
+  opacity: 100;
+  transition: all;
 }
 @media (max-width: 640px) {
   a.active {

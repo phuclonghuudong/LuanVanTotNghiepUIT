@@ -1,18 +1,18 @@
 import Collection from "../../components/common/Collection";
+import NewsletterBox from "../../components/common/NewsletterBox";
 import Seller from "../../components/common/Seller";
 import Slide from "../../components/common/Slide";
+import OurPolicy from "./../../components/common/OurPolicy";
 
 const HomeScreen = () => {
   return (
     <>
-      <div className='w-full overflow-hidden'>
+      <div className="w-full overflow-hidden">
         <Slide />
-      </div>
-      <div className='w-full overflow-hidden'>
         <Collection />
-      </div>
-      <div className='w-full overflow-hidden'>
         <Seller />
+        <OurPolicy />
+        <NewsletterBox />
       </div>
     </>
   );

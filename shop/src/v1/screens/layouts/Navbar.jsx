@@ -52,11 +52,11 @@ const Navbar = ({ onCartClick, onMenuClick }) => {
             </Link>
           </div>
           <div className="hidden xl:block xl:w-1/2">
-            <ul className="flex items-center gap-5 justify-center">
+            <ul className="flex items-center justify-between py-5 font-medium ">
               {Menu.map((data) => (
-                <NavLink to={data.link} key={data.id} className="flex flex-col items-center gap-1">
+                <NavLink to={data.link} key={data.id} className="flex flex-col items-center gap-[2px]">
                   <p>{data.name}</p>
-                  <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
+                  <hr className="w-3/4 border-none h-[1px] bg-gray-700 opacity-0 transition-all duration-400" />
                 </NavLink>
               ))}
             </ul>

@@ -65,7 +65,7 @@ const Collection = () => {
     image: item.image,
     quantity: item.quantity,
   }));
-  return <CardCarousel title='Categories you might like' data={collections} />;
+  return <CardCarousel title="Categories you might like" data={collections} />;
 };
 
 export default Collection;

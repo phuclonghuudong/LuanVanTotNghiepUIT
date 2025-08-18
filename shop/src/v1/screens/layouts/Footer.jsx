@@ -2,12 +2,14 @@ import React from "react";
 import logo from "../../assets/logo/logo.svg";
 import { MdArrowOutward, MdOutlineMail } from "react-icons/md";
 import { FiPhone } from "react-icons/fi";
-import { Link } from "react-router";
 import { FaAmazon, FaFacebookF, FaInstagram, FaTiktok, FaYoutube } from "react-icons/fa6";
+import { Link } from "react-router-dom";
+import IconComponent from "./../../components/ui/IconComponent";
+import ButtonComponent from "./../../components/ui/ButtonComponent";
 
 const Footer = () => {
   return (
-    <div className="border-t border-t-gray-300">
+    <div data-aos="fade-up" className="border-t border-t-gray-300">
       <div className="w-full max-w-7xl mx-auto my-[82px]">
         <div className="footer-body">
           <div className="container mx-auto px-4">
@@ -16,9 +18,9 @@ const Footer = () => {
               <div className="w-full lg:w-1/3 px-4 mb-8 lg:mb-0">
                 <div className="footer-infor">
                   <div className="footer-logo mb-4">
-                    <a href="#">
+                    <Link to="/">
                       <img src={logo} alt="" className="object-contain" />
-                    </a>
+                    </Link>
                   </div>
                   <div className="footer-address mb-4">
                     <p>549 Oak St.Crystal Lake, IL 60014</p>
@@ -28,14 +30,14 @@ const Footer = () => {
                     </Link>
                   </div>
                   <ul className="footer-info space-y-2">
-                    <li className="flex items-center gap-2">
-                      <MdOutlineMail />
+                    <Link className="flex items-center gap-2">
+                      <IconComponent icon={MdOutlineMail} />
                       <p>themesflat@gmail.com</p>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <FiPhone />
+                    </Link>
+                    <Link className="flex items-center gap-2">
+                      <IconComponent icon={FiPhone} />
                       <p>315-666-6688</p>
-                    </li>
+                    </Link>
                   </ul>
                   <div className="tf-social-icon flex flex-wrap gap-2 mt-4">
                     <Link className="w-8  h-8 border  rounded-full flex items-center justify-center hover:text-white hover:bg-[#1877F2] transition-colors duration-300">
@@ -137,12 +139,7 @@ const Footer = () => {
                             placeholder="Enter your e-mail"
                             aria-required="true"
                           />
-                          <button
-                            type="submit"
-                            className=" w-12 h-12 flex items-center justify-center rounded-full bg-black text-white transition-all duration-300 hover:bg-white hover:text-black hover:border"
-                          >
-                            <MdArrowOutward size={20} />
-                          </button>
+                          <ButtonComponent icon={MdArrowOutward} size={30} color="black" className="w-12 h-12" />
                         </div>
                       </form>
                       <div className="tf-cart-checkbox mt-4 flex items-start gap-2">
