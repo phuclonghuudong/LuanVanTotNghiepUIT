@@ -1,15 +1,10 @@
-import axios from "axios";
+import api from "./api";
 
 const loginApi = (username, password) => {
-  return axios.post(
-    "http://localhost:3005/api/v1/auth/customer/sign-in",
-    {username, password},
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  return api.post("auth/customer/sign-in", { username, password });
+};
+const getProfile = () => {
+  return api.get("/auth/customer/profile");
 };
 
-export {loginApi};
+export { loginApi, getProfile };

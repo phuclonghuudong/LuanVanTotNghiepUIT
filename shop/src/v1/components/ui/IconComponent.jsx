@@ -1,6 +1,6 @@
 const IconComponent = ({ icon: Icon, size = 18, color = "none", onClick, className = "", ...props }) => {
   const colorClasses = {
-    none: "bg-white text-black",
+    none: "",
     white: "bg-white text-black hover:bg-black hover:text-white",
     gray: "bg-white text-gray-600 hover:bg-black hover:text-white",
     orange: "bg-orange-50 text-orange-500 hover:bg-orange-500 hover:text-white",

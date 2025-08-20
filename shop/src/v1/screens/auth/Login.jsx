@@ -1,15 +1,15 @@
-import {useState} from "react";
+import { useState } from "react";
 import ButtonComponent from "../../components/ui/ButtonComponent";
 import IconComponent from "../../components/ui/IconComponent";
-import {FaUser, FaLock} from "react-icons/fa";
-import {loginApi} from "../../apis/userApi";
-import {toast} from "react-toastify";
-import {useNavigate, useLocation} from "react-router-dom";
+import { FaUser, FaLock } from "react-icons/fa";
+import { loginApi } from "../../apis/userApi";
+import { toast } from "react-toastify";
+import { useNavigate, useLocation } from "react-router-dom";
 const Login = () => {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({}); // { username?: string, password?: string }
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -55,7 +55,7 @@ const Login = () => {
 
         toast.success("Đăng nhập thành công");
         // ... điều hướng trang, nạp profile, v.v.
-        navigate(from, {replace: true});
+        navigate(from, { replace: true });
         return data;
       }
       if (res.status === 204) {
@@ -63,15 +63,14 @@ const Login = () => {
         return;
       }
     } catch (error) {
-      const {status, data} = error?.response || {};
+      const { status, data } = error?.response || {};
 
       // Sai tài khoản/mật khẩu theo format backend
       if (status === 400 && data?.CODE === "400400") {
         const msg = data?.MESSAGE || "Tài khoản hoặc mật khẩu không chính xác";
-        setErrors({username: msg, password: msg}); // gán cho cả 2 field
+        setErrors({ username: msg, password: msg }); // gán cho cả 2 field
         toast.error(msg);
       } else {
-        // toast.error(getApiErrorMessage(error, "Đăng nhập thất bại"));
         toast.error(error, "Đăng nhập thất bại");
       }
 

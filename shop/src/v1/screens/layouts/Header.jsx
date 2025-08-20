@@ -2,11 +2,11 @@
 import TopNavbar from "./TopNavbar";
 import Navbar from "./Navbar";
 
-const Header = ({ onCartClick, onMenuClick }) => {
+const Header = ({ user, onCartClick, onMenuClick }) => {
   return (
     <>
       <TopNavbar />
-      <Navbar onCartClick={onCartClick} onMenuClick={onMenuClick} />
+      <Navbar user={user} onCartClick={onCartClick} onMenuClick={onMenuClick} />
     </>
   );
 };

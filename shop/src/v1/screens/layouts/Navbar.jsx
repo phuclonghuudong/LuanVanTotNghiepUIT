@@ -38,7 +38,7 @@ const Menu = [
     link: "/contact",
   },
 ];
-const Navbar = ({ onCartClick, onMenuClick }) => {
+const Navbar = ({ user, onCartClick, onMenuClick }) => {
   return (
     <header className="h-[70px] px-2">
       <div className="container w-full max-w-7xl h-full mx-auto ">
@@ -66,20 +66,42 @@ const Navbar = ({ onCartClick, onMenuClick }) => {
               <IconComponent icon={IoSearch} size={25} color="none" className="cursor-pointer" />
               <div className="relative group">
                 <IconComponent icon={FiUser} size={25} color="none" className="hidden md:block cursor-pointer" />
-                <div className="hidden md:block absolute top-[55px] md:-right-20 text-center p-5 bg-white rounded-lg shadow-lg z-20 w-[300px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden">
-                  <Link
-                    to="/auth/login"
-                    className="block text-center py-2 font-medium bg-black text-white rounded-lg hover:bg-gray-800"
-                  >
-                    LOGIN
-                  </Link>
-                  <div className="text-sm text-center py-2 border-b">
-                    Don’t have an account?{" "}
-                    <Link to="/auth/register" className="font-medium hover:underline">
-                      Register
-                    </Link>
-                  </div>
-                  <div className="text-sm text-center py-2">Support</div>
+                <div className="hidden md:block absolute top-[55px] md:-right-20 text-center p-5 bg-white rounded-lg shadow-lg z-20 min-w-[200px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden">
+                  {user ? (
+                    <ul className="flex flex-col">
+                      <Link to="/auth/account-profile" className="border-b">
+                        My Account
+                      </Link>
+                      <Link to="/#" className="border-b">
+                        Order Tracking
+                      </Link>
+                      <Link to="/#" className="border-b">
+                        My Order
+                      </Link>
+                      <Link to="/auth/account-address" className="border-b">
+                        My Address
+                      </Link>
+                      <Link to="/#" className="border-b">
+                        Logout
+                      </Link>
+                    </ul>
+                  ) : (
+                    <>
+                      <Link
+                        to="/auth/login"
+                        className="block text-center py-2 font-medium bg-black text-white rounded-lg hover:bg-gray-800"
+                      >
+                        LOGIN
+                      </Link>
+                      <div className="text-sm text-center py-2 border-b">
+                        Don’t have an account?{" "}
+                        <Link to="/auth/register" className="font-medium hover:underline">
+                          Register
+                        </Link>
+                      </div>
+                      <div className="text-sm text-center py-2">Support</div>
+                    </>
+                  )}
                 </div>
               </div>
               <IconComponent icon={FiHeart} size={25} color="none" className="hidden md:block cursor-pointer" />

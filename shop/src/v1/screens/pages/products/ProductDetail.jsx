@@ -22,23 +22,22 @@ const ProductDetail = () => {
     reviews: 134,
   };
   return (
-    <div className=" bg-white">
+    <div data-aos="fade-up" className=" bg-white">
       <PageTitle
         withBackground={false}
         breadcrumbAlign="left"
-        breadcrumb={[{label: "Homepage", href: "/"}, {label: "Women"}, {label: "Leather boots with tall leg"}]}
+        breadcrumb={[{ label: "Homepage", href: "/" }, { label: "Women" }, { label: "Leather boots with tall leg" }]}
       />
-      <section className='max-w-screen-xl mx-auto px-4 py-3 grid grid-cols-1 md:grid-cols-2 gap-8 items-start'>
+      <section className="max-w-screen-xl mx-auto px-4 py-3 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         {/* Gallery */}
-        <div className='w-full h-full'>
+        <div className="w-full h-full">
           <ImageGalleryComponent images={images} />
         </div>
 
         {/* Info */}
-        <div className='w-full h-full'>
+        <div className="w-full h-full">
           <ProductInfoComponent product={product} />
         </div>
-
       </section>
 
       {/* <ProductStickyBar product={product} /> */}
