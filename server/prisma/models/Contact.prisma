@@ -1,0 +1,23 @@
+model Contact {
+  contact_id       Int        @id @default(autoincrement())           
+  fullname        String      @db.VarChar(100)               
+  email           String      @db.VarChar(100)                
+  phone           String      @db.VarChar(100)                
+  subject         String      @db.Text                                  
+  message         String      @db.Text                                  
+  contact_type      String    @db.VarChar(200)                
+  response          String?   @db.Text 
+  response_at       DateTime?
+  is_featured       Boolean?                           
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+    personnel_id    Int
+    personnel   Personnel @relation(fields: [personnel_id], references: [personnel_id])
+    customer_id    Int
+    customer   Customer @relation(fields: [customer_id], references: [customer_id])
+  
+    @@index([personnel_id])
+    @@index([customer_id])
+}

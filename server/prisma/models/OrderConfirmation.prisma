@@ -1,0 +1,18 @@
+model OrderConfirmation {
+    confirmation_id     Int         @id @default (autoincrement())
+    confirmed_at        DateTime              // Thời gian xác nhận
+    confirmed_status    String      @db.VarChar(50)   // Thời gian xác nhận
+    source              String      @db.VarChar(50)   // Xác nhận                           
+    note                String      @db.Text                          
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    order_id    Int
+    order   Order @relation(fields: [order_id], references: [order_id])
+    personnel_id    Int
+    personnel   Personnel @relation(fields: [personnel_id], references: [personnel_id])
+  
+    @@index([order_id])
+    @@index([personnel_id])
+}

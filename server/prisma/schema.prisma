@@ -8,524 +8,821 @@ datasource db {
 }
 
 
-model BinhLuanSanPham {
-  id          Int        @id @default(autoincrement())
-  noiDung     String     @db.Text
-  parentId    Int?
-  trangThai   Int        @db.TinyInt
-  sanPhamId   Int
-  khachHangId Int
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+model Account {
+    account_id      Int        @id @default (autoincrement())
+    username        String     @db.VarChar(100)  @unique
+    password        String     @db.VarChar(100)  
+    phone           String     @db.VarChar(15)   @unique
+    email           String     @db.VarChar(100)  @unique 
+    verify_email    String?    @db.VarChar(100)
+    verify_otp      Int?
+    expired_otp     DateTime?        
+    refresh_token   String?    @db.Text
+    status          Int        @db.TinyInt                                
+    createdAt       DateTime   @default(now())                            
+    updatedAt       DateTime   @updatedAt  
 
-  sanPham     SanPham    @relation(fields: [sanPhamId], references: [id])
-  khachHang   KhachHang  @relation(fields: [khachHangId], references: [id])
-
-  parent       BinhLuanSanPham? @relation("ParentComment", fields: [parentId], references: [id])
-  replies      BinhLuanSanPham[] @relation("ParentComment")
-
-  @@index([sanPhamId])
-  @@index([khachHangId])
-  @@index([parentId])
-}
-
-model ChiTietGioHang {
-  id                 Int              @id @default(autoincrement())
-  gioHangId          Int
-  chiTietSanPhamId   Int
-  soLuong            Int              @default(1)
-  donVi              Int              // Nếu "đơn vị" là số lượng quy đổi thì nên giải thích thêm
-  giaBanTaiThoiDiem  Decimal          @db.Decimal(12, 2)  // Lưu giá bán tại thời điểm thêm vào giỏ
-  thanhTien          Decimal          @db.Decimal(12, 2)  // = soLuong * giaBanTaiThoiDiem
-
-  gioHang            GioHang          @relation(fields: [gioHangId], references: [id])
-  chiTietSanPham     ChiTietSanPham   @relation(fields: [chiTietSanPhamId], references: [id])
-
-  @@index([gioHangId])
-  @@index([chiTietSanPhamId])
-  @@unique([gioHangId, chiTietSanPhamId])
-}
-
-
-model ChiTietHoaDon {
-  id                   Int       @id @default(autoincrement())
-  soLuong              Int                                         // Số lượng mua
-  giaBanTaiThoiDiem    Decimal?  @db.Decimal(10, 2)                // Giá bán tại thời điểm mua
-  phanTramGiam         Decimal?  @db.Decimal(5, 2)                 // % giảm giá (nếu có)
-  giaSauGiam           Decimal?  @db.Decimal(10, 2)                // Giá sau khi giảm
-  donViTinh            String?   @db.VarChar(50)                   // Đơn vị tính
-  ghiChu               String?   @db.VarChar(255)                  // Ghi chú thêm
-  trangThai            Int       @db.TinyInt                       
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
-
-  // Foreign keys
-  hoaDonId             Int
-  chiTietSanPhamId     Int
-  chiTietKhuyenMaiId   Int?      
-
-  // Relations
-  hoaDon               HoaDon              @relation(fields: [hoaDonId], references: [id])
-  chiTietSanPham       ChiTietSanPham      @relation(fields: [chiTietSanPhamId], references: [id])
-  chiTietKhuyenMai     ChiTietKhuyenMai?   @relation(fields: [chiTietKhuyenMaiId], references: [id])
+    role_id    Int
+    role   Role @relation(fields: [role_id], references: [role_id])
   
-  // Indexes
-  @@index([hoaDonId])
-  @@index([chiTietSanPhamId])
-  @@index([chiTietKhuyenMaiId])
+    @@index([role_id])
+
+    personnel Personnel[]
+    customer Customer[]
 }
 
-
-model ChiTietKhuyenMai {
-  id                  Int       @id @default(autoincrement())               
-  loaiGia             String    @db.VarChar(50)                       // Loại giảm: theo % hoặc theo tiền
-  phanTramGiam        Float?                                          // Phần trăm giảm (nếu có)
-  giaKhuyenMai        Decimal?  @db.Decimal(10, 2)                    // Giá khuyến mãi cố định
-  soLuongToiThieu     Int?                                            // Số lượng tối thiểu để áp dụng giảm
-  giaGiamTheoSoLuong  Decimal?  @db.Decimal(10, 2)                    // Số tiền giảm theo số lượng
-  giaGocLucKhuyenMai  Decimal?  @db.Decimal(10, 2)                    // Ghi lại giá gốc lúc giảm
-  trangThai           Int       @db.TinyInt                          
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-
-  // Foreign keys
-  khuyenMaiId         Int
-  chiTietSanPhamId    Int
-
-  // Relations
-  khuyenMai           KhuyenMai        @relation(fields: [khuyenMaiId], references: [id])
-  chiTietSanPham      ChiTietSanPham   @relation(fields: [chiTietSanPhamId], references: [id])
-
-  // Indexes
-  @@index([khuyenMaiId])
-  @@index([chiTietSanPhamId])
-
-  chiTietHoaDon   ChiTietHoaDon[]
-}
-
-
-model ChiTietSanPham {
-  id                Int       @id @default(autoincrement())
-  maBarCode         String    @db.VarChar(50) @unique
-  maChiTiet        String    @db.VarChar(50) @unique
-  slugChiTiet      String    @db.VarChar(100) @unique
-  giaBan            Decimal?  @db.Decimal(10, 2)   // giá bán
-  giaNhap           Decimal?  @db.Decimal(10, 2)   // giá nhập
-  giaVonTB          Decimal?  @db.Decimal(10, 2)   // giá vốn trung bình
-  moTa              String?   @db.Text
-  trangThai         Int       @db.TinyInt
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-
-  // Foreign keys
-  sanPhamId         Int
-  mauSacId          Int
-  kichCoId          Int
-
-  // Relations
-  sanPham           SanPham   @relation(fields: [sanPhamId], references: [id])
-  mauSac            MauSac    @relation(fields: [mauSacId], references: [id])
-  kichCo            KichCo    @relation(fields: [kichCoId], references: [id])
-
-  @@index([sanPhamId])
-  @@index([mauSacId])
-  @@index([kichCoId])
-
-  chiTietGioHang        ChiTietGioHang[]
-  chiTietKhuyenMai      ChiTietKhuyenMai[]
-  chiTietHoaDon         ChiTietHoaDon[]
-  hinhAnh               HinhAnhChiTietSanPham[]
-  tonKho                TonKho[] 
-}
-
-
-model DanhGiaSanPham {
-  id           Int       @id @default(autoincrement())
-  soSao        Int?      @db.TinyInt
-  noiDung      String?   @db.Text
-  trangThai    Int       @db.TinyInt
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  // Foreign key
-  khachHangId Int
-  sanPhamId    Int
-
-  // Relations
-  khachHang   KhachHang @relation(fields: [khachHangId], references: [id])
-  sanPham     SanPham    @relation(fields: [sanPhamId], references: [id])
-
-  @@index([khachHangId])
-  @@index([sanPhamId])
-}
-
-
-model DiaChi {
-  id             Int       @id @default(autoincrement())
-  diaChi         String    @db.VarChar(255)     // Địa chỉ cụ thể
-  soDienThoai    String    @db.VarChar(20)      // SĐT người nhận
-  tenNguoiNhan   String    @db.VarChar(100)     // Tên người nhận
-  isMain         Boolean   @default(false)      // Có phải địa chỉ chính không
-  ghiChu         String?   @db.Text
-  trangThai      Int       @db.TinyInt          // Trạng thái sử dụng (1: đang dùng, 0: ngừng)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-
-  // Foreign key
-  khachHangId    Int
-
-  // Quan hệ
-  khachHang      KhachHang @relation(fields: [khachHangId], references: [id])
-
-  @@index([khachHangId])
-
-}
-
-
-model GioHang {
-  id             Int       @id @default(autoincrement())
-  tongTienGoc    Decimal   @db.Decimal(12, 2)                         // Tổng tiền chưa giảm
-  tongGiaGiam    Decimal   @db.Decimal(12, 2)                         // Tổng số tiền giảm giá
-  ngayCapNhat    DateTime  @default(now())                           // Ngày cập nhật giỏ hàng
-  ghiChu         String?   @db.Text
-  trangThai      Int       @db.TinyInt                               // 0: tạm, 1: đã đặt hàng, v.v.
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-
-  // Foreign key
-  khachHangId    Int
-
-  // Quan hệ
-  khachHang      KhachHang @relation(fields: [khachHangId], references: [id])
-
-  @@index([khachHangId])
-
-  chiTietGioHang      ChiTietGioHang[]
-}
-
-
-model HinhAnhChiTietSanPham {
-  id         Int      @id @default(autoincrement())
-  duongDan   String   @db.Text                      // URL hoặc path ảnh
-  isMain     Boolean  @default(false)               // Là ảnh chính?
-  moTa       String?  @db.VarChar(255)              // alt ảnh
-  trangThai  Int      @db.TinyInt                   // 1: hoạt động, 0: ẩn, -1: xóa?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  // Foreign key
-  chiTietSanPhamId   Int
-  chiTietSanPham    ChiTietSanPham  @relation(fields: [chiTietSanPhamId ], references: [id])
-
-  @@index([chiTietSanPhamId ])
-}
-
-
-model HinhAnhSanPham {
-  id         Int      @id @default(autoincrement())
-  duongDan   String   @db.Text                      // URL hoặc path ảnh
-  isMain     Boolean  @default(false)               // Là ảnh chính?
-  moTa       String?  @db.VarChar(255)              // alt ảnh
-  trangThai  Int      @db.TinyInt                   // 1: hoạt động, 0: ẩn, -1: xóa?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  // Foreign key
-  sanPhamId  Int
-  sanPham    SanPham  @relation(fields: [sanPhamId], references: [id])
-
-  @@index([sanPhamId])
-
-}
-
-
-model HoaDon {
-  id                  Int       @id @default(autoincrement())
-  maHoaDon            String    @db.VarChar(50) @unique // Mã hóa đơn duy nhất
-  ngayLap             DateTime  @default(now())         // Ngày lập hóa đơn
-  tongTien            Decimal?  @db.Decimal(10, 2)      // Tổng tiền thanh toán sau giảm
-  tongTienGoc         Decimal?  @db.Decimal(10, 2)      // Tổng tiền gốc
-  tongGiamGia         Decimal?  @db.Decimal(10, 2)      // Tổng tiền được giảm
-  hinhThucThanhToan   String?   @db.VarChar(50)     // Hình thức thanh toán (tiền mặt, chuyển khoản, v.v.)
-  ngayGiaoHangDuKien  DateTime?                         // Dự kiến giao hàng
-  ngayGiao            DateTime?                         // Ngày giao thực tế
-  daGiaoHang          Boolean   @default(false)         // Đã giao hay chưa
-  ghiChu              String?  @db.VarChar(255) 
-  trangThai           Int       @db.TinyInt                                
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-
-  // Foreign key
-  khachHangId         Int
-  nhanVienId         Int
-  khuyenMaiId         Int? 
-
-  // Relations
-  khachHang           KhachHang  @relation(fields: [khachHangId], references: [id])
-  nhanVien            NhanVien  @relation(fields: [nhanVienId], references: [id])
-  khuyenMai           KhuyenMai?          @relation(fields: [khuyenMaiId], references: [id])
-  chiTietHoaDon      ChiTietHoaDon[]     
-                
-
-  // Indexes
-  @@index([khachHangId])
-  @@index([khuyenMaiId])
-}
-
-
-model KhachHang {
-  id             Int       @id @default(autoincrement())
-  hoTen          String    @db.VarChar(100)                    // Thêm nếu cần
-  ngaySinh       DateTime                                      // Không dùng default
-  gioiTinh       Int                                           // 0: Nam, 1: Nữ, v.v.
-  diemTichLuy    Int                                           // Tổng điểm tích lũy
-  diaChi         String?   @db.VarChar(255)                    // Địa chỉ dạng text
-  avatar         String?   @db.Text
-  trangThai      Int       @db.TinyInt
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-
-  // Foreign key
-  taiKhoanId     Int    @unique
-
-  // Quan hệ
-  taiKhoan       TaiKhoan @relation(fields: [taiKhoanId], references: [id])
-
-  @@index([taiKhoanId])
-
-  binhLuanSanPham   BinhLuanSanPham[]
-  gioHang           GioHang[]
-  danhGiaSanPham    DanhGiaSanPham[]
-  diaChis            DiaChi[]
-  hoaDon            HoaDon[]
-}
-
-
-model KhuyenMai {
-  id           Int       @id @default(autoincrement())
-  tenKhuyenMai          String    @db.VarChar(50) @unique
-  slugKhuyenMai        String    @db.VarChar(100) @unique
-  hinhAnh      String?   @db.Text
-  moTa         String?   @db.Text
-  ngayBatDau      DateTime?                                            // Ngày bắt đầu khuyến mãi
-  ngayKetThuc     DateTime?                                           // Ngày kết thúc khuyến mãi
-  trangThai    Int       @db.TinyInt
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  // Foreign key
-  loaiKhuyenMaiId    Int
-
-  // Relations
-  loaiKhuyenMai      LoaiKhuyenMai    @relation(fields: [loaiKhuyenMaiId], references: [id])
-
-  @@index([loaiKhuyenMaiId])
-
-  chiTietKhuyenMai   ChiTietKhuyenMai[]
-  hoaDon   HoaDon[]
-}
-
-
-model KichCo {
-  id  Int      @id @default(autoincrement())             // INT AUTO_INCREMENT PRIMARY KEY
-  tenKichCo  String   @db.VarChar(50) @unique                   // VARCHAR(50) NOT NULL
-  maKichCo  String   @db.VarChar(100) @unique                   // VARCHAR(50) NOT NULL
-  moTa        String?  @db.Text                                   // TEXT NULL
-  trangThai   Int      @db.TinyInt                                // TINYINT NOT NULL
-  createdAt   DateTime @default(now())                            // DATETIME DEFAULT CURRENT_TIMESTAMP
-  updatedAt   DateTime @updatedAt                                 // DATETIME DEFAULT CURRENT_TIMESTAMP ON
-
-  chiTietSanPham ChiTietSanPham[]
-}
-
-
-model LoaiKhuyenMai{
-  id  Int      @id @default(autoincrement())           // INT AUTO_INCREMENT PRIMARY KEY
-  tenKhuyenMai  String   @db.VarChar(50) @unique                 // VARCHAR(50) NOT NULL
-  moTa        String?  @db.Text                                   // TEXT NULL
-  trangThai   Int      @db.TinyInt                                // TINYINT NOT NULL
-  createdAt   DateTime @default(now())                            // DATETIME DEFAULT CURRENT_TIMESTAMP
-  updatedAt   DateTime @updatedAt                                 // DATETIME DEFAULT CURRENT_TIMESTAMP ON 
-
-  khuyenMai KhuyenMai[]
-}
-
-
-model LoaiSanPham {
-  id  Int      @id @default(autoincrement())           // INT AUTO_INCREMENT PRIMARY KEY
-  tenLoai  String   @db.VarChar(50) @unique                 // VARCHAR(50) NOT NULL
-  slugLoai  String   @db.VarChar(100) @unique               // VARCHAR(50) NOT NULL
-  hinhAnh     String?   @db.Text                                  // TEXT NULL
-  moTa        String?  @db.Text                                   // TEXT NULL
-  trangThai   Int      @db.TinyInt                                // TINYINT NOT NULL
-  createdAt   DateTime @default(now())                            // DATETIME DEFAULT CURRENT_TIMESTAMP
-  updatedAt   DateTime @updatedAt                                 // DATETIME DEFAULT CURRENT_TIMESTAMP ON 
-
-  sanPham SanPham[]
-}
-
-
-model MauSac {
-  id  Int      @id @default(autoincrement())             // INT AUTO_INCREMENT PRIMARY KEY
-  tenMauSac  String   @db.VarChar(50) @unique                   // VARCHAR(50) NOT NULL
-  maMauSac  String   @db.VarChar(100) @unique                   // VARCHAR(50) NOT NULL
-  hexCode     String   @db.VarChar(100) @unique                // VARCHAR(50) NOT NULL
-  moTa        String?  @db.Text                                   // TEXT NULL
-  trangThai   Int      @db.TinyInt                                // TINYINT NOT NULL
-  createdAt   DateTime @default(now())                            // DATETIME DEFAULT CURRENT_TIMESTAMP
-  updatedAt   DateTime @updatedAt                                 // DATETIME DEFAULT CURRENT_TIMESTAMP ON 
-
-  chiTietSanPham ChiTietSanPham[]
-}
-
-
-model NhanVien {
-  id             Int       @id @default(autoincrement())
-  hoTen          String    @db.VarChar(100)                    
-  ngaySinh       DateTime                                      // Không dùng default
-  gioiTinh       Int                                           // 0: Nam, 1: Nữ, v.v.
-  CCCD    Int                                                  // CCCD
-  diaChi         String?   @db.VarChar(255)                    // Địa chỉ dạng text
-  avatar         String?   @db.Text
-  trangThai      Int       @db.TinyInt
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-
-  // Foreign key
-  taiKhoanId     Int  @unique
-
-  // Quan hệ
-  taiKhoan       TaiKhoan @relation(fields: [taiKhoanId], references: [id])
-
-  @@index([taiKhoanId])
-
-  tinTuc  TinTuc[]
-  hoaDon   HoaDon[]
-}
-
-
-model Quyen {
-  id        Int        @id @default(autoincrement())
-  tenQuyen  String     @db.VarChar(100)
-  maQuyen  String     @db.VarChar(100)
-  moTa      String?
-  trangThai Int        @db.TinyInt
-
-  taiKhoans TaiKhoan[]
-}
-
-
-model SanPham {
-  id           Int       @id @default(autoincrement())
-  tenSanPham          String    @db.VarChar(50) @unique
-  maSanPham           String    @db.VarChar(50) @unique
-  slugSanPham        String    @db.VarChar(100) @unique
-  luotXem      Int?      @db.TinyInt
-  hinhAnh      String?   @db.Text
-  moTa         String?   @db.Text
-  trangThai    Int       @db.TinyInt
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  // Foreign key
-  thuongHieuId Int
-  loaiSanPhamId    Int
-
-  // Relations
-  thuongHieu   ThuongHieu @relation(fields: [thuongHieuId], references: [id])
-  loaiSanPham      LoaiSanPham    @relation(fields: [loaiSanPhamId], references: [id])
-
-  @@index([loaiSanPhamId])
-  @@index([thuongHieuId])
-
-  binhLuanSanPham  BinhLuanSanPham[]
-  chiTietSanPham   ChiTietSanPham[]
-  hinhAnhSanPham   HinhAnhSanPham[]
-  danhGiaSanPham   DanhGiaSanPham[]
-}
-
-
-model TaiKhoan {
-  id             Int       @id @default(autoincrement())
-  tenDangNhap    String    @db.VarChar(100) @unique
-  matKhau        String    @db.VarChar(255)                     // Mã hóa mật khẩu
-  loaiTaiKhoan   Int                                          // 0: Admin, 1: Nhân viên, 2: Khách hàng, v.v.
-  soDienThoai    String    @db.VarChar(20) @unique
-  email          String   @db.VarChar(255) @unique
-  emailXacThuc   String?   @db.Text
-  otpXacThuc     String?   @db.Text
-  otpHetHan      DateTime?                                     // Thời gian hết hạn OTP
-  refreshToken   String?   @db.Text
-  trangThai      Int       @db.TinyInt
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-
-  // Foreign key
-  quyenId        Int
-
-  // Quan hệ
-  quyen          Quyen @relation(fields: [quyenId], references: [id])
-
-  // Nếu liên kết với KhachHang hoặc NhanVien
-  khachHang      KhachHang? 
-  nhanVien       NhanVien?
-
-  @@index([quyenId])
-
-
-}
-
-
-model ThuongHieu {
-  id  Int      @id @default(autoincrement())           // INT AUTO_INCREMENT PRIMARY KEY
-  tenThuongHieu  String   @db.VarChar(50) @unique                 // VARCHAR(50) NOT NULL
-  slugThuongHieu  String   @db.VarChar(100) @unique               // VARCHAR(50) NOT NULL
-  hinhAnh     String?   @db.Text                                  // TEXT NULL
-  moTa        String?  @db.Text                                   // TEXT NULL
-  trangThai   Int      @db.TinyInt                                // TINYINT NOT NULL
-  createdAt   DateTime @default(now())                            // DATETIME DEFAULT CURRENT_TIMESTAMP
-  updatedAt   DateTime @updatedAt                                 // DATETIME DEFAULT CURRENT_TIMESTAMP ON 
+model Action {
+  action_id         Int       @id @default(autoincrement())           
+  action_name       String    @db.VarChar(100) @unique                 
+  description       String?   @db.Text                                  
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
   
-  sanPham SanPham[]
+  rolePermissionAction  RolePermissionAction[]  
 }
 
-
-model TinTuc {
-  id          Int       @id @default(autoincrement())
-  tieuDe      String    @db.VarChar(255)
-  slugTinTuc        String    @db.VarChar(150) @unique                       // Đường dẫn SEO
-  luotXem     Int       @default(0)                                   // Đếm lượt xem
-  noiDung     String    @db.Text                                      // Nội dung chính
-  hinhAnh     String?   @db.VarChar(255)                              // URL ảnh đại diện
-  ghiChu      String?   @db.Text
-  trangThai   Int       @db.TinyInt                                   // 0: Ẩn, 1: Hiện
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  // Foreign key
-  nhanVienId  Int
-  nhanVien    NhanVien  @relation(fields: [nhanVienId], references: [id])
-
-  @@index([nhanVienId])
+model Address {
+  address_id        Int       @id @default(autoincrement())           
+  fullname          String    @db.VarChar(100)           
+  phone             String?   @db.VarChar(15) 
+  address           String    @db.VarChar(100)
+  is_main           Boolean   @default(false)                                 
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+  customer_id    Int
+  customer   Customer @relation(fields: [customer_id], references: [customer_id])
+  
+    @@index([customer_id]) 
 }
 
+model Attribute {
+    attribute_id        Int         @id @default (autoincrement())
+    attribute_name      String      @db.VarChar(100)     @unique
+    attribute_slug      String      @db.VarChar(100)     @unique
+    attribute_type      String      @db.VarChar(100)
+    is_custom           Boolean     @default(false)
+    status              Int         @db.TinyInt                                
+    createdAt           DateTime    @default(now())                            
+    updatedAt           DateTime    @updatedAt  
 
-model TonKho {
-  id                 Int       @id @default(autoincrement())
-  ngayCapNhat        DateTime  @default(now())               // Ngày cập nhật tồn kho
-  soLuongTon         Int                                     // Tổng số lượng còn trong kho
-  soLuongKhaDung     Int                                     // Số lượng có thể bán (không bị đặt trước, v.v.)
-  giaBan             Decimal?  @db.Decimal(10, 2)            // Giá bán tại thời điểm tồn kho (nếu cần lưu)
-  ghiChu             String?   @db.Text
-  trangThai          Int       @db.TinyInt
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
 
-  // Foreign key
-  chiTietSanPhamId   Int
+    category_id Int
+    category   Category @relation(fields: [category_id], references: [category_id])
+  
 
-  // Quan hệ
-  chiTietSanPham     ChiTietSanPham @relation(fields: [chiTietSanPhamId], references: [id])
+    @@index([category_id])
 
-  @@index([chiTietSanPhamId])
+    attributeValue  AttributeValue[]
+    variantAttributeValue  VariantAttributeValue[]
+}
+
+model AttributeValue {
+    value_id        Int         @id @default (autoincrement())
+    value           String      @db.VarChar(100)    
+    display_order   Int         @db.TinyInt
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    attribute_id    Int
+    attribute   Attribute @relation(fields: [attribute_id], references: [attribute_id])
+  
+    @@index([attribute_id])
+
+    variantAttributeValue  VariantAttributeValue[]
+}
+
+model Brand {
+  brand_id        Int         @id @default(autoincrement())           
+  brand_name      String      @db.VarChar(100) @unique                 
+  brand_slug      String      @db.VarChar(100) @unique               
+  description     String?     @db.Text                                  
+  image_url       String?     @db.Text                                   
+  status          Int         @db.TinyInt                                
+  createdAt       DateTime    @default(now())                            
+  updatedAt       DateTime    @updatedAt                                 
+  
+  product Product[]
+}
+
+model Cart {
+    cart_id          Int         @id @default (autoincrement())
+    total_price     Decimal?     @db.Decimal(10,2)
+    total_cost      Decimal?     @db.Decimal(10,2)
+    total_discount  Decimal?     @db.Decimal(10,2)
+    coupon_code     String?      @db.VarChar(50)                           
+    note            String?      @db.VarChar(250)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    customer_id    Int
+    customer   Customer @relation(fields: [customer_id], references: [customer_id])
+  
+    @@index([customer_id])
+
+    cartItem        CartItem[]
+}
+
+model CartItem {
+    item_id          Int         @id @default (autoincrement())
+    quantity        Int?
+    price_at_time   Decimal?     @db.Decimal(10,2)
+    promotion_price Decimal?     @db.Decimal(10,2)                          
+    is_active       Boolean?     @default(false)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    cart_id    Int
+    cart   Cart @relation(fields: [cart_id], references: [cart_id])
+    variant_id    Int
+    productVariant   ProductVariant @relation(fields: [variant_id], references: [variant_id])
+  
+    @@index([variant_id])
+}
+
+model Category {
+  category_id       Int       @id @default(autoincrement())           
+  category_name     String    @db.VarChar(100) @unique                 
+  category_slug     String    @db.VarChar(100) @unique               
+  description       String?   @db.Text                                  
+  image_url         String?   @db.Text                                   
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+  product Product[]
+  attribute Attribute[]
+}
+
+model Contact {
+  contact_id       Int        @id @default(autoincrement())           
+  fullname        String      @db.VarChar(100)               
+  email           String      @db.VarChar(100)                
+  phone           String      @db.VarChar(100)                
+  subject         String      @db.Text                                  
+  message         String      @db.Text                                  
+  contact_type      String    @db.VarChar(200)                
+  response          String?   @db.Text 
+  response_at       DateTime?
+  is_featured       Boolean?                           
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+    personnel_id    Int
+    personnel   Personnel @relation(fields: [personnel_id], references: [personnel_id])
+    customer_id    Int
+    customer   Customer @relation(fields: [customer_id], references: [customer_id])
+  
+    @@index([personnel_id])
+    @@index([customer_id])
+}
+
+model Coupon {
+  coupon_id         Int         @id @default(autoincrement())           
+  code              String      @db.VarChar(50)  @unique       // Mã code áp dụng
+  max_uses          Int         @default(0)           // Số lần sử dụng
+  min_order_value   Int         @default(0)           // Giá trị tối thiểu khi sử dụng
+  used_count        Int         @default(0)           // Số lượng đã sử dụng
+  user_restriction  String?      @db.VarChar(100)     // Giới hạn người dùng
+  expiry_date       DateTime                          // Hạn sử dụng mã
+  usage_limit_per_customer  Int     @default(0)       // Giới hạn sử dụng cho mõi khách hàng
+  is_public         Boolean         @default(false)   // Mã công khai hay chỉ private               
+  status            Int           @db.TinyInt                                
+  createdAt         DateTime      @default(now())                            
+  updatedAt         DateTime      @updatedAt                                 
+  
+  promotion_id      Int
+  promotion   Promotion @relation(fields: [promotion_id], references: [promotion_id])
+    
+  @@index([promotion_id])
+
+  couponUsageHistory  CouponUsageHistory[]
+}
+
+model CouponUsageHistory {
+  history_id        Int           @id @default(autoincrement())           
+  used_at           Int           @default(0)         // Số lần sử dụng
+  discount_value    Decimal       @db.Decimal(10,2)   // Giá trị giảm giá đã dùng             
+  status            Int           @db.TinyInt                                
+  createdAt         DateTime      @default(now())                            
+  updatedAt         DateTime      @updatedAt                                 
+  
+  coupon_id      Int
+  coupon   Coupon @relation(fields: [coupon_id], references: [coupon_id])
+  customer_id      Int
+  customer   Customer @relation(fields: [customer_id], references: [customer_id])
+  order_id      Int
+  order   Order @relation(fields: [order_id], references: [order_id])
+    
+  @@index([coupon_id])
+  @@index([customer_id])
+  @@index([order_id])
+}
+
+model Customer {
+    customer_id     Int         @id @default (autoincrement())
+    fullname        String      @db.VarChar(100)
+    gender          Int?         @db.TinyInt
+    birthday        DateTime?    @db.DateTime
+    points          Int?        @default(0)
+    address         String?      @db.VarChar(100)
+    avatar          String?      @db.Text
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    account_id    Int    @unique
+    account   Account @relation(fields: [account_id], references: [account_id])
+    group_id    Int
+    group   CustomerGroup @relation(fields: [group_id], references: [group_id])
+  
+    @@index([account_id])
+    @@index([group_id])
+
+    productReview   ProductReview[]
+    productComment  ProductComment[]
+    addressFK         Address[]
+    couponUsageHistory  CouponUsageHistory[]
+    order           Order[]
+    returnOrder     ReturnOrder[]
+    cart            Cart[]
+    contact         Contact[]
+    favorite        FavoriteProduct[]
+}
+
+model CustomerGroup {
+    group_id        Int         @id @default (autoincrement())
+    group_name      String      @db.VarChar(100)     @unique
+    description     String?      @db.VarChar(255)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    customers Customer[]
+}
+
+model FavoriteProduct {
+    favorite_id         Int         @id @default (autoincrement())
+    favorite_date       DateTime
+    status              Int         @db.TinyInt                                
+    createdAt           DateTime    @default(now())                            
+    updatedAt           DateTime    @updatedAt  
+
+
+    product_id      Int
+    product   Product @relation(fields: [product_id], references: [product_id])
+    customer_id      Int
+    customer   Customer @relation(fields: [customer_id], references: [customer_id])
+    
+    @@index([product_id])
+    @@index([customer_id])
+}
+
+model ImgProduct {
+    img_id Int      @id         @default (autoincrement())
+    image_url       String      @db.VarChar(255)
+    is_main         Boolean?     @default(false)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+
+    product_id      Int
+    product   Product @relation(fields: [product_id], references: [product_id])
+    @@index([product_id])
+}
+
+model ImgProductDetail {
+    img_id Int      @id         @default (autoincrement())
+    image_url       String      @db.VarChar(255)
+    is_main         Boolean?     @default(false)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+
+    variant_id      Int
+    productVariant   ProductVariant @relation(fields: [variant_id], references: [variant_id])
+  
+    @@index([variant_id])
+}
+
+model Inventory {
+  inventory_id        Int           @id @default(autoincrement())                        
+  quantity            Int           @db.TinyInt 
+  avg_cost            Decimal       @db.Decimal(10,2)                               
+  last_import_price   Decimal       @db.Decimal(10,2)  // Giá nhập mới nhất                             
+  status            Int           @db.TinyInt                                
+  createdAt         DateTime      @default(now())                            
+  updatedAt         DateTime      @updatedAt                                 
+  
+  warehouse_id      Int
+  warehouse   Warehouse @relation(fields: [warehouse_id], references: [warehouse_id])
+  variant_id      Int
+  variant   ProductVariant @relation(fields: [variant_id], references: [variant_id])
+    
+  @@index([warehouse_id])
+  @@index([variant_id])
+
+  
+}
+
+model News {
+  news_id       Int       @id @default(autoincrement())           
+  news_title    String    @db.VarChar(100) @unique               
+  summary       String    @db.Text                
+  news_slug     String    @db.VarChar(100) @unique               
+  content       String?   @db.Text                                  
+  image_url         String?   @db.Text 
+  view_count        Int       @default(0)
+  publish_date      DateTime
+  is_featured       Boolean                           
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+    personnel_id    Int
+    personnel   Personnel @relation(fields: [personnel_id], references: [personnel_id])
+  
+    @@index([personnel_id])
+}
+
+model Order {
+    order_id        Int         @id @default (autoincrement())
+    order_code      String      @db.VarChar(20)             // Mã đơn hàng
+    total_price     Decimal     @db.Decimal(10,2)           // Tổng tiền sau KM
+    total_cost      Decimal     @db.Decimal(10,2)           // Tổng giá vốn tại thời điểm
+    total_discount  Decimal     @db.Decimal(10,2)           // Tổng khuyến mãi
+    coupon_code     String      @db.VarChar(50)             // Mã giảm giá áp dụng
+    shipping_fee    Decimal     @db.Decimal(10,2)           // Phí vận chuyển
+    recipient_name  String      @db.VarChar(50)             // Tên người nhận
+    recipient_phone String      @db.VarChar(50)             // Số điện thoại người nhận
+    shipping_address    String      @db.VarChar(250)        // Địa chỉ nhận hàng
+    note            String      @db.Text
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    customer_id    Int
+    customer   Customer @relation(fields: [customer_id], references: [customer_id])
+    promotion_id    Int
+    promotion   Promotion @relation(fields: [promotion_id], references: [promotion_id])
+    shipping_id    Int
+    shipping   ShippingMethod @relation(fields: [shipping_id], references: [shipping_id])
+    payment_id    Int
+    payment   Payment @relation(fields: [payment_id], references: [payment_id])
+    
+  
+    @@index([customer_id])
+    @@index([promotion_id])
+    @@index([shipping_id])
+    @@index([payment_id])
+
+    couponUsageHistory  CouponUsageHistory[]
+    orderDetail         OrderDetail[]
+    returnOrder         ReturnOrder[]
+    orderConfirmation   OrderConfirmation[]
+}
+
+model OrderConfirmation {
+    confirmation_id     Int         @id @default (autoincrement())
+    confirmed_at        DateTime              // Thời gian xác nhận
+    confirmed_status    String      @db.VarChar(50)   // Thời gian xác nhận
+    source              String      @db.VarChar(50)   // Xác nhận                           
+    note                String      @db.Text                          
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    order_id    Int
+    order   Order @relation(fields: [order_id], references: [order_id])
+    personnel_id    Int
+    personnel   Personnel @relation(fields: [personnel_id], references: [personnel_id])
+  
+    @@index([order_id])
+    @@index([personnel_id])
+}
+
+model OrderDetail {
+    order_detail_id          Int         @id @default (autoincrement())
+    quantity        Int         
+    price_sell      Decimal     @db.Decimal(10,2)   // Giá trước khuyến mãi
+    discount        Decimal     @db.Decimal(10,2)   // Tổng giảm giá                           
+    final_price     Decimal     @db.Decimal(10,2)   // Tổng giảm giá x số lượng                        
+    cost_price      Decimal     @db.Decimal(10,2)   // Giá vốn tại thời điểm bán                         
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    order_id    Int
+    order   Order @relation(fields: [order_id], references: [order_id])
+    variant_id    Int
+    variant   ProductVariant @relation(fields: [variant_id], references: [variant_id])
+  
+    @@index([order_id])
+    @@index([variant_id])
+}
+
+model Payment {
+  payment_id        Int       @id @default(autoincrement())           
+  payment_method    String      @db.VarChar(50)    @unique                        
+  payment_code      String      @db.VarChar(50)    @unique
+  amount            Decimal     @db.Decimal(10,2) // Số tiền thanh toán
+  payment_status    Int         @db.TinyInt       // Trạng thái thanh toán
+  payment_date      DateTime                      // Thời gian
+  payment_detail    String      @db.Text          // Chi tiết phản hồi
+  back_code         String      @db.VarChar(50)
+  card_type         String      @db.VarChar(50)
+  note              String      @db.Text                         
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt   
+
+  order           Order[]                              
+}
+
+model PaymentGateway {
+  gateway_id        Int         @id @default(autoincrement())           
+  gateway_name      String      @db.VarChar(100)   @unique                         
+  gateway_code      String      @db.VarChar(100)   @unique
+  merchant_id       String      @db.VarChar(100)   @unique
+  merchant_key      String      @db.VarChar(255)   @unique
+  config            String      @db.Text 
+  is_active         Boolean
+  fee_percentage    Decimal     @db.Decimal(10,2)
+  fee_fixed         Decimal     @db.Decimal(10,2)
+  description       String      @db.Text                        
+  note              String      @db.Text                        
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+}
+
+model Permission {
+  permission_id         Int       @id @default(autoincrement())           
+  permission_name       String    @db.VarChar(100) @unique                 
+  description       String?   @db.Text                                  
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+  rolePermissionAction  RolePermissionAction[]
+}
+
+model Personnel {
+    personnel_id     Int         @id @default (autoincrement())
+    fullname        String      @db.VarChar(100)
+    gender          Int         @db.TinyInt
+    birthday        DateTime    @db.DateTime
+    cccd            Int
+    address         String      @db.VarChar(100)
+    avatar          String      @db.Text
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    account_id    Int
+    account   Account @relation(fields: [account_id], references: [account_id])
+  
+    @@index([account_id])
+
+    productComment   ProductComment[]
+    purchaseOrder   PurchaseOrder[]
+    news            News[]
+    contacts         Contact[]
+    orderConfirmation   OrderConfirmation[]
+}
+
+model Product {
+    product_id          Int         @id @default (autoincrement())
+    product_name        String      @db.VarChar(100)     @unique
+    product_slug        String      @db.VarChar(100)     @unique
+    product_sku         String      @db.VarChar(50)      @unique
+    views               Int
+    description         String      @db.Text
+    status              Int         @db.TinyInt                                
+    createdAt           DateTime    @default(now())                            
+    updatedAt           DateTime    @updatedAt  
+
+
+    category_id         Int
+    category   Category @relation(fields: [category_id], references: [category_id])
+    brand_id            Int
+    brand   Brand @relation(fields: [brand_id], references: [brand_id])
+  
+
+    @@index([category_id])
+    @@index([brand_id])
+
+    productVariant  ProductVariant[]
+    productComment  ProductComment[]
+    productReview   ProductReview[]
+    imgProductFK    ImgProduct[]
+    favorite        FavoriteProduct[]
+}
+
+model ProductComment {
+    comment_id      Int         @id @default (autoincrement())
+    parent_id       Int?      
+    content         String      @db.VarChar(255)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+
+    product_id      Int
+    product   Product @relation(fields: [product_id], references: [product_id])
+    customer_id     Int
+    customer   Customer @relation(fields: [customer_id], references: [customer_id])
+    personnel_id    Int
+    personnel   Personnel @relation(fields: [personnel_id], references: [personnel_id])
+  
+
+    @@index([product_id])
+    @@index([customer_id])
+    @@index([personnel_id])
+}
+
+model ProductReview {
+    review_id       Int         @id @default (autoincrement())
+    product_name    String      @db.VarChar(100)     @unique
+    product_slug    String      @db.VarChar(100)     @unique
+    product_sku     String      @db.VarChar(50)      @unique
+    rating          Int?        @default(0)
+    content         String?     @db.Text
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+
+    product_id      Int
+    product   Product @relation(fields: [product_id], references: [product_id])
+    customer_id     Int
+    customer   Customer @relation(fields: [customer_id], references: [customer_id])
+  
+
+    @@index([product_id])
+    @@index([customer_id])
+}
+
+model ProductVariant {
+    variant_id      Int         @id @default (autoincrement())
+    sku             String      @db.VarChar(100)     @unique  
+    description     String      @db.VarChar(255)
+    avg_cost        Decimal      @db.Decimal(10,2)
+    price_sell      Decimal      @db.Decimal(10,2)                   // Gia ban mac dinh
+    price_original  Decimal      @db.Decimal(10,2)                   // Gia goc khong giam
+    is_default      Boolean     @default(false)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+
+    product_id      Int
+    product   Product @relation(fields: [product_id], references: [product_id])
+    
+    @@index([product_id])
+
+    promotionDetail     PromotionDetail[]
+    inventory           Inventory[]
+    purchaseOrderDetail PurchaseOrderDetail[]
+    orderDetail         OrderDetail[]
+    returnOrderDetail   ReturnOrderDetail[]
+    cartItem            CartItem[]
+    imgProductDetail    ImgProductDetail[]
+}
+
+model Promotion {
+  promotion_id        Int         @id @default(autoincrement())           
+  promotion_name      String      @db.VarChar(100) @unique                 
+  promotion_slug      String      @db.VarChar(100) @unique               
+  description     String?         @db.Text 
+  start_date      DateTime                                 
+  end_date        DateTime  
+  is_active       Boolean
+  priority        Int?                              
+  promotion_type  String        @db.VarChar(100)                                   
+  status          Int           @db.TinyInt                                
+  createdAt       DateTime      @default(now())                            
+  updatedAt       DateTime      @updatedAt                                 
+  
+  promotionRule     PromotionRule[]
+  promotionAction   PromotionAction[]
+  promotionCoupon   Coupon[]
+  promotionDetail   PromotionDetail[]
+  order             Order[]
+}
+
+model PromotionAction {
+  action_id       Int         @id @default(autoincrement())           
+  action_type     String      @db.VarChar(255)   @unique                 
+  action_value    String      @db.VarChar(255)                 
+  status          Int           @db.TinyInt                                
+  createdAt       DateTime      @default(now())                            
+  updatedAt       DateTime      @updatedAt                                 
+  
+  promotion_id      Int
+  promotion   Promotion @relation(fields: [promotion_id], references: [promotion_id])
+    
+  @@index([promotion_id])
+
+  
+}
+
+model PromotionDetail {
+  detail_id        Int         @id @default(autoincrement())                        
+  status            Int           @db.TinyInt                                
+  createdAt         DateTime      @default(now())                            
+  updatedAt         DateTime      @updatedAt                                 
+  
+  promotion_id      Int
+  promotion   Promotion @relation(fields: [promotion_id], references: [promotion_id])
+  variant_id      Int
+  variant   ProductVariant @relation(fields: [variant_id], references: [variant_id])
+    
+  @@index([promotion_id])
+  @@index([variant_id])
+
+}
+
+model PromotionRule {
+  rule_id        Int         @id @default(autoincrement())           
+  rule_type      String      @db.VarChar(255)    @unique                
+  condition_value      String      @db.VarChar(255)                                                
+  status          Int           @db.TinyInt                                
+  createdAt       DateTime      @default(now())                            
+  updatedAt       DateTime      @updatedAt                                 
+  
+  promotion_id      Int
+  promotion   Promotion @relation(fields: [promotion_id], references: [promotion_id])
+    
+  @@index([promotion_id])
+
+}
+
+model PurchaseOrder {
+    po_id          Int         @id @default (autoincrement())
+    supplier_name   String      @db.VarChar(100)                          
+    note            String      @db.VarChar(100)                          
+    total_price     Decimal     @db.Decimal(10,2)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    personnel_id    Int
+    personnel   Personnel @relation(fields: [personnel_id], references: [personnel_id])
+  
+    @@index([personnel_id])
+
+    purchaseOrderDetail PurchaseOrderDetail[]
+}
+
+model PurchaseOrderDetail {
+    pod_id          Int         @id @default (autoincrement())
+    quantity        Int         @db.TinyInt     
+    price_import    Decimal     @db.Decimal(10,2)
+    unit            String       @db.VarChar(50)                           
+    total_price     Decimal     @db.Decimal(10,2)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    po_id    Int
+    purchaseOrder   PurchaseOrder @relation(fields: [po_id], references: [po_id])
+    variant_id    Int
+    productVariant   ProductVariant @relation(fields: [variant_id], references: [variant_id])
+  
+    @@index([po_id])
+    @@index([variant_id])
+}
+
+model ReturnOrder {
+    return_id          Int         @id @default (autoincrement())
+    total_refund    Decimal     @db.Decimal(10,2)
+    return_reason   String      @db.VarChar(250)                           
+    note            String      @db.VarChar(250)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    order_id    Int
+    order   Order @relation(fields: [order_id], references: [order_id])
+    customer_id    Int
+    customer   Customer @relation(fields: [customer_id], references: [customer_id])
+    warehouse_id    Int
+    warehouse   Warehouse @relation(fields: [warehouse_id], references: [warehouse_id])
+  
+    @@index([order_id])
+    @@index([customer_id])
+    @@index([warehouse_id])
+
+    returnOrderDetail   ReturnOrderDetail[]
+}
+
+model ReturnOrderDetail {
+    return_detail_id          Int         @id @default (autoincrement())
+    quantity        Int         @db.TinyInt     
+    unit            String       @db.VarChar(50)                           
+    refund_price    Decimal     @db.Decimal(10,2)
+    restock         Boolean     
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    return_id    Int
+    returnOrder   ReturnOrder @relation(fields: [return_id], references: [return_id])
+    variant_id    Int
+    productVariant   ProductVariant @relation(fields: [variant_id], references: [variant_id])
+    
+  
+    @@index([return_id])
+    @@index([variant_id])
+}
+
+model Role {
+  role_id           Int       @id @default(autoincrement())           
+  role_name         String    @db.VarChar(100) @unique                 
+  role_slug         String    @db.VarChar(100) @unique               
+  description       String   @db.Text                                  
+  is_system         Boolean                                      
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+  account Account[]
+  rolePermissionAction  RolePermissionAction[]
+}
+
+model RolePermissionAction {
+  id         Int       @id @default(autoincrement())           
+  description       String?   @db.Text                                  
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt  
+
+    role_id    Int
+    role   Role @relation(fields: [role_id], references: [role_id])
+    permission_id        Int
+    permission   Permission @relation(fields: [permission_id], references: [permission_id])
+    action_id        Int
+    action   Action @relation(fields: [action_id], references: [action_id])
+  
+    @@index([role_id])
+    @@index([permission_id])                               
+    @@index([action_id])                               
+  
+}
+
+model ShippingMethod {
+  shipping_id        Int       @id @default(autoincrement())           
+  shipping_code     String      @db.VarChar(50)    @unique    // Mã định danh                     
+  shipping_name     String      @db.VarChar(100)   // Mô tả chi tiết  
+  description       String      @db.Text            
+  fee_type          String      @db.VarChar(100)   // Cách tính phí
+  carrier           String      @db.VarChar(250)   // Đơn vị vận chuyển
+  is_active         Boolean     @default(false)
+  delivery_time     String      @db.VarChar(100)   // Thời gian giao hàng
+  base_fee          Decimal     @db.Decimal(10,2)  // Phí cơ bản
+  free_threshold    Decimal     @db.Decimal(10,2)  // Miễn phí từ giá trị này                          
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+  order           Order[]
+}
+
+model VariantAttributeValue {
+    id              Int         @id @default (autoincrement())
+    custom_value    String      @db.VarChar(100)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    attribute_id    Int
+    attribute   Attribute @relation(fields: [attribute_id], references: [attribute_id])
+    value_id        Int
+    attributeValue   AttributeValue @relation(fields: [value_id], references: [value_id])
+  
+    @@index([attribute_id])
+    @@index([value_id])
+}
+
+model Warehouse {
+  warehouse_id           Int       @id @default(autoincrement())           
+  warehouse_name         String    @db.VarChar(100) @unique                 
+  address           String    @db.VarChar(100)              
+  description       String   @db.Text                                  
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+  inventory           Inventory[]
+   returnOrder         ReturnOrder[]
 }

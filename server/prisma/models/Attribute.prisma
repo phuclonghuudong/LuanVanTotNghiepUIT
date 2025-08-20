@@ -1,0 +1,20 @@
+model Attribute {
+    attribute_id        Int         @id @default (autoincrement())
+    attribute_name      String      @db.VarChar(100)     @unique
+    attribute_slug      String      @db.VarChar(100)     @unique
+    attribute_type      String      @db.VarChar(100)
+    is_custom           Boolean     @default(false)
+    status              Int         @db.TinyInt                                
+    createdAt           DateTime    @default(now())                            
+    updatedAt           DateTime    @updatedAt  
+
+
+    category_id Int
+    category   Category @relation(fields: [category_id], references: [category_id])
+  
+
+    @@index([category_id])
+
+    attributeValue  AttributeValue[]
+    variantAttributeValue  VariantAttributeValue[]
+}

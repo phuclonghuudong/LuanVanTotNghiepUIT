@@ -1,0 +1,17 @@
+model ShippingMethod {
+  shipping_id        Int       @id @default(autoincrement())           
+  shipping_code     String      @db.VarChar(50)    @unique    // Mã định danh                     
+  shipping_name     String      @db.VarChar(100)   // Mô tả chi tiết  
+  description       String      @db.Text            
+  fee_type          String      @db.VarChar(100)   // Cách tính phí
+  carrier           String      @db.VarChar(250)   // Đơn vị vận chuyển
+  is_active         Boolean     @default(false)
+  delivery_time     String      @db.VarChar(100)   // Thời gian giao hàng
+  base_fee          Decimal     @db.Decimal(10,2)  // Phí cơ bản
+  free_threshold    Decimal     @db.Decimal(10,2)  // Miễn phí từ giá trị này                          
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+  order           Order[]
+}

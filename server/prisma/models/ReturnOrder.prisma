@@ -1,0 +1,22 @@
+model ReturnOrder {
+    return_id          Int         @id @default (autoincrement())
+    total_refund    Decimal     @db.Decimal(10,2)
+    return_reason   String      @db.VarChar(250)                           
+    note            String      @db.VarChar(250)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    order_id    Int
+    order   Order @relation(fields: [order_id], references: [order_id])
+    customer_id    Int
+    customer   Customer @relation(fields: [customer_id], references: [customer_id])
+    warehouse_id    Int
+    warehouse   Warehouse @relation(fields: [warehouse_id], references: [warehouse_id])
+  
+    @@index([order_id])
+    @@index([customer_id])
+    @@index([warehouse_id])
+
+    returnOrderDetail   ReturnOrderDetail[]
+}

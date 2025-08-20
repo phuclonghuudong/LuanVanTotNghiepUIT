@@ -1,0 +1,19 @@
+model Inventory {
+  inventory_id        Int           @id @default(autoincrement())                        
+  quantity            Int           @db.TinyInt 
+  avg_cost            Decimal       @db.Decimal(10,2)                               
+  last_import_price   Decimal       @db.Decimal(10,2)  // Giá nhập mới nhất                             
+  status            Int           @db.TinyInt                                
+  createdAt         DateTime      @default(now())                            
+  updatedAt         DateTime      @updatedAt                                 
+  
+  warehouse_id      Int
+  warehouse   Warehouse @relation(fields: [warehouse_id], references: [warehouse_id])
+  variant_id      Int
+  variant   ProductVariant @relation(fields: [variant_id], references: [variant_id])
+    
+  @@index([warehouse_id])
+  @@index([variant_id])
+
+  
+}

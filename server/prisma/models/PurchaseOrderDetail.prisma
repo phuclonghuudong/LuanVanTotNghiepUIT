@@ -1,0 +1,18 @@
+model PurchaseOrderDetail {
+    pod_id          Int         @id @default (autoincrement())
+    quantity        Int         @db.TinyInt     
+    price_import    Decimal     @db.Decimal(10,2)
+    unit            String       @db.VarChar(50)                           
+    total_price     Decimal     @db.Decimal(10,2)
+    status          Int         @db.TinyInt                                
+    createdAt       DateTime    @default(now())                            
+    updatedAt       DateTime    @updatedAt  
+
+    po_id    Int
+    purchaseOrder   PurchaseOrder @relation(fields: [po_id], references: [po_id])
+    variant_id    Int
+    productVariant   ProductVariant @relation(fields: [variant_id], references: [variant_id])
+  
+    @@index([po_id])
+    @@index([variant_id])
+}
