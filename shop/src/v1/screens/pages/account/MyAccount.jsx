@@ -1,11 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PageTitle from "../../../components/common/PageTitle";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import IconComponent from "./../../../components/ui/IconComponent";
 import { FiLogOut, FiShoppingCart, FiUser } from "react-icons/fi";
 import { BiLocationPlus } from "react-icons/bi";
-
+import { logout } from "../../../slices/authSlice";
+import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
 const MyAccount = () => {
+  const dispatch = useDispatch();
+  const { isLoggedIn, user } = useSelector((state) => state.auth);
+  const handleLogout = () => {
+    dispatch(logout());
+    toast.info("Đăng xuất tài khoản thành công");
+  };
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      // nếu chưa login → quay lại trang trước đó
+      navigate(-1);
+    }
+  }, [isLoggedIn, navigate]);
+
+  if (!isLoggedIn) return null; // tránh render flicker
   return (
     <div data-aos="fade-up">
       <PageTitle
@@ -26,8 +44,8 @@ const MyAccount = () => {
                 <div className="h-20 w-20 overflow-hidden rounded-full ring-1 ring-gray-200">
                   <img src="images/avatar/user-account.jpg" alt="avatar" className="h-full w-full object-cover" />
                 </div>
-                <h6 className="text-2xl font-semibold">Tony Nguyen</h6>
-                <div className="text-md font-medium text-gray-600">themesflat@gmail.com</div>
+                <h6 className="text-2xl font-semibold">{user?.fullname}</h6>
+                <div className="text-md font-medium text-gray-600">{user?.email}</div>
               </div>
 
               {/* <!-- Nav --> */}
@@ -56,7 +74,7 @@ const MyAccount = () => {
                   My Address
                 </Link>
                 <Link
-                  to="/#"
+                  onClick={handleLogout}
                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium bg-[#f7f7f7] hover:bg-white "
                 >
                   <IconComponent icon={FiLogOut} size={22} />

@@ -1,11 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BiLocationPlus } from "react-icons/bi";
 import { FiLogOut, FiShoppingCart, FiUser } from "react-icons/fi";
 import IconComponent from "../../../components/ui/IconComponent";
 import PageTitle from "../../../components/common/PageTitle";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const MyAddress = () => {
+  const [addAddress, setAddAddress] = useState(false);
+  const [editAddress, setEditAddress] = useState(false);
+  const { isLoggedIn, user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      // nếu chưa login → quay lại trang trước đó
+      navigate(-1);
+    }
+  }, [isLoggedIn, navigate]);
+
+  if (!isLoggedIn) return null; // tránh render flicker
   return (
     <div>
       <PageTitle
@@ -26,8 +40,8 @@ const MyAddress = () => {
                 <div className="h-20 w-20 overflow-hidden rounded-full ring-1 ring-gray-200">
                   <img src="images/avatar/user-account.jpg" alt="avatar" className="h-full w-full object-cover" />
                 </div>
-                <h6 className="text-2xl font-semibold">Tony Nguyen</h6>
-                <div className="text-md font-medium text-gray-600">themesflat@gmail.com</div>
+                <h6 className="text-2xl font-semibold">{user?.fullname}</h6>
+                <div className="text-md font-medium text-gray-600">{user?.email}</div>
               </div>
               {/* <!-- Nav --> */}
               <ul className="mt-4 space-y-3">
@@ -68,12 +82,17 @@ const MyAddress = () => {
                 <button
                   className="inline-flex items-center justify-center rounded-md bg-black px-4 py-2 text-white hover:bg-amber-600 mb-5"
                   id="btn-address"
+                  onClick={() => setAddAddress(!addAddress)}
                 >
                   <span className="text-sm font-medium">Add a new address</span>
                 </button>
                 {/* <!-- Add address form (hidden by default) --> */}
                 <div className="text-center">
-                  <form action="#" className="mx-auto max-w-3xl text-left" id="form-add-address">
+                  <form
+                    action="#"
+                    className={`mx-auto max-w-3xl text-left ${addAddress ? "" : "hidden"}`}
+                    id="form-add-address"
+                  >
                     <div className="text-xl font-semibold mb-4">Add a new address "popul hidden add new address"</div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
                       <input
@@ -145,6 +164,7 @@ const MyAddress = () => {
                         type="button"
                         className="inline-flex items-center justify-center rounded-md bg-gray-200 px-4 py-2 text-gray-800 hover:bg-gray-300"
                         id="btn-cancel-add"
+                        onClick={() => setAddAddress(false)}
                       >
                         <span className="text-sm font-medium">Cancel</span>
                       </button>
@@ -162,7 +182,10 @@ const MyAddress = () => {
                     <p>themesflat.com</p>
                     <p className="mb-3">(212) 555-1234</p>
                     <div className="flex justify-center gap-3">
-                      <button className="inline-flex items-center justify-center rounded-md bg-black px-4 py-2 text-white hover:bg-amber-600 btn-edit-address">
+                      <button
+                        className="inline-flex items-center justify-center rounded-md bg-black px-4 py-2 text-white hover:bg-amber-600 btn-edit-address"
+                        onClick={() => setEditAddress()}
+                      >
                         <span className="text-sm font-medium">Edit</span>
                       </button>
                       <button className="inline-flex items-center justify-center rounded-md border border-black px-4 py-2 text-black hover:bg-amber-50 btn-delete-address">
@@ -226,6 +249,7 @@ const MyAddress = () => {
                       <div className="flex flex-col gap-3">
                         <button
                           type="button"
+                          onClick={() => setEditAddress(!editAddress)}
                           className="inline-flex items-center justify-center rounded-md bg-black px-4 py-2 text-white hover:bg-amber-600"
                         >
                           <span className="text-sm font-medium">Add address</span>
@@ -248,7 +272,10 @@ const MyAddress = () => {
                     <p>themesflat.com</p>
                     <p className="mb-3">(212) 555-1234</p>
                     <div className="flex justify-center gap-3">
-                      <button className="inline-flex items-center justify-center rounded-md bg-black px-4 py-2 text-white hover:bg-amber-600 btn-edit-address">
+                      <button
+                        onClick={() => setEditAddress(!editAddress)}
+                        className="inline-flex items-center justify-center rounded-md bg-black px-4 py-2 text-white hover:bg-amber-600 btn-edit-address"
+                      >
                         <span className="text-sm font-medium">Edit</span>
                       </button>
                       <button className="inline-flex items-center justify-center rounded-md border border-black px-4 py-2 text-black hover:bg-amber-50 btn-delete-address">
@@ -256,7 +283,7 @@ const MyAddress = () => {
                       </button>
                     </div>
                     {/* <!-- Edit form (hidden by default) --> */}
-                    <form action="#" className="mt-5 " id="form-edit-address-1">
+                    <form action="#" className={`${editAddress ? "" : "hidden"}`}>
                       <div className="text-lg font-semibold mb-4">Edit address "popul add edit address"</div>
                       <input
                         type="text"

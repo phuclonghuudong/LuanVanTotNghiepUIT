@@ -5,6 +5,9 @@ import { FiHeart, FiUser } from "react-icons/fi";
 import { HiOutlineShoppingBag } from "react-icons/hi";
 import IconComponent from "../../components/ui/IconComponent";
 import { Link, NavLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../slices/authSlice";
+import { toast } from "react-toastify";
 
 const Menu = [
   {
@@ -38,7 +41,13 @@ const Menu = [
     link: "/contact",
   },
 ];
-const Navbar = ({ user, onCartClick, onMenuClick }) => {
+const Navbar = ({ onCartClick, onMenuClick }) => {
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const handleLogout = () => {
+    dispatch(logout());
+    toast.info("Đăng xuất tài khoản thành công");
+  };
   return (
     <header className="h-[70px] px-2">
       <div className="container w-full max-w-7xl h-full mx-auto ">
@@ -66,22 +75,22 @@ const Navbar = ({ user, onCartClick, onMenuClick }) => {
               <IconComponent icon={IoSearch} size={25} color="none" className="cursor-pointer" />
               <div className="relative group">
                 <IconComponent icon={FiUser} size={25} color="none" className="hidden md:block cursor-pointer" />
-                <div className="hidden md:block absolute top-[55px] md:-right-20 text-center p-5 bg-white rounded-lg shadow-lg z-20 min-w-[200px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden">
-                  {user ? (
-                    <ul className="flex flex-col">
-                      <Link to="/auth/account-profile" className="border-b">
+                <div className="hidden md:block absolute top-[55px] md:-right-20 text-center p-5 bg-white rounded-lg min-w-[200px] shadow-lg z-20  opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-500 overflow-hidden">
+                  {isLoggedIn ? (
+                    <ul className="flex flex-col items-start ">
+                      <Link to="/auth/account-profile" className="border-b border-gray-100 font-medium text-xl pb-3">
                         My Account
                       </Link>
-                      <Link to="/#" className="border-b">
+                      <Link to="/#" className="border-b border-gray-100 font-medium text-xl pb-3">
                         Order Tracking
                       </Link>
-                      <Link to="/#" className="border-b">
+                      <Link to="/#" className="border-b border-gray-100 font-medium text-xl pb-3">
                         My Order
                       </Link>
-                      <Link to="/auth/account-address" className="border-b">
+                      <Link to="/auth/account-address" className="border-b border-gray-100 font-medium text-xl pb-3">
                         My Address
                       </Link>
-                      <Link to="/#" className="border-b">
+                      <Link onClick={handleLogout} className=" font-medium text-xl pb-3">
                         Logout
                       </Link>
                     </ul>
