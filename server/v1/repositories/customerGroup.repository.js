@@ -8,6 +8,24 @@ class CustomerGroupDAO {
     return result.map((x) => new CustomerGroupDTO(x));
   }
 
+  async findByStatus1() {
+    const result = await prisma.customerGroup.findMany({
+      where: { status: 1 },
+    });
+    return result.map((x) => new CustomerGroupDTO(x));
+  }
+
+  async findByNotMinus1() {
+    const result = await prisma.customerGroup.findMany({
+      where: {
+        status: {
+          not: -1,
+        },
+      },
+    });
+    return result.map((x) => new CustomerGroupDTO(x));
+  }
+
   async findById(id) {
     const result = await prisma.customerGroup.findUnique({
       where: { group_id: id },

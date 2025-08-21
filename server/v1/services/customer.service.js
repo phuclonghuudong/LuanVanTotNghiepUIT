@@ -76,6 +76,20 @@ class CustomerBUS {
     return result.toJSON?.() ?? result;
   }
 
+  async updateInfoCustomer(id, data) {
+    await this.getCustomerById(id);
+
+    const result = await CustomerDAO.updateEditInfo(Number(id), {
+      ...data,
+      gender: Number(data.gender),
+    });
+
+    if (!result || result.length === 0)
+      throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
+
+    return result.toJSON?.() ?? result;
+  }
+
   async deleteCustomer(id) {
     await this.getCustomerById(id);
     await CustomerDAO.delete(Number(id));

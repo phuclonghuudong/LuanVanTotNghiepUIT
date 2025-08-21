@@ -30,9 +30,9 @@ class CustomerDAO {
         fullname: data.fullname,
         gender: data.gender || null,
         birthday: data.birthday || null,
-        points: data.point || 0,
+        points: data.point ?? 0,
         address: data.address || null,
-        avatar: data.address || null,
+        avatar: data.avatar || null,
         status: data.status || 1,
       },
     });
@@ -43,6 +43,20 @@ class CustomerDAO {
     const result = await prisma.customer.update({
       where: { customer_id: id },
       data,
+    });
+    return new CustomerDTO(result);
+  }
+
+  async updateEditInfo(id, data) {
+    const result = await prisma.customer.update({
+      where: { customer_id: id },
+      data: {
+        fullname: data?.fullname || null,
+        gender: data?.gender ?? null,
+        birthday: data?.birthday ? new Date(data.birthday) : null,
+        address: data?.address || null,
+        avatar: data?.avatar || null,
+      },
     });
     return new CustomerDTO(result);
   }

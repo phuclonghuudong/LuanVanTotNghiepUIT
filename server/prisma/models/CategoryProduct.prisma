@@ -1,0 +1,17 @@
+model CategoryProduct {
+  category_product_id       Int       @id @default(autoincrement())           
+  category_product_name     String    @db.VarChar(100) @unique                 
+  category_product_slug     String    @db.VarChar(100) @unique               
+  description       String?   @db.Text                                  
+  image_url         String?   @db.Text                                   
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt  
+
+  category_id    Int
+  category   Category @relation(fields: [category_id], references: [category_id])  
+
+  @@index([category_id])                             
+  
+  product Product[]
+}

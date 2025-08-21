@@ -123,6 +123,17 @@ class AccountDAO {
     return new AccountDTO(result);
   }
 
+  async updateEditInfo(id, data) {
+    const result = await prisma.account.update({
+      where: { account_id: id },
+      data: {
+        username: data?.username,
+        phone: data?.phone,
+        email: data?.email,
+      },
+    });
+    return new AccountDTO(result);
+  }
   async delete(id) {
     await prisma.account.delete({
       where: { account_id: id },

@@ -8,7 +8,7 @@ class RoleDTO {
     status,
     createdAt,
     updatedAt,
-    account = [],
+    // account = [],
   }) {
     this.role_id = role_id;
     this.role_name = role_name;
@@ -18,7 +18,7 @@ class RoleDTO {
     this.status = status;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
-    this.account = account;
+    // this.account = account;
   }
 
   toJSON() {
@@ -31,7 +31,6 @@ class RoleDTO {
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
-      account: this.account,
     };
   }
 }

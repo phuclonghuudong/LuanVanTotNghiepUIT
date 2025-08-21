@@ -5,7 +5,7 @@ model Promotion {
   description     String?         @db.Text 
   start_date      DateTime                                 
   end_date        DateTime  
-  is_active       Boolean
+  is_active       Boolean   
   priority        Int?                              
   promotion_type  String        @db.VarChar(100)                                   
   status          Int           @db.TinyInt                                

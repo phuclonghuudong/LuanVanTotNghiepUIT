@@ -14,6 +14,18 @@ const getAllBrand = async (req, res, next) => {
   }
 };
 
+const getAllBrandActive = async (req, res, next) => {
+  try {
+    const result = await BrandBUS.getAllActive();
+    if (!result || result.length === 0)
+      throw new NotFoundError("KHÔNG TÌM THẤY DỮ LIỆU");
+
+    responseHandler(res, 200, "DANH SÁCH ", result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getBrandById = async (req, res, next) => {
   const { id } = req.params;
 
@@ -88,6 +100,7 @@ const updateBrand = async (req, res, next) => {
 
 module.exports = {
   getAllBrand,
+  getAllBrandActive,
   getBrandById,
   getBrandBySlug,
   createBrand,

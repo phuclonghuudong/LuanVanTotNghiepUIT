@@ -6,11 +6,13 @@ const {
   createBrand,
   updateBrand,
   getBrandBySlug,
+  getAllBrandActive,
 } = require("../controllers/brand.controller");
 
 // const PATH = "/brand";
 
-router.get(`/`, getAllBrand);
+router.get(`/all`, getAllBrand);
+router.get(`/active`, getAllBrandActive);
 router.get(`/:id`, getBrandById);
 router.get(`/detail/:slug`, getBrandBySlug);
 router.post(`/`, createBrand);

@@ -8,6 +8,26 @@ class BrandDAO {
     return result.map((x) => new BrandDTO(x));
   }
 
+  async findByStatus1() {
+    const result = await prisma.brand.findMany({
+      where: {
+        status: 1,
+      },
+    });
+    return result.map((x) => new BrandDTO(x));
+  }
+
+  async findByStatusNotMinus1() {
+    const result = await prisma.brand.findMany({
+      where: {
+        status: {
+          not: -1,
+        },
+      },
+    });
+    return result.map((x) => new BrandDTO(x));
+  }
+
   async findById(id) {
     const result = await prisma.brand.findUnique({
       where: { brand_id: id },

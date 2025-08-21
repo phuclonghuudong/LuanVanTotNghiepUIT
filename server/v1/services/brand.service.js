@@ -1,9 +1,22 @@
 const BrandDAO = require("../repositories/brand.repository");
-const { ConflictError, NotFoundError } = require("../utils/errors");
+const {
+  ConflictError,
+  NotFoundError,
+  BadRequestError,
+} = require("../utils/errors");
+const { isValidSlugInput } = require("../utils/isValidateInput");
 
 class BrandBUS {
   async getAllBrand() {
     const result = await BrandDAO.findAll();
+    if (!result || result.length === 0)
+      throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
+
+    return result.map((c) => c.toJSON?.() ?? c);
+  }
+
+  async getAllActive() {
+    const result = await BrandDAO.findByStatus1();
     if (!result || result.length === 0)
       throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
 
@@ -19,19 +32,26 @@ class BrandBUS {
 
   async getBrandBySlug(value) {
     const result = await BrandDAO.findBySlug(value);
-    if (!result) throw new NotFoundError("KHÔNG TỒN TẠI DỮ LIỆU");
+    if (!result) throw new NotFoundError("THƯƠNG HIỆU KHÔNG TỒN TẠI DỮ LIỆU");
 
     return result.toJSON?.() ?? result;
   }
 
   async getBrandByName(value) {
     const result = await BrandDAO.findByName(Number(value));
-    if (!result) throw new NotFoundError("KHÔNG TỒN TẠI DỮ LIỆU");
+    if (!result)
+      throw new NotFoundError("TÊN THƯƠNG HIỆU KHÔNG TỒN TẠI DỮ LIỆU");
 
     return result.toJSON?.() ?? result;
   }
 
   async validateForCreate(slug, name) {
+    const isValidSlug = await isValidSlugInput(slug);
+    if (!isValidSlug)
+      throw new BadRequestError(
+        "ĐỊNH DANH KHÔNG ĐÚNG ĐỊNH DẠNG (Ví dụ: thuc-the)"
+      );
+
     const [existingBySlug, existingByName] = await Promise.all([
       BrandDAO.findBySlug(slug),
       BrandDAO.findByName(name),
@@ -42,6 +62,12 @@ class BrandBUS {
   }
 
   async validateForUpdate(slug, name, excludeId) {
+    const isValidSlug = await isValidSlugInput(slug);
+    if (!isValidSlug)
+      throw new BadRequestError(
+        "ĐỊNH DANH KHÔNG ĐÚNG ĐỊNH DẠNG (Ví dụ: thuc-the)"
+      );
+
     const [existingBySlug, existingByName] = await Promise.all([
       BrandDAO.findBySlug(slug),
       BrandDAO.findByName(name),
@@ -69,10 +95,10 @@ class BrandBUS {
     await this.validateForUpdate(data.slug, data.name, id);
 
     const isUnchanged =
-      oldBrand.brand_slug === data.slug &&
-      oldBrand.brand_name === data.name &&
+      oldBrand.slug === data.slug &&
+      oldBrand.name === data.name &&
       oldBrand.description === data.description &&
-      oldBrand.image_url === data.imageUrl &&
+      oldBrand.imageUrl === data.imageUrl &&
       Number(oldBrand.status) === Number(data.status);
 
     if (isUnchanged) throw new ConflictError("KHÔNG CÓ GÌ THAY ĐỔI");

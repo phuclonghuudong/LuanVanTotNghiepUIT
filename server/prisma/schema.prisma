@@ -68,15 +68,9 @@ model Attribute {
     createdAt           DateTime    @default(now())                            
     updatedAt           DateTime    @updatedAt  
 
-
-    category_id Int
-    category   Category @relation(fields: [category_id], references: [category_id])
-  
-
-    @@index([category_id])
-
     attributeValue  AttributeValue[]
     variantAttributeValue  VariantAttributeValue[]
+    categoryAttribute   CategoryAttribute[]
 }
 
 model AttributeValue {
@@ -142,6 +136,7 @@ model CartItem {
     variant_id    Int
     productVariant   ProductVariant @relation(fields: [variant_id], references: [variant_id])
   
+    @@index([cart_id])
     @@index([variant_id])
 }
 
@@ -155,8 +150,42 @@ model Category {
   createdAt         DateTime  @default(now())                            
   updatedAt         DateTime  @updatedAt                                 
   
+  categoryProduct CategoryProduct[]
+  categoryAttribute   CategoryAttribute[]
+}
+
+model CategoryAttribute {
+  id       Int       @id @default(autoincrement())                        
+  description       String?   @db.Text                                  
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+  category_id    Int
+    category   Category @relation(fields: [category_id], references: [category_id])
+  attribute_id    Int
+    attribute   Attribute @relation(fields: [attribute_id], references: [attribute_id])
+
+    @@index([category_id]) 
+    @@index([attribute_id]) 
+}
+
+model CategoryProduct {
+  category_product_id       Int       @id @default(autoincrement())           
+  category_product_name     String    @db.VarChar(100) @unique                 
+  category_product_slug     String    @db.VarChar(100) @unique               
+  description       String?   @db.Text                                  
+  image_url         String?   @db.Text                                   
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt  
+
+  category_id    Int
+  category   Category @relation(fields: [category_id], references: [category_id])  
+
+  @@index([category_id])                             
+  
   product Product[]
-  attribute Attribute[]
 }
 
 model Contact {
@@ -512,13 +541,13 @@ model Product {
     updatedAt           DateTime    @updatedAt  
 
 
-    category_id         Int
-    category   Category @relation(fields: [category_id], references: [category_id])
+    category_product_id         Int
+    categoryProduct   CategoryProduct @relation(fields: [category_product_id], references: [category_product_id])
     brand_id            Int
     brand   Brand @relation(fields: [brand_id], references: [brand_id])
   
 
-    @@index([category_id])
+    @@index([category_product_id])
     @@index([brand_id])
 
     productVariant  ProductVariant[]
@@ -552,9 +581,6 @@ model ProductComment {
 
 model ProductReview {
     review_id       Int         @id @default (autoincrement())
-    product_name    String      @db.VarChar(100)     @unique
-    product_slug    String      @db.VarChar(100)     @unique
-    product_sku     String      @db.VarChar(50)      @unique
     rating          Int?        @default(0)
     content         String?     @db.Text
     status          Int         @db.TinyInt                                
@@ -606,7 +632,7 @@ model Promotion {
   description     String?         @db.Text 
   start_date      DateTime                                 
   end_date        DateTime  
-  is_active       Boolean
+  is_active       Boolean   
   priority        Int?                              
   promotion_type  String        @db.VarChar(100)                                   
   status          Int           @db.TinyInt                                
