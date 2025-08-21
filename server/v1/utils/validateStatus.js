@@ -5,7 +5,7 @@ const validateAccountStatus = async (status) => {
     case 3: // inactive
       throw new BadRequestError("TÀI KHOẢN ĐANG BỊ VÔ HIỆU HÓA");
     case 2: // pending
-      throw new BadRequestError("TÀI KHOẢN CHƯA XÁC NHẬN");
+      throw new BadRequestError("TÀI KHOẢN CHƯA ĐƯỢC XÁC NHẬN");
     case 0: // suspended
       throw new BadRequestError("TÀI KHOẢN ĐANG BỊ KHÓA");
     case -1: // deleted
@@ -17,8 +17,10 @@ const validateAccountStatus = async (status) => {
   }
 };
 
-const validateCategoryStatus = async (status) => {
+const validateStatus = async (status) => {
   switch (status) {
+    case 2: // pending
+      throw new BadRequestError("CHƯA ĐƯỢC XÁC NHẬN");
     case 0: // suspended
       throw new BadRequestError("ĐANG BỊ KHÓA");
     case -1: // deleted
@@ -30,4 +32,4 @@ const validateCategoryStatus = async (status) => {
   }
 };
 
-module.exports = { validateAccountStatus, validateCategoryStatus };
+module.exports = { validateAccountStatus, validateStatus };

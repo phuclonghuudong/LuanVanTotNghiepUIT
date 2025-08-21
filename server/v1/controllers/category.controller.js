@@ -12,6 +12,16 @@ const getAllCategory = async (req, res, next) => {
   }
 };
 
+const getAllCategoryStatusEqual1 = async (req, res, next) => {
+  try {
+    const result = await CategoryBUS.getAllCategoriesStatusEqual1();
+
+    responseHandler(res, 200, "DANH SÁCH LOẠI SẢN PHẨM", result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getCategoryById = async (req, res, next) => {
   const { id } = req.params;
   if (!id) throw new BadRequestError("VUI LÒNG CUNG CẤP ĐẦY ĐỦ THÔNG TIN");
@@ -87,6 +97,7 @@ const updateCategory = async (req, res, next) => {
 
 module.exports = {
   getAllCategory,
+  getAllCategoryStatusEqual1,
   getCategoryById,
   getCategoryBySlug,
   createCategory,

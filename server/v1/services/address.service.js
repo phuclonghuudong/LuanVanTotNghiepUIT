@@ -31,6 +31,17 @@ class AddressBUS {
     return result.toJSON?.() ?? result;
   }
 
+  async getAddressByIdAndCustomer(id, customer) {
+    const result = await AddressDAO.findByIdAndCustomer(
+      Number(id),
+      Number(customer)
+    );
+    if (!result || result.length === 0)
+      throw new NotFoundError("KHÔNG THỂ THỰC HIỆN THAO TÁC NÀY");
+
+    return result.toJSON?.() ?? result;
+  }
+
   async validateInput(data) {
     const { phone } = data;
 
@@ -54,8 +65,9 @@ class AddressBUS {
     return result.toJSON?.() ?? result;
   }
 
-  async updateAddress(id, data) {
+  async updateAddress(user, id, data) {
     await this.validateInput(data);
+    await this.getAddressByIdAndCustomer(id, user);
 
     const oldData = await this.getAddressById(id);
 

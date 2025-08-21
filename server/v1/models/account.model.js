@@ -47,7 +47,7 @@ class AccountDTO {
       refreshToken: this.refresh_token,
       status: this.status,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
+      updatedAt: this.createdAt,
       customer: this.customer,
       personnel: this.personnel,
     };

@@ -10,6 +10,14 @@ class RoleBUS {
     return result.map((x) => x.toJSON?.() ?? x);
   }
 
+  async getAllRoleActive() {
+    const result = await RoleDAO.findByStatus1();
+    if (!result || result.length === 0)
+      throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
+
+    return result.map((x) => x.toJSON?.() ?? x);
+  }
+
   async getRoleById(id) {
     const result = await RoleDAO.findById(Number(id));
     if (!result) throw new NotFoundError("ID KHÔNG TỒN TẠI DỮ LIỆU");

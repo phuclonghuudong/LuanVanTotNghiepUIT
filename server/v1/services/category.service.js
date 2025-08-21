@@ -1,5 +1,10 @@
 const CategoryDAO = require("../repositories/category.repository");
-const { NotFoundError, ConflictError } = require("../utils/errors");
+const {
+  NotFoundError,
+  ConflictError,
+  BadRequestError,
+} = require("../utils/errors");
+const { isValidSlugInput } = require("../utils/isValidateInput");
 
 class CategoryBUS {
   async getAllCategories() {
@@ -11,9 +16,27 @@ class CategoryBUS {
     return result.map((c) => c.toJSON?.() ?? c);
   }
 
+  async getAllCategoriesStatusEqual1() {
+    const result = await CategoryDAO.findByStatus1();
+
+    if (!result || result.length === 0)
+      throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
+
+    return result.map((c) => c.toJSON?.() ?? c);
+  }
+
+  async getAllCategoriesStatusNotMinus1() {
+    const result = await CategoryDAO.findByStatusNotMinus1();
+
+    if (!result || result.length === 0)
+      throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
+
+    return result.map((c) => c.toJSON?.() ?? c);
+  }
+
   async getCategoryById(id) {
     const result = await CategoryDAO.findById(Number(id));
-    if (!result) throw new NotFoundError("ID KHÔNG TỒN TẠI DỮ LIỆU");
+    if (!result) throw new NotFoundError("DANH MỤC KHÔNG TỒN TẠI DỮ LIỆU");
 
     return result.toJSON?.() ?? result;
   }
@@ -26,6 +49,12 @@ class CategoryBUS {
   }
 
   async validateForCreate(slug, name) {
+    const isValidSlug = await isValidSlugInput(slug);
+    if (!isValidSlug)
+      throw new BadRequestError(
+        "ĐỊNH DANH KHÔNG ĐÚNG ĐỊNH DẠNG (Ví dụ: thuc-the)"
+      );
+
     const [existingBySlug, existingByName] = await Promise.all([
       CategoryDAO.findBySlug(slug),
       CategoryDAO.findByName(name),
@@ -36,6 +65,12 @@ class CategoryBUS {
   }
 
   async validateForUpdate(slug, name, excludeId) {
+    const isValidSlug = await isValidSlugInput(slug);
+    if (!isValidSlug)
+      throw new BadRequestError(
+        "ĐỊNH DANH KHÔNG ĐÚNG ĐỊNH DẠNG (Ví dụ: thuc-the)"
+      );
+
     const [existingBySlug, existingByName] = await Promise.all([
       CategoryDAO.findBySlug(slug),
       CategoryDAO.findByName(name),

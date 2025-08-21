@@ -7,6 +7,18 @@ class RoleDAO {
     const result = await prisma.role.findMany();
     return result.map((c) => new RoleDTO(c));
   }
+  async findByStatus1() {
+    const result = await prisma.role.findMany({
+      where: { status: 1 },
+    });
+    return result.map((c) => new RoleDTO(c));
+  }
+  async findByStatusNotMinus1() {
+    const result = await prisma.role.findMany({
+      where: { status: { not: -1 } },
+    });
+    return result.map((c) => new RoleDTO(c));
+  }
 
   async findById(id) {
     const result = await prisma.role.findUnique({

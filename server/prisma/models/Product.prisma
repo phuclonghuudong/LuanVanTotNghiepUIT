@@ -10,13 +10,13 @@ model Product {
     updatedAt           DateTime    @updatedAt  
 
 
-    category_id         Int
-    category   Category @relation(fields: [category_id], references: [category_id])
+    category_product_id         Int
+    categoryProduct   CategoryProduct @relation(fields: [category_product_id], references: [category_product_id])
     brand_id            Int
     brand   Brand @relation(fields: [brand_id], references: [brand_id])
   
 
-    @@index([category_id])
+    @@index([category_product_id])
     @@index([brand_id])
 
     productVariant  ProductVariant[]

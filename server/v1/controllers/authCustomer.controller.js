@@ -1,5 +1,5 @@
 const { BadRequestError } = require("../utils/errors");
-const AuthBUS = require("../services/auth.service");
+const AuthCustomerBUS = require("../services/authCustomer.service");
 const responseHandler = require("../utils/responseHandler");
 const {
   generateAndSetToken,
@@ -9,9 +9,10 @@ const {
 const payloadToken = async (data) => {
   const payload = {
     account: data?.accountId,
-    customer: data?.customerId,
-    role: data?.roleId,
+    user: data?.customerId,
+    role: data?.role,
     username: data?.username,
+    fullname: data?.fullname,
   };
   return payload;
 };
@@ -34,7 +35,7 @@ const signUpCustomer = async (req, res, next) => {
 
   try {
     const valueInput = req.body;
-    const result = await AuthBUS.signUpCustomer(valueInput);
+    const result = await AuthCustomerBUS.signUpCustomer(valueInput);
 
     const payload = await payloadToken(result);
 
@@ -45,7 +46,7 @@ const signUpCustomer = async (req, res, next) => {
 
     const accountId = result?.accountId;
 
-    await AuthBUS.refreshToken({
+    await AuthCustomerBUS.refreshToken({
       id: accountId,
       token: refreshToken,
     });
@@ -66,7 +67,7 @@ const signInCustomer = async (req, res, next) => {
 
   try {
     const validInput = req.body;
-    const result = await AuthBUS.signInCustomer(validInput);
+    const result = await AuthCustomerBUS.signInCustomer(validInput);
 
     const payload = await payloadToken(result);
 
@@ -77,7 +78,7 @@ const signInCustomer = async (req, res, next) => {
 
     const accountId = result?.accountId;
 
-    await AuthBUS.refreshToken({
+    await AuthCustomerBUS.refreshToken({
       id: accountId,
       token: refreshToken,
     });
@@ -96,7 +97,9 @@ const verifyEmailForgotPasswordCustomer = async (req, res, next) => {
   if (!email) throw new BadRequestError("VUI LÒNG NHẬP ĐẦY ĐỦ THÔNG TIN");
 
   try {
-    const result = await AuthBUS.verifyEmailForgotPasswordCustomer(email);
+    const result = await AuthCustomerBUS.verifyEmailForgotPasswordCustomer(
+      email
+    );
 
     responseHandler(res, 200, "VUI LÒNG XEM HỘP THƯ CỦA BẠN");
   } catch (error) {
@@ -114,7 +117,7 @@ const verifyOtpByEmail = async (req, res, next) => {
 
   try {
     const payload = req.body;
-    const result = await AuthBUS.verifyOtpByEmail(payload);
+    const result = await AuthCustomerBUS.verifyOtpByEmail(payload);
 
     responseHandler(
       res,
@@ -137,7 +140,7 @@ const resetPassword = async (req, res, next) => {
 
   try {
     const payload = req.body;
-    const result = await AuthBUS.resetPassword(payload);
+    const result = await AuthCustomerBUS.resetPassword(payload);
 
     responseHandler(res, 200, "ĐỔI MẬT KHẨU THÀNH CÔNG");
   } catch (error) {
@@ -155,7 +158,7 @@ const refreshToken = async (req, res, next) => {
 
     const accountId = verifyToken?.account;
 
-    const checkUser = await AuthBUS.checkAccountAndCustomer(accountId);
+    const checkUser = await AuthCustomerBUS.checkAccountAndCustomer(accountId);
 
     const payload = await payloadToken(checkUser);
 
@@ -164,13 +167,13 @@ const refreshToken = async (req, res, next) => {
       payload
     );
 
-    await AuthBUS.refreshToken({
+    await AuthCustomerBUS.refreshToken({
       id: accountId,
       token: refreshToken,
     });
 
     responseHandler(res, 200, "THAO TÁC THÀNH CÔNG", {
-      USER: checkUser,
+      // USER: checkUser,
       TOKEN: accessToken,
     });
   } catch (error) {
@@ -182,11 +185,41 @@ const profileAccountCustomer = async (req, res, next) => {
   try {
     const user = req.user?.account;
 
-    const result = await AuthBUS.checkAccountAndCustomer(user);
+    const result = await AuthCustomerBUS.checkAccountAndCustomer(user);
 
     responseHandler(res, 200, "THÔNG TIN TÀI KHOẢN", { USER: result });
   } catch (error) {
     next();
+  }
+};
+
+const editInfoCustomer = async (req, res, next) => {
+  const {
+    fullname,
+
+    username,
+    email,
+    phone,
+    gender,
+    birthday,
+    address,
+    avatar,
+  } = req.body;
+  if (!fullname.trim() || !username.trim() || !phone.trim() || !email.trim())
+    throw new BadRequestError("VUI LÒNG NHẬP ĐẦY ĐỦ THÔNG TIN");
+
+  try {
+    const user = req.user?.user;
+    const account = req.user?.account;
+    const result = await AuthCustomerBUS.editInfoCustomer(
+      user,
+      account,
+      req.body
+    );
+
+    responseHandler(res, 200, "THÔNG TIN TÀI KHOẢN", { USER: result });
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -198,4 +231,5 @@ module.exports = {
   resetPassword,
   refreshToken,
   profileAccountCustomer,
+  editInfoCustomer,
 };

@@ -1,8 +1,5 @@
 model ProductReview {
     review_id       Int         @id @default (autoincrement())
-    product_name    String      @db.VarChar(100)     @unique
-    product_slug    String      @db.VarChar(100)     @unique
-    product_sku     String      @db.VarChar(50)      @unique
     rating          Int?        @default(0)
     content         String?     @db.Text
     status          Int         @db.TinyInt                                

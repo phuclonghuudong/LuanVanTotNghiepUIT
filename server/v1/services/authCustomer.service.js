@@ -1,17 +1,24 @@
 const sendEmail = require("../configs/sendMail");
-const AccountBUS = require("../services/account.service");
-const CustomerBUS = require("../services/customer.service");
-const { BadRequestError } = require("../utils/errors");
+const AccountBUS = require("./account.service");
+const CustomerBUS = require("./customer.service");
+const RoleBUS = require("./role.service");
+const {
+  BadRequestError,
+  ConflictError,
+  UnauthorizedError,
+} = require("../utils/errors");
 const {
   comparePassword,
   validEmailInput,
+  isValidNormalizeDate,
 } = require("../utils/isValidateInput");
 const { validateAccountStatus } = require("../utils/validateStatus");
 const verifyEmailTemplate = require("../utils/verifyEmailTemplate");
 
-class AuthBUS {
-  async customerAccountInformation(account, customer) {
+class AuthCustomerBUS {
+  async customerAccountInformation(account, customer, role) {
     return {
+      role: role?.slug,
       customerId: customer?.id,
       accountId: account?.id,
       roleId: account?.roleId,
@@ -33,9 +40,12 @@ class AuthBUS {
 
     const checkCustomer = await CustomerBUS.getCustomerByAccountId(accountId);
 
+    const checkRole = await RoleBUS.getRoleById(checkAccount?.roleId);
+
     const result = await this.customerAccountInformation(
       checkAccount,
-      checkCustomer
+      checkCustomer,
+      checkRole
     );
 
     if (!result || result.length === 0)
@@ -47,18 +57,24 @@ class AuthBUS {
   async signUpCustomer(data) {
     const createAccount = await AccountBUS.createAccount({
       ...data,
-      role: "KHACHHANG",
+      role: "CUSTOMER",
     });
+
+    const accountId = createAccount?.id;
 
     const createCustomer = await CustomerBUS.createCustomer({
       ...data,
-      accountId: createAccount?.id,
+      accountId: accountId,
       groupId: 1,
     });
 
+    const roleId = createAccount?.roleId;
+    const findRole = await RoleBUS.getRoleById(roleId);
+
     const result = await this.customerAccountInformation(
       createAccount,
-      createCustomer
+      createCustomer,
+      findRole
     );
 
     if (!result || result.length === 0)
@@ -79,11 +95,15 @@ class AuthBUS {
       throw new BadRequestError("TÀI KHOẢN HOẶC MẬT KHẨU KHÔNG CHÍNH XÁC");
 
     const accountId = checkAccount?.id;
+    const roleId = checkAccount?.roleId;
+
+    const findRole = await RoleBUS.getRoleById(roleId);
     const findCustomer = await CustomerBUS.getCustomerByAccountId(accountId);
 
     const result = await this.customerAccountInformation(
       checkAccount,
-      findCustomer
+      findCustomer,
+      findRole
     );
 
     await validateAccountStatus(result?.status);
@@ -138,6 +158,41 @@ class AuthBUS {
 
     return result;
   }
+
+  async editInfoCustomer(userId, accountId, data) {
+    const checkUser = await CustomerBUS.getCustomerById(userId);
+    const checkAccount = await AccountBUS.getAccountById(accountId);
+    const roleId = checkAccount?.roleId;
+
+    const findRole = await RoleBUS.getRoleById(roleId);
+
+    const isSame = Boolean(
+      checkUser.fullname === data.fullname &&
+        Number(checkUser.gender) === Number(data.gender) &&
+        isValidNormalizeDate(checkUser.birthday) ===
+          isValidNormalizeDate(data.birthday) &&
+        checkUser.address === (data.address || null) &&
+        checkUser.avatar === (data.avatar || null) &&
+        checkAccount.username === data.username &&
+        checkAccount.phone === data.phone &&
+        checkAccount.email === data.email
+    );
+
+    if (isSame) {
+      throw new ConflictError("DỮ LIỆU KHÔNG CÓ GÌ THAY ĐỔI ");
+    }
+
+    const updateCustomer = await CustomerBUS.updateInfoCustomer(userId, data);
+    const updateAccount = await AccountBUS.updateAccountInfo(accountId, data);
+
+    const result = await this.customerAccountInformation(
+      updateAccount,
+      updateCustomer,
+      findRole
+    );
+
+    return result;
+  }
 }
 
-module.exports = new AuthBUS();
+module.exports = new AuthCustomerBUS();

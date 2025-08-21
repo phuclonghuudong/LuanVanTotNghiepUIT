@@ -7,6 +7,8 @@ class AddressDTO {
     address,
     is_main,
     status,
+    createdAt,
+    updatedAt,
   }) {
     this.address_id = address_id;
     this.customer_id = customer_id;
@@ -15,6 +17,8 @@ class AddressDTO {
     this.address = address;
     this.is_main = is_main;
     this.status = status;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
   }
 
   toJSON() {
@@ -26,6 +30,8 @@ class AddressDTO {
       address: this.address,
       isMain: this.is_main,
       status: this.status,
+      createdAt: this.createdAt,
+      updatedAt: this.createdAt,
     };
   }
 }

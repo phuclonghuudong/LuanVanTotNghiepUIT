@@ -12,6 +12,16 @@ const getAllCustomerGroup = async (req, res, next) => {
   }
 };
 
+const getAllCustomerGroupActive = async (req, res, next) => {
+  try {
+    const result = await CustomerGroupBUS.getAllActive();
+
+    responseHandler(res, 200, "DANH SÁCH", result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getCustomerGroupById = async (req, res, next) => {
   const { id } = req.params;
   if (!id) throw new BadRequestError("VUI LÒNG CUNG CẤP ĐẦY ĐỦ THÔNG TIN");
@@ -55,6 +65,7 @@ const updateCustomerGroup = async (req, res, next) => {
 
 module.exports = {
   getAllCustomerGroup,
+  getAllCustomerGroupActive,
   getCustomerGroupById,
   createCustomerGroup,
   updateCustomerGroup,
