@@ -17,6 +17,7 @@
 a.active hr {
   opacity: 100;
   transition: all;
+  width: 100%;
 }
 @media (max-width: 640px) {
   a.active {

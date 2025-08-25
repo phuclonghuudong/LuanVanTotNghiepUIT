@@ -1,4 +1,4 @@
-import Collection from "../../components/common/Collection";
+import CarouselCollection from "../../components/common/Collection";
 import NewsletterBox from "../../components/common/NewsletterBox";
 import Seller from "../../components/common/Seller";
 import Slide from "../../components/common/Slide";
@@ -9,7 +9,7 @@ const HomeScreen = () => {
     <>
       <div className="w-full overflow-hidden">
         <Slide />
-        <Collection />
+        <CarouselCollection />
         <Seller />
         <OurPolicy />
         <NewsletterBox />

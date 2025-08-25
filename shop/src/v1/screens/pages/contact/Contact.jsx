@@ -95,6 +95,14 @@ const Contact = () => {
               className="inline-flex items-center rounded-full bg-black px-6 md:px-8 py-3 text-white text-base font-medium hover:opacity-95 active:opacity-90"
             />
           </div>
+          {/* <a
+            href="#"
+            className="relative inline-block text-black font-medium 
+             after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0 
+             after:bg-black after:transition-all after:duration-300 hover:after:w-full"
+          >
+            Hover Me
+          </a> */}
         </form>
       </div>
     </div>

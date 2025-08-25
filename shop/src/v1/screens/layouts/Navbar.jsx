@@ -66,11 +66,16 @@ const Navbar = ({onCartClick, onMenuClick}) => {
             </Link>
           </div>
           <div className="hidden xl:block xl:w-1/2">
-            <ul className="flex items-center justify-between py-5 font-medium ">
+            <ul className="flex items-center justify-between py-5 font-medium">
               {Menu.map((data) => (
-                <NavLink to={data.link} key={data.id} className="flex flex-col items-center gap-[2px]">
-                  <p>{data.name}</p>
-                  <hr className="w-3/4 border-none h-[1px] bg-gray-700 opacity-0 transition-all duration-400" />
+                <NavLink to={data.link} key={data.id} className={`flex flex-col items-center gap-[2px] group `}>
+                  <p className="relative">
+                    {data.name}
+                    {/* underline animation */}
+                    <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                  </p>
+                  {/* hr line cho active (ẩn/hiện qua CSS) */}
+                  <hr className="w-3/4 border-none h-[2px] bg-gray-700 opacity-0 transition-all duration-400" />
                 </NavLink>
               ))}
             </ul>
