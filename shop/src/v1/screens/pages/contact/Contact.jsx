@@ -14,32 +14,34 @@ const Contact = () => {
             referrerPolicy="no-referrer-when-downgrade"
           ></iframe>
         </div>
-        <div class="h-full  bg-neutral-100/70 p-6 md:p-8">
-          <h2 class="text-2xl md:text-3xl font-semibold mb-6">Information</h2>
+        <div className="h-full  bg-neutral-100/70 p-6 md:p-8">
+          <h2 className="text-2xl md:text-3xl font-semibold mb-6">Information</h2>
 
-          <div class="space-y-6 text-sm md:text-base">
+          <div className="space-y-6 text-sm md:text-base">
             <div>
-              <p class="font-medium text-neutral-800">Phone:</p>
-              <a href="tel:+16662348888" class="mt-1 inline-block text-neutral-700 hover:text-black">
+              <p className="font-medium text-neutral-800">Phone:</p>
+              <a href="tel:+16662348888" className="mt-1 inline-block text-neutral-700 hover:text-black">
                 +1 666 234 8888
               </a>
             </div>
 
             <div>
-              <p class="font-medium text-neutral-800">Email:</p>
-              <a href="mailto:themesflat@gmail.com" class="mt-1 inline-block text-neutral-700 hover:text-black">
+              <p className="font-medium text-neutral-800">Email:</p>
+              <a href="mailto:themesflat@gmail.com" className="mt-1 inline-block text-neutral-700 hover:text-black">
                 themesflat@gmail.com
               </a>
             </div>
 
             <div>
-              <p class="font-medium text-neutral-800">Address:</p>
-              <p class="mt-1 text-neutral-700">2163 Phillips Gap Rd, West Jefferson, North Carolina, United States</p>
+              <p className="font-medium text-neutral-800">Address:</p>
+              <p className="mt-1 text-neutral-700">
+                2163 Phillips Gap Rd, West Jefferson, North Carolina, United States
+              </p>
             </div>
 
             <div>
-              <p class="font-medium text-neutral-800">Open Time:</p>
-              <ul class="mt-1 space-y-1 text-neutral-700">
+              <p className="font-medium text-neutral-800">Open Time:</p>
+              <ul className="mt-1 space-y-1 text-neutral-700">
                 <li>Mon – Sat: 7:30am – 8:00pm PST</li>
                 <li>Sunday: 9:00am – 5:00pm PST</li>
               </ul>
@@ -95,14 +97,6 @@ const Contact = () => {
               className="inline-flex items-center rounded-full bg-black px-6 md:px-8 py-3 text-white text-base font-medium hover:opacity-95 active:opacity-90"
             />
           </div>
-          {/* <a
-            href="#"
-            className="relative inline-block text-black font-medium 
-             after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0 
-             after:bg-black after:transition-all after:duration-300 hover:after:w-full"
-          >
-            Hover Me
-          </a> */}
         </form>
       </div>
     </div>
