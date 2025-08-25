@@ -25,7 +25,7 @@ class AttributeBUS {
 
   async getAttributeById(id) {
     const result = await AttributeDAO.findById(Number(id));
-    if (!result) throw new NotFoundError("KHÔNG TỒN TẠI DỮ LIỆU");
+    if (!result) throw new NotFoundError("THUỘC TÍNH KHÔNG TỒN TẠI");
 
     return result.toJSON?.() ?? result;
   }

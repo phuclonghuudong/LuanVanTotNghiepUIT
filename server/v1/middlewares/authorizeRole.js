@@ -1,4 +1,5 @@
 const { ForbiddenError } = require("../utils/errors");
+// ADMIN, PERSONNEL, CUSTOMER,
 
 const authorizeRole = (...allowedRoles) => {
   return (req, res, next) => {

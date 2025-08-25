@@ -25,7 +25,7 @@ class BrandBUS {
 
   async getBrandById(id) {
     const result = await BrandDAO.findById(Number(id));
-    if (!result) throw new NotFoundError("KHÔNG TỒN TẠI DỮ LIỆU");
+    if (!result) throw new NotFoundError("THƯƠNG HIỆU KHÔNG TỒN TẠI");
 
     return result.toJSON?.() ?? result;
   }

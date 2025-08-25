@@ -28,7 +28,7 @@ class CategoryProductBUS {
 
   async getCategoryProductById(id) {
     const result = await CategoryProductDAO.findById(Number(id));
-    if (!result) throw new NotFoundError("ID KHÔNG TỒN TẠI DỮ LIỆU");
+    if (!result) throw new NotFoundError("DANH MỤC SẢN PHẨM KHÔNG TỒN TẠI");
 
     return result.toJSON?.() ?? result;
   }

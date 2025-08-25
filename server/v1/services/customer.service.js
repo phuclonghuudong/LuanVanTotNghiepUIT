@@ -28,6 +28,12 @@ class CustomerBUS {
     return result.toJSON?.() ?? result;
   }
 
+  async getCustomerByAccountIdLogin(value) {
+    const result = await CustomerDAO.findByAccountId(Number(value));
+
+    return result ? result.toJSON?.() : null;
+  }
+
   async createCustomer(data) {
     const { accountId, groupId, status } = data;
 

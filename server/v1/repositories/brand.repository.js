@@ -56,7 +56,7 @@ class BrandDAO {
         brand_slug: data.slug,
         description: data.description,
         image_url: data.imageUrl,
-        status: data.status || 1,
+        status: data.status ?? 1,
       },
     });
     return new BrandDTO(result);
