@@ -5,11 +5,13 @@ const {
   getCustomerGroupById,
   createCustomerGroup,
   updateCustomerGroup,
+  getAllCustomerGroupActive,
 } = require("../controllers/customerGroup.controller");
 
 // const PATH = "/group";
 
-router.get(`/`, getAllCustomerGroup);
+router.get(`/all`, getAllCustomerGroup);
+router.get(`/active`, getAllCustomerGroupActive);
 router.get(`/:id`, getCustomerGroupById);
 router.post(`/`, createCustomerGroup);
 router.put(`/:id`, updateCustomerGroup);

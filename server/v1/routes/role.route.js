@@ -6,16 +6,15 @@ const {
   getRoleBySlug,
   createRole,
   updateRole,
+  getAllRoleActive,
 } = require("../controllers/role.controller");
 
 // const PATH = "/role";
 
-router.get(`/`, getAllRole);
-
+router.get(`/all`, getAllRole);
+router.get(`/active`, getAllRoleActive);
 router.get("/detail/:slug", getRoleBySlug);
-
 router.get(`/:id`, getRoleById);
-
 router.post(`/`, createRole);
 router.put(`/:id`, updateRole);
 

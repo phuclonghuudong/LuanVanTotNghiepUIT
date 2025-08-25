@@ -30,7 +30,7 @@ class BrandDTO {
       imageUrl: this.image_url,
       status: this.status,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
+      updatedAt: this.createdAt,
       products: this.products,
     };
   }

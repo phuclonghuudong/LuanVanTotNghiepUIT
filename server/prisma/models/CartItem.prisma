@@ -13,5 +13,6 @@ model CartItem {
     variant_id    Int
     productVariant   ProductVariant @relation(fields: [variant_id], references: [variant_id])
   
+    @@index([cart_id])
     @@index([variant_id])
 }

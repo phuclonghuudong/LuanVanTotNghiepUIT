@@ -24,7 +24,7 @@ class CustomerGroupDTO {
       description: this.description,
       status: this.status,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
+      updatedAt: this.createdAt,
       customer: this.customer,
     };
   }

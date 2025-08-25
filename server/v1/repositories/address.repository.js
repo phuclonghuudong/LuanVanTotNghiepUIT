@@ -22,6 +22,13 @@ class AddressDAO {
     return result.map((x) => new AddressDTO(x));
   }
 
+  async findByIdAndCustomer(id, customer) {
+    const result = await prisma.address.findMany({
+      where: { customer_id: customer, customer_id: id },
+    });
+    return result.map((x) => new AddressDTO(x));
+  }
+
   async create(data) {
     const result = await prisma.address.create({
       data: {
@@ -29,7 +36,7 @@ class AddressDAO {
         fullname: data.fullname || null,
         phone: data.phone || null,
         address: data.address || null,
-        is_main: data.is_main || false,
+        is_main: data.isMain ?? false,
         status: data.status || 1,
       },
     });
@@ -43,7 +50,7 @@ class AddressDAO {
         fullname: data?.fullname,
         phone: data?.phone,
         address: data?.address,
-        is_main: data?.isMain,
+        is_main: data?.isMain ?? false,
         status: data?.status,
       },
     });

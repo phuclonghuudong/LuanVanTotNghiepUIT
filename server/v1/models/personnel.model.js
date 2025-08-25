@@ -10,11 +10,11 @@ class PersonnelDTO {
     status,
     createdAt,
     updatedAt,
-    productComment = [],
-    purchaseOrder = [],
-    news = [],
-    contacts = [],
-    orderConfirmation = [],
+    // productComment = [],
+    // purchaseOrder = [],
+    // news = [],
+    // contacts = [],
+    // orderConfirmation = [],
   }) {
     this.personnel_id = personnel_id;
     this.fullname = fullname;
@@ -26,11 +26,11 @@ class PersonnelDTO {
     this.status = status;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
-    this.productComment = productComment;
-    this.purchaseOrder = purchaseOrder;
-    this.news = news;
-    this.contacts = contacts;
-    this.orderConfirmation = orderConfirmation;
+    // this.productComment = productComment;
+    // this.purchaseOrder = purchaseOrder;
+    // this.news = news;
+    // this.contacts = contacts;
+    // this.orderConfirmation = orderConfirmation;
   }
 
   toJSON() {
@@ -44,12 +44,12 @@ class PersonnelDTO {
       avatar: this.avatar,
       status: this.status,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
-      productComment: this.productComment,
-      purchaseOrder: this.purchaseOrder,
-      news: this.news,
-      contacts: this.contacts,
-      orderConfirmation: this.orderConfirmation,
+      updatedAt: this.createdAt,
+      // productComment,
+      // purchaseOrder,
+      // news,
+      // contacts,
+      // orderConfirmation,
     };
   }
 }

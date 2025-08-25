@@ -68,15 +68,9 @@ model Attribute {
     createdAt           DateTime    @default(now())                            
     updatedAt           DateTime    @updatedAt  
 
-
-    category_id Int
-    category   Category @relation(fields: [category_id], references: [category_id])
-  
-
-    @@index([category_id])
-
     attributeValue  AttributeValue[]
     variantAttributeValue  VariantAttributeValue[]
+    categoryAttribute   CategoryAttribute[]
 }
 
 model AttributeValue {
@@ -142,6 +136,7 @@ model CartItem {
     variant_id    Int
     productVariant   ProductVariant @relation(fields: [variant_id], references: [variant_id])
   
+    @@index([cart_id])
     @@index([variant_id])
 }
 
@@ -155,8 +150,71 @@ model Category {
   createdAt         DateTime  @default(now())                            
   updatedAt         DateTime  @updatedAt                                 
   
+  categoryProduct     CategoryProduct[]
+  categoryAttribute   CategoryAttribute[]
+  categorySize        CategorySize[]
+}
+
+model CategoryAttribute {
+  id       Int       @id @default(autoincrement())                        
+  description       String?   @db.Text                                  
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+  category_id    Int
+    category   Category @relation(fields: [category_id], references: [category_id])
+  attribute_id    Int
+    attribute   Attribute @relation(fields: [attribute_id], references: [attribute_id])
+
+    @@index([category_id]) 
+    @@index([attribute_id]) 
+}
+
+model CategoryProduct {
+  category_product_id       Int       @id @default(autoincrement())           
+  category_product_name     String    @db.VarChar(100) @unique                 
+  category_product_slug     String    @db.VarChar(100) @unique               
+  description       String?   @db.Text                                  
+  image_url         String?   @db.Text                                   
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt  
+
+  category_id    Int
+  category   Category @relation(fields: [category_id], references: [category_id])  
+
+  @@index([category_id])                             
+  
   product Product[]
-  attribute Attribute[]
+}
+
+model CategorySize {
+  id       Int       @id @default(autoincrement())                        
+  description       String?   @db.Text                                  
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+   category_id    Int
+    category   Category @relation(fields: [category_id], references: [category_id])
+    size_id    Int
+    size   Size @relation(fields: [size_id], references: [size_id])
+
+    @@index([category_id]) 
+    @@index([size_id]) 
+}
+
+model Color {
+  color_id           Int       @id @default(autoincrement())           
+  color_name         String    @db.VarChar(100) @unique                 
+  color_code         String    @db.VarChar(100) @unique               
+  display_order     Int       @db.TinyInt                                    
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+  productVariant    ProductVariant[]
 }
 
 model Contact {
@@ -481,14 +539,14 @@ model Personnel {
     fullname        String      @db.VarChar(100)
     gender          Int         @db.TinyInt
     birthday        DateTime    @db.DateTime
-    cccd            Int
+    cccd           String     @db.VarChar(15)   @unique
     address         String      @db.VarChar(100)
     avatar          String      @db.Text
     status          Int         @db.TinyInt                                
     createdAt       DateTime    @default(now())                            
     updatedAt       DateTime    @updatedAt  
 
-    account_id    Int
+    account_id    Int   @unique
     account   Account @relation(fields: [account_id], references: [account_id])
   
     @@index([account_id])
@@ -512,13 +570,13 @@ model Product {
     updatedAt           DateTime    @updatedAt  
 
 
-    category_id         Int
-    category   Category @relation(fields: [category_id], references: [category_id])
+    category_product_id         Int
+    categoryProduct   CategoryProduct @relation(fields: [category_product_id], references: [category_product_id])
     brand_id            Int
     brand   Brand @relation(fields: [brand_id], references: [brand_id])
   
 
-    @@index([category_id])
+    @@index([category_product_id])
     @@index([brand_id])
 
     productVariant  ProductVariant[]
@@ -552,9 +610,6 @@ model ProductComment {
 
 model ProductReview {
     review_id       Int         @id @default (autoincrement())
-    product_name    String      @db.VarChar(100)     @unique
-    product_slug    String      @db.VarChar(100)     @unique
-    product_sku     String      @db.VarChar(50)      @unique
     rating          Int?        @default(0)
     content         String?     @db.Text
     status          Int         @db.TinyInt                                
@@ -588,7 +643,15 @@ model ProductVariant {
     product_id      Int
     product   Product @relation(fields: [product_id], references: [product_id])
     
+    size_id      Int
+    size   Size @relation(fields: [size_id], references: [size_id])
+    
+    color_id      Int
+    color   Color @relation(fields: [color_id], references: [color_id])
+    
     @@index([product_id])
+    @@index([size_id])
+    @@index([color_id])
 
     promotionDetail     PromotionDetail[]
     inventory           Inventory[]
@@ -606,7 +669,7 @@ model Promotion {
   description     String?         @db.Text 
   start_date      DateTime                                 
   end_date        DateTime  
-  is_active       Boolean
+  is_active       Boolean   
   priority        Int?                              
   promotion_type  String        @db.VarChar(100)                                   
   status          Int           @db.TinyInt                                
@@ -796,6 +859,20 @@ model ShippingMethod {
   updatedAt         DateTime  @updatedAt                                 
   
   order           Order[]
+}
+
+model Size {
+  size_id           Int       @id @default(autoincrement())           
+  size_name         String    @db.VarChar(100) @unique                 
+  size_code         String    @db.VarChar(100) @unique               
+  size_type         String    @db.VarChar(100)          
+  display_order     Int       @db.TinyInt                                    
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+  productVariant    ProductVariant[]
+  categorySize      CategorySize[]
 }
 
 model VariantAttributeValue {

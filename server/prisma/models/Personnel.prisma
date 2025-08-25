@@ -3,14 +3,14 @@ model Personnel {
     fullname        String      @db.VarChar(100)
     gender          Int         @db.TinyInt
     birthday        DateTime    @db.DateTime
-    cccd            Int
+    cccd           String     @db.VarChar(15)   @unique
     address         String      @db.VarChar(100)
     avatar          String      @db.Text
     status          Int         @db.TinyInt                                
     createdAt       DateTime    @default(now())                            
     updatedAt       DateTime    @updatedAt  
 
-    account_id    Int
+    account_id    Int   @unique
     account   Account @relation(fields: [account_id], references: [account_id])
   
     @@index([account_id])

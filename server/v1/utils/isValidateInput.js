@@ -22,6 +22,13 @@ const validPasswordInput = async (password) => {
   return reg.test(password);
 };
 
+const isValidSlugInput = (slug) => {
+  // slug: chỉ cho phép chữ thường (a-z), số (0-9) và dấu gạch ngang (-)
+  // Không bắt đầu/kết thúc bằng "-", không có "--" liên tiếp
+  const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+  return slugRegex.test(slug);
+};
+
 const isValidCCCDInput = async (cccd) => {
   const regex = /^\d{12}$/;
   return regex.test(cccd);
@@ -37,12 +44,40 @@ const comparePassword = async (txtPassword, password) => {
   return pass;
 };
 
+const isValidNormalizeValue = (value) => {
+  if (value === undefined) return null;
+  if (value === "") return null;
+  return value;
+};
+
+const isValidNormalizeDate = (value) => {
+  if (!value) return null;
+  return new Date(value).toISOString().split("T")[0];
+};
+
+const isValidSkuInput = (sku) => {
+  if (!sku || typeof sku !== "string") return false;
+
+  sku = sku.trim();
+
+  if (sku.length < 3 || sku.length > 30) return false;
+
+  const regex = /^[A-Za-z0-9_-]+$/;
+  if (!regex.test(sku)) return false;
+
+  return true;
+};
+
 module.exports = {
   validUsernameInput,
   validEmailInput,
   validPhoneInput,
   validPasswordInput,
+  isValidSlugInput,
   isValidCCCDInput,
   hashPassword,
   comparePassword,
+  isValidNormalizeValue,
+  isValidNormalizeDate,
+  isValidSkuInput,
 };

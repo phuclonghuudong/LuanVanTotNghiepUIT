@@ -1,4 +1,4 @@
-import CarouselCollection from "../../components/common/Collection";
+import CarouselCollection from "../../components/common/CarouselCollection";
 import NewsletterBox from "../../components/common/NewsletterBox";
 import Seller from "../../components/common/Seller";
 import Slide from "../../components/common/Slide";

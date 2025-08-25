@@ -114,6 +114,30 @@ class AccountBUS {
       throw new ConflictError("EMAIL ĐÃ TỒN TẠI");
   }
 
+  async validateForUpdateInfo(id, data) {
+    const { username, phone, email } = data;
+
+    const isValidEmail = await validEmailInput(email);
+    const isValidPhone = await validPhoneInput(phone);
+
+    if (!isValidEmail) throw new BadRequestError("EMAIL KHÔNG ĐÚNG ĐỊNH DẠNG");
+    if (!isValidPhone)
+      throw new BadRequestError("SỐ ĐIỆN THOẠI KHÔNG ĐÚNG ĐỊNH DẠNG");
+
+    const [existingUsername, existingPhone, existingEmail] = await Promise.all([
+      AccountDAO.findByUsername(username),
+      AccountDAO.findByPhone(phone),
+      AccountDAO.findByEmail(email),
+    ]);
+
+    if (existingUsername && Number(existingUsername.account_id) !== Number(id))
+      throw new ConflictError("TÀI KHOẢN ĐÃ TỒN TẠI");
+    if (existingPhone && Number(existingPhone.account_id) !== Number(id))
+      throw new ConflictError("SỐ ĐIỆN THOẠI ĐÃ TỒN TẠI");
+    if (existingEmail && Number(existingEmail.account_id) !== Number(id))
+      throw new ConflictError("EMAIL ĐÃ TỒN TẠI");
+  }
+
   async createAccount(data) {
     const { role } = data;
     const checkRole = await RoleBUS.getRoleBySlug(role);
@@ -231,6 +255,19 @@ class AccountBUS {
     await this.getAccountById(id);
 
     const result = await AccountDAO.updateRefreshToken(id, token);
+
+    if (!result || result.length === 0)
+      throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
+
+    return result.toJSON?.() ?? result;
+  }
+
+  async updateAccountInfo(id, data) {
+    await this.getAccountById(Number(id));
+
+    await this.validateForUpdateInfo(id, data);
+
+    const result = await AccountDAO.updateEditInfo(Number(id), data);
 
     if (!result || result.length === 0)
       throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");

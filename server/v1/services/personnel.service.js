@@ -13,9 +13,23 @@ class CustomerBUS {
   async getPersonnelById(id) {
     const result = await PersonnelDAO.findById(Number(id));
     if (!result || result.length === 0)
-      throw new NotFoundError("ID KHÔNG TỒN TẠI DỮ LIỆU");
+      throw new NotFoundError("NHÂN VIÊN KHÔNG TỒN TẠI DỮ LIỆU");
 
     return result.toJSON?.() ?? result;
+  }
+
+  async getPersonnelByAccountId(id) {
+    const result = await PersonnelDAO.findByAccountId(Number(id));
+    if (!result || result.length === 0)
+      throw new NotFoundError("TÀI KHOẢN KHÔNG TỒN TẠI TRONG NHÂN VIÊN");
+
+    return result.toJSON?.() ?? result;
+  }
+
+  async getPersonnelByAccountIdLogin(id) {
+    const result = await PersonnelDAO.findByAccountId(Number(id));
+
+    return result ? result.toJSON?.() : null;
   }
 
   async createPersonnel(data) {

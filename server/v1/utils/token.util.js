@@ -1,16 +1,36 @@
 const jwt = require("jsonwebtoken");
 const configKey = require("../configs/configENV");
 
-const verifyAccessToken = async (token) => {
+// const verifyAccessToken = async (token) => {
+//   const secretKey = configKey.SECRET_KEY_ACCESS_TOKEN;
+//   const verifyToken = await jwt.verify(token, secretKey);
+//   return verifyToken;
+// };
+
+// const verifyRefreshToken = async (token) => {
+//   const secretKey = configKey.SECRET_KEY_REFRESH_TOKEN;
+//   const verifyToken = await jwt.verify(token, secretKey);
+//   return verifyToken;
+// };
+
+const verifyAccessToken = (token) => {
   const secretKey = configKey.SECRET_KEY_ACCESS_TOKEN;
-  const verifyToken = await jwt.verify(token, secretKey);
-  return verifyToken;
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, secretKey, (err, decoded) => {
+      if (err) return reject(err);
+      resolve(decoded);
+    });
+  });
 };
 
-const verifyRefreshToken = async (token) => {
+const verifyRefreshToken = (token) => {
   const secretKey = configKey.SECRET_KEY_REFRESH_TOKEN;
-  const verifyToken = await jwt.verify(token, secretKey);
-  return verifyToken;
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, secretKey, (err, decoded) => {
+      if (err) return reject(err);
+      resolve(decoded);
+    });
+  });
 };
 
 const generateAccessToken = async (payload) => {

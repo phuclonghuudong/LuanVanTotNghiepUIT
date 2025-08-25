@@ -1,29 +1,36 @@
 const sendEmail = require("../configs/sendMail");
-const AccountBUS = require("../services/account.service");
-const CustomerBUS = require("../services/customer.service");
-const { BadRequestError } = require("../utils/errors");
+const AccountBUS = require("./account.service");
+const CustomerBUS = require("./customer.service");
+const PersonnelBUS = require("./personnel.service");
+const RoleBUS = require("./role.service");
+const {
+  BadRequestError,
+  ConflictError,
+  UnauthorizedError,
+} = require("../utils/errors");
 const {
   comparePassword,
   validEmailInput,
+  isValidNormalizeDate,
 } = require("../utils/isValidateInput");
 const { validateAccountStatus } = require("../utils/validateStatus");
 const verifyEmailTemplate = require("../utils/verifyEmailTemplate");
 
 class AuthBUS {
-  async customerAccountInformation(account, customer) {
+  async userAccountInformation(account, user, role) {
     return {
-      customerId: customer?.id,
+      role: role?.slug,
+      userId: user?.id,
       accountId: account?.id,
       roleId: account?.roleId,
       username: account?.username,
       phone: account?.phone,
       email: account?.email,
-      fullname: customer?.fullname,
-      gender: customer?.gender,
-      birthday: customer?.birthday,
-      points: customer?.points,
-      address: customer?.address,
-      avatar: customer?.avatar,
+      fullname: user?.fullname,
+      gender: user?.gender,
+      birthday: user?.birthday,
+      address: user?.address,
+      avatar: user?.avatar,
       status: account?.status,
     };
   }
@@ -33,9 +40,12 @@ class AuthBUS {
 
     const checkCustomer = await CustomerBUS.getCustomerByAccountId(accountId);
 
-    const result = await this.customerAccountInformation(
+    const checkRole = await RoleBUS.getRoleById(checkAccount?.roleId);
+
+    const result = await this.userAccountInformation(
       checkAccount,
-      checkCustomer
+      checkCustomer,
+      checkRole
     );
 
     if (!result || result.length === 0)
@@ -47,18 +57,24 @@ class AuthBUS {
   async signUpCustomer(data) {
     const createAccount = await AccountBUS.createAccount({
       ...data,
-      role: "KHACHHANG",
+      role: "CUSTOMER",
     });
+
+    const accountId = createAccount?.id;
 
     const createCustomer = await CustomerBUS.createCustomer({
       ...data,
-      accountId: createAccount?.id,
+      accountId: accountId,
       groupId: 1,
     });
 
-    const result = await this.customerAccountInformation(
+    const roleId = createAccount?.roleId;
+    const findRole = await RoleBUS.getRoleById(roleId);
+
+    const result = await this.userAccountInformation(
       createAccount,
-      createCustomer
+      createCustomer,
+      findRole
     );
 
     if (!result || result.length === 0)
@@ -67,7 +83,7 @@ class AuthBUS {
     return result;
   }
 
-  async signInCustomer(data) {
+  async signIn(data) {
     const { username, password } = data;
     const checkAccount = await AccountBUS.getAccountByIdentifier(username);
 
@@ -79,11 +95,21 @@ class AuthBUS {
       throw new BadRequestError("TÀI KHOẢN HOẶC MẬT KHẨU KHÔNG CHÍNH XÁC");
 
     const accountId = checkAccount?.id;
-    const findCustomer = await CustomerBUS.getCustomerByAccountId(accountId);
+    const roleId = checkAccount?.roleId;
 
-    const result = await this.customerAccountInformation(
+    const findRole = await RoleBUS.getRoleById(roleId);
+
+    const [customer, personnel] = await Promise.all([
+      CustomerBUS.getCustomerByAccountIdLogin(accountId),
+      PersonnelBUS.getPersonnelByAccountIdLogin(accountId),
+    ]);
+
+    const entity = customer ?? personnel;
+
+    const result = await this.userAccountInformation(
       checkAccount,
-      findCustomer
+      entity,
+      findRole
     );
 
     await validateAccountStatus(result?.status);
@@ -135,6 +161,41 @@ class AuthBUS {
 
     if (!result || result.length === 0)
       throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
+
+    return result;
+  }
+
+  async editInfoCustomer(userId, accountId, data) {
+    const checkUser = await CustomerBUS.getCustomerById(userId);
+    const checkAccount = await AccountBUS.getAccountById(accountId);
+    const roleId = checkAccount?.roleId;
+
+    const findRole = await RoleBUS.getRoleById(roleId);
+
+    const isSame = Boolean(
+      checkUser.fullname === data.fullname &&
+        Number(checkUser.gender) === Number(data.gender) &&
+        isValidNormalizeDate(checkUser.birthday) ===
+          isValidNormalizeDate(data.birthday) &&
+        checkUser.address === (data.address || null) &&
+        checkUser.avatar === (data.avatar || null) &&
+        checkAccount.username === data.username &&
+        checkAccount.phone === data.phone &&
+        checkAccount.email === data.email
+    );
+
+    if (isSame) {
+      throw new ConflictError("DỮ LIỆU KHÔNG CÓ GÌ THAY ĐỔI ");
+    }
+
+    const updateCustomer = await CustomerBUS.updateInfoCustomer(userId, data);
+    const updateAccount = await AccountBUS.updateAccountInfo(accountId, data);
+
+    const result = await this.userAccountInformation(
+      updateAccount,
+      updateCustomer,
+      findRole
+    );
 
     return result;
   }

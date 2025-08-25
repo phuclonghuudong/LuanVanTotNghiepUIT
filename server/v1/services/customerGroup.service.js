@@ -10,6 +10,14 @@ class CustomerGroupBUS {
     return result.map((x) => x.toJSON?.() ?? x);
   }
 
+  async getAllActive() {
+    const result = await CustomerGroupDAO.findByStatus1();
+    if (!result || result.length === 0)
+      throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
+
+    return result.map((x) => x.toJSON?.() ?? x);
+  }
+
   async getCustomerGroupById(id) {
     const result = await CustomerGroupDAO.findById(Number(id));
     if (!result || result.length === 0)

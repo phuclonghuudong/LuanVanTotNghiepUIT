@@ -8,13 +8,7 @@ model Attribute {
     createdAt           DateTime    @default(now())                            
     updatedAt           DateTime    @updatedAt  
 
-
-    category_id Int
-    category   Category @relation(fields: [category_id], references: [category_id])
-  
-
-    @@index([category_id])
-
     attributeValue  AttributeValue[]
     variantAttributeValue  VariantAttributeValue[]
+    categoryAttribute   CategoryAttribute[]
 }

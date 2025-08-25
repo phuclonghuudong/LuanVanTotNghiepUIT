@@ -37,7 +37,7 @@ class CustomerDTO {
       avatar: this.avatar,
       status: this.status,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
+      updatedAt: this.createdAt,
     };
   }
 }

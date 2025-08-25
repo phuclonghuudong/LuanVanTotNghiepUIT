@@ -14,7 +14,15 @@ model ProductVariant {
     product_id      Int
     product   Product @relation(fields: [product_id], references: [product_id])
     
+    size_id      Int
+    size   Size @relation(fields: [size_id], references: [size_id])
+    
+    color_id      Int
+    color   Color @relation(fields: [color_id], references: [color_id])
+    
     @@index([product_id])
+    @@index([size_id])
+    @@index([color_id])
 
     promotionDetail     PromotionDetail[]
     inventory           Inventory[]
