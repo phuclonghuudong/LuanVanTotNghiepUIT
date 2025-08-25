@@ -8,6 +8,16 @@ class CategoryAttributeDAO {
     return result.map((x) => new CategoryAttributeDTO(x));
   }
 
+  async findByCategoryAndAttribute(ca, at) {
+    const result = await prisma.categoryAttribute.findFirst({
+      where: {
+        category_id: ca,
+        attribute_id: at,
+      },
+    });
+    return result ? new CategoryAttributeDTO(result) : null;
+  }
+
   async findByStatus1() {
     const result = await prisma.categoryAttribute.findMany({
       where: { status: 1 },
@@ -35,7 +45,7 @@ class CategoryAttributeDAO {
         category_id: data.categoryId,
         attribute_id: data.attributeId,
         description: data.description,
-        status: data.status || 1,
+        status: data.status ?? 1,
       },
     });
     return new CategoryAttributeDTO(result);
@@ -58,6 +68,13 @@ class CategoryAttributeDAO {
     await prisma.categoryAttribute.delete({
       where: { id: id },
     });
+  }
+
+  async findByCategory(id) {
+    const result = await prisma.categoryAttribute.findUnique({
+      where: { category_id: id },
+    });
+    return result ? new CategoryAttributeDTO(result) : null;
   }
 }
 

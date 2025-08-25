@@ -1,5 +1,5 @@
 const { BadRequestError } = require("../utils/errors");
-const AuthCustomerBUS = require("../services/authCustomer.service");
+const AuthBUS = require("../services/auth.service");
 const responseHandler = require("../utils/responseHandler");
 const {
   generateAndSetToken,
@@ -15,6 +15,38 @@ const payloadToken = async (data) => {
     fullname: data?.fullname,
   };
   return payload;
+};
+
+const signIn = async (req, res, next) => {
+  const { username, password } = req.body;
+  if (!username.trim() || !password.trim())
+    throw new BadRequestError("VUI LÒNG NHẬP ĐẦY ĐỦ THÔNG TIN");
+
+  try {
+    const validInput = req.body;
+    const result = await AuthBUS.signIn(validInput);
+
+    const payload = await payloadToken(result);
+
+    const { accessToken, refreshToken } = await generateAndSetToken(
+      res,
+      payload
+    );
+
+    const accountId = result?.accountId;
+
+    await AuthBUS.refreshToken({
+      id: accountId,
+      token: refreshToken,
+    });
+
+    responseHandler(res, 200, "ĐĂNG NHẬP THÀNH CÔNG", {
+      USER: result,
+      TOKEN: accessToken,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const signUpCustomer = async (req, res, next) => {
@@ -35,7 +67,7 @@ const signUpCustomer = async (req, res, next) => {
 
   try {
     const valueInput = req.body;
-    const result = await AuthCustomerBUS.signUpCustomer(valueInput);
+    const result = await AuthBUS.signUpCustomer(valueInput);
 
     const payload = await payloadToken(result);
 
@@ -46,7 +78,7 @@ const signUpCustomer = async (req, res, next) => {
 
     const accountId = result?.accountId;
 
-    await AuthCustomerBUS.refreshToken({
+    await AuthBUS.refreshToken({
       id: accountId,
       token: refreshToken,
     });
@@ -60,46 +92,12 @@ const signUpCustomer = async (req, res, next) => {
   }
 };
 
-const signInCustomer = async (req, res, next) => {
-  const { username, password } = req.body;
-  if (!username.trim() || !password.trim())
-    throw new BadRequestError("VUI LÒNG NHẬP ĐẦY ĐỦ THÔNG TIN");
-
-  try {
-    const validInput = req.body;
-    const result = await AuthCustomerBUS.signInCustomer(validInput);
-
-    const payload = await payloadToken(result);
-
-    const { accessToken, refreshToken } = await generateAndSetToken(
-      res,
-      payload
-    );
-
-    const accountId = result?.accountId;
-
-    await AuthCustomerBUS.refreshToken({
-      id: accountId,
-      token: refreshToken,
-    });
-
-    responseHandler(res, 200, "ĐĂNG NHẬP THÀNH CÔNG", {
-      USER: result,
-      TOKEN: accessToken,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 const verifyEmailForgotPasswordCustomer = async (req, res, next) => {
   const { email } = req.body;
   if (!email) throw new BadRequestError("VUI LÒNG NHẬP ĐẦY ĐỦ THÔNG TIN");
 
   try {
-    const result = await AuthCustomerBUS.verifyEmailForgotPasswordCustomer(
-      email
-    );
+    const result = await AuthBUS.verifyEmailForgotPasswordCustomer(email);
 
     responseHandler(res, 200, "VUI LÒNG XEM HỘP THƯ CỦA BẠN");
   } catch (error) {
@@ -117,7 +115,7 @@ const verifyOtpByEmail = async (req, res, next) => {
 
   try {
     const payload = req.body;
-    const result = await AuthCustomerBUS.verifyOtpByEmail(payload);
+    const result = await AuthBUS.verifyOtpByEmail(payload);
 
     responseHandler(
       res,
@@ -140,7 +138,7 @@ const resetPassword = async (req, res, next) => {
 
   try {
     const payload = req.body;
-    const result = await AuthCustomerBUS.resetPassword(payload);
+    const result = await AuthBUS.resetPassword(payload);
 
     responseHandler(res, 200, "ĐỔI MẬT KHẨU THÀNH CÔNG");
   } catch (error) {
@@ -158,7 +156,7 @@ const refreshToken = async (req, res, next) => {
 
     const accountId = verifyToken?.account;
 
-    const checkUser = await AuthCustomerBUS.checkAccountAndCustomer(accountId);
+    const checkUser = await AuthBUS.checkAccountAndCustomer(accountId);
 
     const payload = await payloadToken(checkUser);
 
@@ -167,7 +165,7 @@ const refreshToken = async (req, res, next) => {
       payload
     );
 
-    await AuthCustomerBUS.refreshToken({
+    await AuthBUS.refreshToken({
       id: accountId,
       token: refreshToken,
     });
@@ -185,7 +183,7 @@ const profileAccountCustomer = async (req, res, next) => {
   try {
     const user = req.user?.account;
 
-    const result = await AuthCustomerBUS.checkAccountAndCustomer(user);
+    const result = await AuthBUS.checkAccountAndCustomer(user);
 
     responseHandler(res, 200, "THÔNG TIN TÀI KHOẢN", { USER: result });
   } catch (error) {
@@ -211,11 +209,7 @@ const editInfoCustomer = async (req, res, next) => {
   try {
     const user = req.user?.user;
     const account = req.user?.account;
-    const result = await AuthCustomerBUS.editInfoCustomer(
-      user,
-      account,
-      req.body
-    );
+    const result = await AuthBUS.editInfoCustomer(user, account, req.body);
 
     responseHandler(res, 200, "THÔNG TIN TÀI KHOẢN", { USER: result });
   } catch (error) {
@@ -225,7 +219,7 @@ const editInfoCustomer = async (req, res, next) => {
 
 module.exports = {
   signUpCustomer,
-  signInCustomer,
+  signIn,
   verifyEmailForgotPasswordCustomer,
   verifyOtpByEmail,
   resetPassword,

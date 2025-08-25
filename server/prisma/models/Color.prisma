@@ -1,0 +1,11 @@
+model Color {
+  color_id           Int       @id @default(autoincrement())           
+  color_name         String    @db.VarChar(100) @unique                 
+  color_code         String    @db.VarChar(100) @unique               
+  display_order     Int       @db.TinyInt                                    
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+  productVariant    ProductVariant[]
+}

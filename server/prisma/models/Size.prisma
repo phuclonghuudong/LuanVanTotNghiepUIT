@@ -1,0 +1,13 @@
+model Size {
+  size_id           Int       @id @default(autoincrement())           
+  size_name         String    @db.VarChar(100) @unique                 
+  size_code         String    @db.VarChar(100) @unique               
+  size_type         String    @db.VarChar(100)          
+  display_order     Int       @db.TinyInt                                    
+  status            Int       @db.TinyInt                                
+  createdAt         DateTime  @default(now())                            
+  updatedAt         DateTime  @updatedAt                                 
+  
+  productVariant    ProductVariant[]
+  categorySize      CategorySize[]
+}

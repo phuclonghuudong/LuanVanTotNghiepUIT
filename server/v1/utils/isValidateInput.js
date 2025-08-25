@@ -55,6 +55,19 @@ const isValidNormalizeDate = (value) => {
   return new Date(value).toISOString().split("T")[0];
 };
 
+const isValidSkuInput = (sku) => {
+  if (!sku || typeof sku !== "string") return false;
+
+  sku = sku.trim();
+
+  if (sku.length < 3 || sku.length > 30) return false;
+
+  const regex = /^[A-Za-z0-9_-]+$/;
+  if (!regex.test(sku)) return false;
+
+  return true;
+};
+
 module.exports = {
   validUsernameInput,
   validEmailInput,
@@ -66,4 +79,5 @@ module.exports = {
   comparePassword,
   isValidNormalizeValue,
   isValidNormalizeDate,
+  isValidSkuInput,
 };
