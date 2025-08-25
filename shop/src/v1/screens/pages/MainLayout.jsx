@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {Outlet} from "react-router-dom";
 import Header from "../layouts/Header";
 import Footer from "../layouts/Footer";
 import ModalCartSidebar from "../../components/common/cart/ModalCartSidebar";
 import MenuScreenMobile from "../../components/common/MenuScreenMobile";
 import LoadingPage from "../../components/common/LoadingPage";
-import { store } from "./../../stores/store";
-import { Provider } from "react-redux";
+import {store} from "./../../stores/store";
+import {Provider} from "react-redux";
 
 const MainLayout = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);

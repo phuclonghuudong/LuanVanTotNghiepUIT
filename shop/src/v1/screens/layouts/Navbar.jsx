@@ -1,13 +1,13 @@
 import React from "react";
-import { IoMenuOutline, IoSearch } from "react-icons/io5";
+import {IoMenuOutline, IoSearch} from "react-icons/io5";
 import logo from "../../assets/logo/logo.svg";
-import { FiHeart, FiUser } from "react-icons/fi";
-import { HiOutlineShoppingBag } from "react-icons/hi";
+import {FiHeart, FiUser} from "react-icons/fi";
+import {HiOutlineShoppingBag} from "react-icons/hi";
 import IconComponent from "../../components/ui/IconComponent";
-import { Link, NavLink } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../slices/authSlice";
-import { toast } from "react-toastify";
+import {Link, NavLink} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import {logout} from "../../slices/authSlice";
+import {toast} from "react-toastify";
 
 const Menu = [
   {
@@ -31,6 +31,11 @@ const Menu = [
     link: "/cart",
   },
   {
+    id: 7,
+    name: "BÀI VIẾT",
+    link: "/blog",
+  },
+  {
     id: 5,
     name: "GIỚI THIỆU",
     link: "/about",
@@ -41,7 +46,7 @@ const Menu = [
     link: "/contact",
   },
 ];
-const Navbar = ({ onCartClick, onMenuClick }) => {
+const Navbar = ({onCartClick, onMenuClick}) => {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const handleLogout = () => {

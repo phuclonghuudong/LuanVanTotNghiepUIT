@@ -1,14 +1,14 @@
-import React, { useEffect } from "react";
+import React, {useEffect} from "react";
 import logo from "../../assets/logo/logo.svg";
-import { Link, NavLink } from "react-router-dom";
+import {Link, NavLink} from "react-router-dom";
 import IconComponent from "./../ui/IconComponent";
-import { CiSearch } from "react-icons/ci";
-import { IoAddOutline } from "react-icons/io5";
+import {CiSearch} from "react-icons/ci";
+import {IoAddOutline} from "react-icons/io5";
 import ButtonComponent from "./../ui/ButtonComponent";
-import { FiHeart, FiPhone, FiUser } from "react-icons/fi";
-import { TfiClose } from "react-icons/tfi";
-import { MdArrowOutward, MdOutlineMail } from "react-icons/md";
-import { HiOutlineShoppingBag } from "react-icons/hi";
+import {FiHeart, FiPhone, FiUser} from "react-icons/fi";
+import {TfiClose} from "react-icons/tfi";
+import {MdArrowOutward, MdOutlineMail} from "react-icons/md";
+import {HiOutlineShoppingBag} from "react-icons/hi";
 const Menu = [
   {
     id: 1,
@@ -41,7 +41,7 @@ const Menu = [
     link: "/contact",
   },
 ];
-const MenuScreenMobile = ({ isOpen, onClose }) => {
+const MenuScreenMobile = ({isOpen, onClose}) => {
   useEffect(() => {
     if (isOpen) {
       document.body.classList.add("overflow-hidden");
@@ -57,7 +57,10 @@ const MenuScreenMobile = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-[9999] w-full h-full flex items-start justify-start">
+    <div
+      data-oas="fade-left"
+      className="fixed inset-0 z-[9999] w-full h-full flex items-start justify-start transition-all duration-700"
+    >
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose}></div>
       <div
