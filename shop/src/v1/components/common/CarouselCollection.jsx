@@ -59,7 +59,7 @@ const CollectionData = [
     quantity: "11 items",
   },
 ];
-const Collection = () => {
+const CarouselCollection = () => {
   const collections = CollectionData.map((item) => ({
     name: item.name,
     image: item.image,
@@ -68,4 +68,4 @@ const Collection = () => {
   return <CardCarousel title="Categories you might like" data={collections} />;
 };
 
-export default Collection;
+export default CarouselCollection;

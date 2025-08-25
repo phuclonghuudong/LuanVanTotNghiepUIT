@@ -1,11 +1,11 @@
-import { BiGitCompare } from "react-icons/bi";
-import { IoEyeOutline } from "react-icons/io5";
-import { IoMdHeartEmpty } from "react-icons/io";
+import {BiGitCompare} from "react-icons/bi";
+import {IoEyeOutline} from "react-icons/io5";
+import {IoMdHeartEmpty} from "react-icons/io";
 import IconComponent from "../../ui/IconComponent";
 import ButtonComponent from "../../ui/ButtonComponent";
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 const delayProduct = [0, 150, 200, 250, 300, 350, 400, 450];
-const ProductGrid = ({ products }) => {
+const ProductGrid = ({products}) => {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {products.map((product, index) => (
@@ -13,7 +13,7 @@ const ProductGrid = ({ products }) => {
           data-aos="fade-up"
           data-aos-delay={delayProduct[index]}
           key={index}
-          className="relative group shadow-md hover:shadow-md transition-all"
+          className="relative group shadow hover:shadow-lg transition-all rounded-md"
         >
           {/* Sale Badge */}
           {product.sale && (
@@ -71,7 +71,7 @@ const ProductGrid = ({ products }) => {
                   className={`w-5 h-5 rounded-full border-2  transition-all ${
                     idx === 0 ? "border-black" : "border-transparent hover:border-black"
                   }`}
-                  style={{ backgroundColor: color }}
+                  style={{backgroundColor: color}}
                 ></span>
               ))}
             </div>

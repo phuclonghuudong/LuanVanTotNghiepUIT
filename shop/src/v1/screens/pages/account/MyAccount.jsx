@@ -1,15 +1,15 @@
-import React, { useEffect } from "react";
+import React, {useEffect} from "react";
 import PageTitle from "../../../components/common/PageTitle";
-import { Link, useNavigate } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import IconComponent from "./../../../components/ui/IconComponent";
-import { FiLogOut, FiShoppingCart, FiUser } from "react-icons/fi";
-import { BiLocationPlus } from "react-icons/bi";
-import { logout } from "../../../slices/authSlice";
-import { toast } from "react-toastify";
-import { useDispatch, useSelector } from "react-redux";
+import {FiLogOut, FiShoppingCart, FiUser} from "react-icons/fi";
+import {BiLocationPlus} from "react-icons/bi";
+import {logout} from "../../../slices/authSlice";
+import {toast} from "react-toastify";
+import {useDispatch, useSelector} from "react-redux";
 const MyAccount = () => {
   const dispatch = useDispatch();
-  const { isLoggedIn, user } = useSelector((state) => state.auth);
+  const {isLoggedIn, user} = useSelector((state) => state.auth);
   const handleLogout = () => {
     dispatch(logout());
     toast.info("Đăng xuất tài khoản thành công");
@@ -30,7 +30,7 @@ const MyAccount = () => {
         title="My Account"
         withBackground={true}
         breadcrumbAlign="center"
-        breadcrumb={[{ label: "Homepage", href: "/" }, { label: "Pages", href: "/" }, { label: "My account" }]}
+        breadcrumb={[{label: "Homepage", href: "/"}, {label: "Pages", href: "/"}, {label: "My account"}]}
       />
 
       {/* <!-- MY ACCOUNT --> */}

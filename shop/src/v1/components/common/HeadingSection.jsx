@@ -1,11 +1,11 @@
 import React from "react";
-import { Link } from "react-router";
+import {Link} from "react-router";
 
 const HeadingSection = () => {
   const tabs = [
-    { label: "New Arrivals", path: "/products/new-arrivals", active: true },
-    { label: "Best Seller", path: "/products/best-seller", active: false },
-    { label: "On Sale", path: "/products/on-sale", active: false },
+    {label: "New Arrivals", path: "/products/new-arrivals", active: true},
+    {label: "Best Seller", path: "/products/best-seller", active: false},
+    {label: "On Sale", path: "/products/on-sale", active: false},
   ];
   return (
     <div className="w-full max-w-7xl mx-auto pb-12">
@@ -14,11 +14,15 @@ const HeadingSection = () => {
           <Link
             to={tab.path}
             key={index}
-            className={`text-xl sm:text-3xl md:text-4xl font-medium  ${
-              tab.active === true ? "text-black underline" : "text-gray-600"
-            }  hover:underline  transition-all duration-400 hover:text-black`}
+            className={`relative group text-xl sm:text-3xl md:text-4xl font-medium  transition-all duration-400 `}
           >
             {tab.label}
+            <span
+              className={`absolute left-0 -bottom-1 w-0 h-[2px] bg-black transition-all duration-300  ${
+                tab.active === true ? "w-full" : "group-hover:w-full"
+              }`}
+            ></span>
+            <hr className="w-3/4 border-none h-[2px] bg-gray-700 opacity-0 transition-all duration-400" />
           </Link>
         ))}
       </div>

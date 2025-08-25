@@ -1,14 +1,14 @@
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 import clsx from "clsx";
 import ImageTitle from "../../assets/section/page-title.jpg";
-import { FaChevronRight } from "react-icons/fa";
+import {FaChevronRight} from "react-icons/fa";
 
-const PageTitle = ({ title, breadcrumb = [], withBackground = true, breadcrumbAlign = "center" }) => {
+const PageTitle = ({title, breadcrumb = [], withBackground = true, breadcrumbAlign = "center"}) => {
   return (
     <div
       data-aos="fade-up"
       className={clsx(withBackground ? "bg-cover bg-center py-8" : "py-6", "w-full")}
-      style={withBackground ? { backgroundImage: `url(${ImageTitle})` } : {}}
+      style={withBackground ? {backgroundImage: `url(${ImageTitle})`} : {}}
     >
       <div className="max-w-screen-xl mx-auto px-4">
         <h1 className={clsx("text-3xl font-semibold mb-2", breadcrumbAlign === "left" ? "text-left" : "text-center")}>

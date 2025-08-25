@@ -1,13 +1,13 @@
 import React from "react";
-import { IoMenuOutline, IoSearch } from "react-icons/io5";
+import {IoMenuOutline, IoSearch} from "react-icons/io5";
 import logo from "../../assets/logo/logo.svg";
-import { FiHeart, FiUser } from "react-icons/fi";
-import { HiOutlineShoppingBag } from "react-icons/hi";
+import {FiHeart, FiUser} from "react-icons/fi";
+import {HiOutlineShoppingBag} from "react-icons/hi";
 import IconComponent from "../../components/ui/IconComponent";
-import { Link, NavLink } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../slices/authSlice";
-import { toast } from "react-toastify";
+import {Link, NavLink} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import {logout} from "../../slices/authSlice";
+import {toast} from "react-toastify";
 
 const Menu = [
   {
@@ -31,6 +31,11 @@ const Menu = [
     link: "/cart",
   },
   {
+    id: 7,
+    name: "BÀI VIẾT",
+    link: "/blog",
+  },
+  {
     id: 5,
     name: "GIỚI THIỆU",
     link: "/about",
@@ -41,7 +46,7 @@ const Menu = [
     link: "/contact",
   },
 ];
-const Navbar = ({ onCartClick, onMenuClick }) => {
+const Navbar = ({onCartClick, onMenuClick}) => {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const handleLogout = () => {
@@ -61,11 +66,16 @@ const Navbar = ({ onCartClick, onMenuClick }) => {
             </Link>
           </div>
           <div className="hidden xl:block xl:w-1/2">
-            <ul className="flex items-center justify-between py-5 font-medium ">
+            <ul className="flex items-center justify-between py-5 font-medium">
               {Menu.map((data) => (
-                <NavLink to={data.link} key={data.id} className="flex flex-col items-center gap-[2px]">
-                  <p>{data.name}</p>
-                  <hr className="w-3/4 border-none h-[1px] bg-gray-700 opacity-0 transition-all duration-400" />
+                <NavLink to={data.link} key={data.id} className={`flex flex-col items-center gap-[2px] group `}>
+                  <p className="relative">
+                    {data.name}
+                    {/* underline animation */}
+                    <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                  </p>
+                  {/* hr line cho active (ẩn/hiện qua CSS) */}
+                  <hr className="w-3/4 border-none h-[2px] bg-gray-700 opacity-0 transition-all duration-400" />
                 </NavLink>
               ))}
             </ul>
