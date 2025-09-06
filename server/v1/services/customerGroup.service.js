@@ -1,9 +1,13 @@
 const CustomerGroupDAO = require("../repositories/customerGroup.repository");
-const { NotFoundError, ConflictError } = require("../utils/errors");
+const {
+  BadRequestError,
+  NotFoundError,
+  ConflictError,
+} = require("../utils/errors");
 
 class CustomerGroupBUS {
   async getAllGroups() {
-    const result = await CustomerGroupDAO.findAll();
+    const result = await CustomerGroupDAO.findAllCustomerGroups();
     if (!result || result.length === 0)
       throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
 
@@ -11,7 +15,7 @@ class CustomerGroupBUS {
   }
 
   async getAllActive() {
-    const result = await CustomerGroupDAO.findByStatus1();
+    const result = await CustomerGroupDAO.findActiveCustomerGroups();
     if (!result || result.length === 0)
       throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
 
@@ -19,15 +23,19 @@ class CustomerGroupBUS {
   }
 
   async getCustomerGroupById(id) {
-    const result = await CustomerGroupDAO.findById(Number(id));
+    if (id <= 0 || isNaN(id)) {
+      throw new BadRequestError("ĐỊNH DANH KHÔNG HỢP LỆ");
+    }
+
+    const result = await CustomerGroupDAO.findCustomerGroupById(id);
     if (!result || result.length === 0)
-      throw new NotFoundError("NHÓM KHÔNG TỒN TẠI DỮ LIỆU");
+      throw new NotFoundError("NHÓM KHÔNG TỒN TẠI ");
 
     return result.toJSON?.() ?? result;
   }
 
   async getCustomerGroupByName(value) {
-    const result = await CustomerGroupDAO.findByName(value);
+    const result = await CustomerGroupDAO.findCustomerGroupByName(value);
     if (!result || result.length === 0)
       throw new NotFoundError("KHÔNG TỒN TẠI DỮ LIỆU");
 
@@ -35,15 +43,16 @@ class CustomerGroupBUS {
   }
 
   async validateForCreate(value) {
-    const existingName = await CustomerGroupDAO.findByName(value);
+    const existingName = await CustomerGroupDAO.findCustomerGroupByName(value);
     if (existingName) throw new ConflictError("TÊN NHÓM ĐÃ TỒN TẠI");
   }
 
   async validateForUpdate(value, id) {
-    const existingName = await CustomerGroupDAO.findByName(value);
+    const existingName = await CustomerGroupDAO.findCustomerGroupByName(value);
     if (existingName && Number(existingName.group_id) !== Number(id))
-      throw new ConflictError("TÊN NHÓM ĐÃ TỒN TẠI Ở DANH MỤC KHÁC");
+      throw new ConflictError("TÊN NHÓM ĐÃ TỒN TẠI ");
   }
+  s;
 
   async createCustomerGroup(data) {
     await this.validateForCreate(data.name);
@@ -62,7 +71,7 @@ class CustomerGroupBUS {
     await this.validateForUpdate(data.name, id);
 
     const isUnchanged =
-      oldData.group_name === data.name &&
+      oldData.name === data.name &&
       oldData.description === data.description &&
       Number(oldData.status) === Number(data.status);
 
@@ -76,9 +85,10 @@ class CustomerGroupBUS {
     return result.toJSON?.() ?? result;
   }
 
-  async deleteCustomerGroup(id) {
+  async softDeleteGroup(id) {
     await this.getCustomerGroupById(id);
-    await CustomerGroupDAO.delete(Number(id));
+    const result = await CustomerGroupDAO.softDeleteCustomerGroup(id);
+    return result.toJSON?.() ?? result;
   }
 }
 

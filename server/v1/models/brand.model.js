@@ -31,7 +31,7 @@ class BrandDTO {
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.createdAt,
-      products: this.products,
+      // products: this.products,
     };
   }
 }

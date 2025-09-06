@@ -1,87 +1,121 @@
 const ColorDAO = require("../repositories/color.repository");
-const { NotFoundError, ConflictError } = require("../utils/errors");
+const {
+  NotFoundError,
+  BadRequestError,
+  ConflictError,
+} = require("../utils/errors");
 
 class ColorBUS {
   async getAllColor() {
-    const result = await ColorDAO.findAll();
+    const result = await ColorDAO.findAllColors();
     if (!result || result.length === 0)
       throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
 
-    return result.map((c) => c.toJSON?.() ?? c);
+    return result.map((x) => x.toJSON?.() ?? x);
   }
 
   async getAllColorActive() {
-    const result = await ColorDAO.findByStatus();
+    const result = await ColorDAO.findActiveColors();
     if (!result || result.length === 0)
       throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
 
-    return result.map((c) => c.toJSON?.() ?? c);
+    return result.map((x) => x.toJSON?.() ?? x);
   }
 
   async getColorById(id) {
-    const result = await ColorDAO.findById(Number(id));
-    if (!result) throw new NotFoundError("ID KHÔNG TỒN TẠI DỮ LIỆU");
+    if (!id || isNaN(id)) {
+      throw new BadRequestError("ID KHÔNG HỢP LỆ");
+    }
+
+    const result = await ColorDAO.findColorById(id);
+    if (!result || result.length == 0)
+      throw new NotFoundError("DỮ LIỆU KHÔNG TỒN TẠI");
 
     return result.toJSON?.() ?? result;
   }
 
-  async getColorByName(value) {
-    const result = await ColorDAO.findByName(value);
-    if (!result) throw new NotFoundError("TÊN KHÔNG TỒN TẠI DỮ LIỆU");
+  async getColorByName(name) {
+    if (!name) {
+      throw new BadRequestError("TÊN DỮ LIỆU KHÔNG HỢP LỆ");
+    }
+
+    const result = await ColorDAO.findColorByName(name);
+    if (!result) throw new NotFoundError("TÊN DỮ LIỆU KHÔNG TỒN TẠI");
 
     return result.toJSON?.() ?? result;
   }
 
-  async getColorByCode(value) {
-    const result = await ColorDAO.findByCode(value);
-    if (!result) throw new NotFoundError("MÃ CODE KHÔNG TỒN TẠI DỮ LIỆU");
+  async getColorByCode(code) {
+    if (!code) {
+      throw new BadRequestError("MÃ CODE KHÔNG HỢP LỆ");
+    }
+
+    const result = await ColorDAO.findColorByCode(code);
+    if (!result) throw new NotFoundError("MÃ CODE KHÔNG TỒN TẠI");
 
     return result.toJSON?.() ?? result;
   }
 
   async validateForCreate(data) {
-    const { name, code } = data;
-    const [existingByName, existingByCode] = await Promise.all([
-      ColorDAO.findByName(name),
-      ColorDAO.findByCode(code),
+    const { slug, name } = data;
+    const [existingByCode, existingByName] = await Promise.all([
+      ColorDAO.findColorByCode(slug),
+      ColorDAO.findColorByName(name),
     ]);
 
-    if (existingByName) throw new ConflictError("TÊN NÀY ĐÃ TỒN TẠI");
-    if (existingByCode) throw new ConflictError("MÃ MÀU ĐÃ TỒN TẠI");
+    if (existingByCode) throw new ConflictError("MÃ CODE ĐÃ TỒN TẠI");
+    if (existingByName) throw new ConflictError("TÊN DỮ LIỆU ĐÃ TỒN TẠI");
   }
 
-  async validateForUpdate(id, data) {
-    const { name, code } = data;
-    const [existingByName, existingByCode] = await Promise.all([
-      ColorDAO.findByName(name),
-      ColorDAO.findByCode(code),
+  async validateForUpdate(excludeId, data) {
+    const { slug, name } = data;
+    const [existingByCode, existingByName] = await Promise.all([
+      ColorDAO.findColorByCode(slug),
+      ColorDAO.findColorByName(name),
     ]);
-
-    if (existingByName && Number(existingByName.color_id) !== Number(id))
-      throw new ConflictError("TÊN MÀU ĐÃ TỒN TẠI");
-    if (existingByCode && Number(existingByCode.color_id) !== Number(id))
-      throw new ConflictError("MÃ CODE ĐÃ TỒN TẠI");
+    if (existingByCode && Number(existingByCode.color_id) !== Number(excludeId))
+      throw new ConflictError("MÃ CODE ĐÃ TỒN TẠI ");
+    if (existingByName && Number(existingByName.color_id) !== Number(excludeId))
+      throw new ConflictError(" TÊN DỮ LIỆU ĐÃ TỒN TẠI ");
   }
 
-  async create(data) {
+  async createColor(data) {
     await this.validateForCreate(data);
-
     const result = await ColorDAO.create(data);
+
     if (!result || result.length === 0)
       throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
 
     return result.toJSON?.() ?? result;
   }
 
-  async update(id, data) {
-    await this.getColorById(id);
+  async updateColor(id, data) {
+    const oldData = await this.getColorById(id);
+
     await this.validateForUpdate(id, data);
 
-    const result = await ColorDAO.update(Number(id), {
-      ...data,
-      displayOrder: Number(data.displayOrder),
-      status: Number(data.status),
-    });
+    const isUnchanged =
+      oldData.name === data.name &&
+      oldData.code === data.code &&
+      Number(oldData.displayOrder) === Number(data.displayOrder) &&
+      Number(oldData.status) === Number(data.status);
+    if (isUnchanged) throw new ConflictError("KHÔNG CÓ GÌ THAY ĐỔI");
+
+    const result = await ColorDAO.update(id, data);
+
+    if (!result || result.length === 0)
+      throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
+
+    return result.toJSON?.() ?? result;
+  }
+
+  async softDeleteColor(id) {
+    const checkId = await this.getColorById(id);
+
+    if (Number(checkId.status) === -1)
+      throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, DỮ LIỆU ĐÃ BỊ XÓA");
+
+    const result = await ColorDAO.softDeleteColor(id);
     if (!result || result.length === 0)
       throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
 

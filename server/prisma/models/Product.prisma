@@ -22,6 +22,6 @@ model Product {
     productVariant  ProductVariant[]
     productComment  ProductComment[]
     productReview   ProductReview[]
-    imgProductFK    ImgProduct[]
+    imgProduct    ImgProduct[]
     favorite        FavoriteProduct[]
 }

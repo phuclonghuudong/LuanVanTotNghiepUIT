@@ -36,6 +36,7 @@ const verifyRefreshToken = (token) => {
 const generateAccessToken = async (payload) => {
   const secretKey = configKey.SECRET_KEY_ACCESS_TOKEN;
   const expiresIn = configKey.EXPIRES_IN_ACCESS_TOKEN;
+
   const token = await jwt.sign(payload, secretKey, {
     expiresIn: expiresIn,
   });

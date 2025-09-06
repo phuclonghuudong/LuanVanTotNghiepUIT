@@ -1,110 +1,122 @@
 const SizeDAO = require("../repositories/size.repository");
 const {
   NotFoundError,
-  ConflictError,
   BadRequestError,
+  ConflictError,
 } = require("../utils/errors");
-const { isValidSlugInput } = require("../utils/isValidateInput");
 
 class SizeBUS {
   async getAllSize() {
-    const result = await SizeDAO.findAll();
+    const result = await SizeDAO.findAllSize();
     if (!result || result.length === 0)
       throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
 
-    return result.map((c) => c.toJSON?.() ?? c);
+    return result.map((x) => x.toJSON?.() ?? x);
   }
 
   async getAllSizeActive() {
-    const result = await SizeDAO.findByStatus();
+    const result = await SizeDAO.findActiveSize();
     if (!result || result.length === 0)
       throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
 
-    return result.map((c) => c.toJSON?.() ?? c);
+    return result.map((x) => x.toJSON?.() ?? x);
   }
 
   async getSizeById(id) {
-    const result = await SizeDAO.findById(Number(id));
-    if (!result) throw new NotFoundError("ID KHÔNG TỒN TẠI DỮ LIỆU");
+    if (!id || isNaN(id)) {
+      throw new BadRequestError("ID KHÔNG HỢP LỆ");
+    }
+
+    const result = await SizeDAO.findSizeById(id);
+    if (!result || result.length == 0)
+      throw new NotFoundError("DỮ LIỆU KHÔNG TỒN TẠI");
 
     return result.toJSON?.() ?? result;
   }
 
-  async getSizeByName(value) {
-    const result = await SizeDAO.findByName(value);
-    if (!result) throw new NotFoundError("TÊN KHÔNG TỒN TẠI DỮ LIỆU");
+  async getSizeByName(name) {
+    if (!name) {
+      throw new BadRequestError("TÊN DỮ LIỆU KHÔNG HỢP LỆ");
+    }
+
+    const result = await SizeDAO.findSizeByName(name);
+    if (!result) throw new NotFoundError("TÊN DỮ LIỆU KHÔNG TỒN TẠI");
 
     return result.toJSON?.() ?? result;
   }
 
-  async getSizeByCode(value) {
-    const result = await SizeDAO.findByCode(value);
-    if (!result) throw new NotFoundError("MÃ CODE KHÔNG TỒN TẠI DỮ LIỆU");
+  async getSizeByCode(code) {
+    if (!code) {
+      throw new BadRequestError("MÃ CODE KHÔNG HỢP LỆ");
+    }
+
+    const result = await SizeDAO.findSizeByCode(code);
+    if (!result) throw new NotFoundError("MÃ CODE KHÔNG TỒN TẠI");
 
     return result.toJSON?.() ?? result;
   }
 
   async validateForCreate(data) {
-    const { name, code } = data;
-
-    const isValid = await isValidSlugInput(code);
-    if (!isValid)
-      throw new BadRequestError("MÃ KÍCH THƯỚC KHÔNG ĐÚNG ĐỊNH DẠNG");
-
-    const [existingByName, existingByCode] = await Promise.all([
-      SizeDAO.findByName(name),
-      SizeDAO.findByCode(code),
+    const { slug, name } = data;
+    const [existingByCode, existingByName] = await Promise.all([
+      SizeDAO.findSizeByCode(slug),
+      SizeDAO.findSizeByName(name),
     ]);
 
-    if (existingByName) throw new ConflictError("TÊN NÀY ĐÃ TỒN TẠI");
     if (existingByCode) throw new ConflictError("MÃ CODE ĐÃ TỒN TẠI");
+    if (existingByName) throw new ConflictError("TÊN DỮ LIỆU ĐÃ TỒN TẠI");
   }
 
-  async validateForUpdate(id, data) {
-    const { name, code } = data;
-
-    const isValid = await isValidSlugInput(code);
-    if (!isValid)
-      throw new BadRequestError("MÃ KÍCH THƯỚC KHÔNG ĐÚNG ĐỊNH DẠNG");
-
-    const [existingByName, existingByCode] = await Promise.all([
-      SizeDAO.findByName(name),
-      SizeDAO.findByCode(code),
+  async validateForUpdate(excludeId, data) {
+    const { slug, name } = data;
+    const [existingByCode, existingByName] = await Promise.all([
+      SizeDAO.findSizeByCode(slug),
+      SizeDAO.findSizeByName(name),
     ]);
-
-    if (existingByName && Number(existingByName.size_id) !== Number(id))
-      throw new ConflictError("TÊN KÍCH THƯỚC ĐÃ TỒN TẠI");
-    if (existingByCode && Number(existingByCode.size_id) !== Number(id))
-      throw new ConflictError("MÃ CODE ĐÃ TỒN TẠI");
+    if (existingByCode && Number(existingByCode.size_id) !== Number(excludeId))
+      throw new ConflictError("MÃ CODE ĐÃ TỒN TẠI ");
+    if (existingByName && Number(existingByName.size_id) !== Number(excludeId))
+      throw new ConflictError(" TÊN DỮ LIỆU ĐÃ TỒN TẠI ");
   }
 
-  async create(data) {
+  async createSize(data) {
     await this.validateForCreate(data);
-
     const result = await SizeDAO.create(data);
+
     if (!result || result.length === 0)
       throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
 
     return result.toJSON?.() ?? result;
   }
 
-  async update(id, data) {
+  async updateSize(id, data) {
     const oldData = await this.getSizeById(id);
+
     await this.validateForUpdate(id, data);
-    const isSame =
+
+    const isUnchanged =
       oldData.name === data.name &&
       oldData.code === data.code &&
-      oldData.type === data.type &&
+      oldData.type === (data.type || null) &&
       Number(oldData.displayOrder) === Number(data.displayOrder) &&
       Number(oldData.status) === Number(data.status);
+    if (isUnchanged) throw new ConflictError("KHÔNG CÓ GÌ THAY ĐỔI");
 
-    if (isSame) throw new ConflictError("KHÔNG CÓ GÌ THAY ĐỔI");
+    const result = await SizeDAO.update(id, data);
 
-    const result = await SizeDAO.update(Number(id), {
-      ...data,
-      displayOrder: Number(data.displayOrder),
-      status: Number(data.status),
-    });
+    if (!result || result.length === 0)
+      throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
+
+    return result.toJSON?.() ?? result;
+  }
+
+  async softDeleteSize(id) {
+    const checkId = await this.getSizeById(id);
+
+    if (Number(checkId.status) === -1)
+      throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, DỮ LIỆU ĐÃ BỊ XÓA");
+
+    const result = await SizeDAO.softDeleteSize(id);
     if (!result || result.length === 0)
       throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
 

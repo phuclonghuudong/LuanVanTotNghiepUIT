@@ -1,99 +1,92 @@
 const CategoryDAO = require("../repositories/category.repository");
 const {
   NotFoundError,
-  ConflictError,
   BadRequestError,
+  ConflictError,
 } = require("../utils/errors");
-const { isValidSlugInput } = require("../utils/isValidateInput");
 
 class CategoryBUS {
   async getAllCategories() {
-    const result = await CategoryDAO.findAll();
-
+    const result = await CategoryDAO.findAllCategories();
     if (!result || result.length === 0)
       throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
 
-    return result.map((c) => c.toJSON?.() ?? c);
+    return result.map((x) => x.toJSON?.() ?? x);
   }
 
-  async getAllCategoriesStatusEqual1() {
-    const result = await CategoryDAO.findByStatus1();
-
+  async getAllCategoryActive() {
+    const result = await CategoryDAO.findActiveCategories();
     if (!result || result.length === 0)
       throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
 
-    return result.map((c) => c.toJSON?.() ?? c);
-  }
-
-  async getAllCategoriesStatusNotMinus1() {
-    const result = await CategoryDAO.findByStatusNotMinus1();
-
-    if (!result || result.length === 0)
-      throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
-
-    return result.map((c) => c.toJSON?.() ?? c);
+    return result.map((x) => x.toJSON?.() ?? x);
   }
 
   async getCategoryById(id) {
-    const result = await CategoryDAO.findById(Number(id));
-    if (!result) throw new NotFoundError("DANH MỤC KHÔNG TỒN TẠI DỮ LIỆU");
+    if (!id || isNaN(id)) {
+      throw new BadRequestError("ID KHÔNG HỢP LỆ");
+    }
+
+    const result = await CategoryDAO.findCategoryById(id);
+    if (!result || result.length == 0)
+      throw new NotFoundError("DANH MỤC KHÔNG TỒN TẠI");
+
+    return result.toJSON?.() ?? result;
+  }
+
+  async getCategoryByName(name) {
+    if (!name) {
+      throw new BadRequestError("TÊN DANH MỤC KHÔNG HỢP LỆ");
+    }
+
+    const result = await CategoryDAO.findCategoryByName(name);
+    if (!result) throw new NotFoundError("TÊN DANH MỤC KHÔNG TỒN TẠI");
 
     return result.toJSON?.() ?? result;
   }
 
   async getCategoryBySlug(slug) {
-    const result = await CategoryDAO.findBySlug(slug);
-    if (!result) throw new NotFoundError("ĐỊNH DANH KHÔNG TỒN TẠI DỮ LIỆU");
+    if (!slug) {
+      throw new BadRequestError("TÊN ĐỊNH DANH KHÔNG HỢP LỆ");
+    }
+
+    const result = await CategoryDAO.findCategoryBySlug(slug);
+    if (!result) throw new NotFoundError("ĐỊNH DANH DANH MỤC KHÔNG TỒN TẠI");
 
     return result.toJSON?.() ?? result;
   }
 
-  async validateForCreate(slug, name) {
-    const isValidSlug = await isValidSlugInput(slug);
-    if (!isValidSlug)
-      throw new BadRequestError(
-        "ĐỊNH DANH KHÔNG ĐÚNG ĐỊNH DẠNG (Ví dụ: thuc-the)"
-      );
-
+  async validateForCreate(data) {
+    const { slug, name } = data;
     const [existingBySlug, existingByName] = await Promise.all([
-      CategoryDAO.findBySlug(slug),
-      CategoryDAO.findByName(name),
+      CategoryDAO.findCategoryBySlug(slug),
+      CategoryDAO.findCategoryByName(name),
     ]);
 
-    if (existingBySlug) throw new ConflictError("TÊN ĐỊNH DANH ĐÃ TỒN TẠI!");
-    if (existingByName) throw new ConflictError("TÊN LOẠI ĐÃ TỒN TẠI!");
+    if (existingBySlug) throw new ConflictError("TÊN ĐỊNH DANH ĐÃ TỒN TẠI");
+    if (existingByName) throw new ConflictError("TÊN DANH MỤC ĐÃ TỒN TẠI");
   }
 
-  async validateForUpdate(slug, name, excludeId) {
-    const isValidSlug = await isValidSlugInput(slug);
-    if (!isValidSlug)
-      throw new BadRequestError(
-        "ĐỊNH DANH KHÔNG ĐÚNG ĐỊNH DẠNG (Ví dụ: thuc-the)"
-      );
-
+  async validateForUpdate(excludeId, data) {
+    const { slug, name } = data;
     const [existingBySlug, existingByName] = await Promise.all([
-      CategoryDAO.findBySlug(slug),
-      CategoryDAO.findByName(name),
+      CategoryDAO.findCategoryBySlug(slug),
+      CategoryDAO.findCategoryByName(name),
     ]);
-
     if (
       existingBySlug &&
       Number(existingBySlug.category_id) !== Number(excludeId)
-    ) {
-      throw new ConflictError("TÊN ĐỊNH DANH ĐÃ TỒN TẠI Ở DANH MỤC KHÁC!");
-    }
-
+    )
+      throw new ConflictError("TÊN ĐỊNH DANH ĐÃ TỒN TẠI ");
     if (
       existingByName &&
       Number(existingByName.category_id) !== Number(excludeId)
-    ) {
-      throw new ConflictError("TÊN LOẠI ĐÃ TỒN TẠI Ở DANH MỤC KHÁC!");
-    }
+    )
+      throw new ConflictError(" TÊN DANH MỤC ĐÃ TỒN TẠI ");
   }
 
   async createCategory(data) {
-    await this.validateForCreate(data.slug, data.name);
-
+    await this.validateForCreate(data);
     const result = await CategoryDAO.create(data);
 
     if (!result || result.length === 0)
@@ -103,20 +96,19 @@ class CategoryBUS {
   }
 
   async updateCategory(id, data) {
-    const oldCategory = await this.getCategoryById(id);
+    const oldData = await this.getCategoryById(id);
 
-    await this.validateForUpdate(data.slug, data.name, id);
+    await this.validateForUpdate(id, data);
 
     const isUnchanged =
-      oldCategory.category_slug === data.slug &&
-      oldCategory.category_name === data.name &&
-      oldCategory.description === data.description &&
-      oldCategory.image_url === data.imageUrl &&
-      Number(oldCategory.status) === Number(data.status);
+      oldData.name === data.name &&
+      oldData.slug === data.slug &&
+      oldData.description === (data.description || null) &&
+      oldData.imageUrl === (data.imageUrl || null) &&
+      Number(oldData.status) === Number(data.status);
+    if (isUnchanged) throw new ConflictError("KHÔNG CÓ GÌ THAY ĐỔI");
 
-    if (isUnchanged) throw new ConflictError("KHÔNG CÓ GÌ THAY ĐỔI!");
-
-    const result = await CategoryDAO.update(Number(id), data);
+    const result = await CategoryDAO.update(id, data);
 
     if (!result || result.length === 0)
       throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
@@ -124,9 +116,17 @@ class CategoryBUS {
     return result.toJSON?.() ?? result;
   }
 
-  async deleteCategory(id) {
-    await this.getCategoryById(id);
-    await CategoryDAO.delete(Number(id));
+  async softDeleteCategory(id) {
+    const checkId = await this.getCategoryById(id);
+
+    if (Number(checkId.status) === -1)
+      throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, DỮ LIỆU ĐÃ BỊ XÓA");
+
+    const result = await CategoryDAO.softDeleteCategory(id);
+    if (!result || result.length === 0)
+      throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
+
+    return result.toJSON?.() ?? result;
   }
 }
 

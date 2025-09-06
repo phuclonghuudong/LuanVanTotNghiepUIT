@@ -1,9 +1,13 @@
 const PersonnelDAO = require("../repositories/personnel.repository");
-const { NotFoundError, ConflictError } = require("../utils/errors");
+const {
+  NotFoundError,
+  ConflictError,
+  BadRequestError,
+} = require("../utils/errors");
 
-class CustomerBUS {
+class PersonnelBUS {
   async getAllPersonnel() {
-    const result = await PersonnelDAO.findAll();
+    const result = await PersonnelDAO.findAllPersonnel();
     if (!result || result.length === 0)
       throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
 
@@ -11,23 +15,31 @@ class CustomerBUS {
   }
 
   async getPersonnelById(id) {
-    const result = await PersonnelDAO.findById(Number(id));
+    if (!id || isNaN(id)) {
+      throw new BadRequestError("ID KHÔNG HỢP LỆ");
+    }
+
+    const result = await PersonnelDAO.findPersonnelById(id);
     if (!result || result.length === 0)
-      throw new NotFoundError("NHÂN VIÊN KHÔNG TỒN TẠI DỮ LIỆU");
+      throw new NotFoundError("NHÂN VIÊN KHÔNG TỒN TẠI ");
 
     return result.toJSON?.() ?? result;
   }
 
   async getPersonnelByAccountId(id) {
-    const result = await PersonnelDAO.findByAccountId(Number(id));
+    if (!id || isNaN(id)) {
+      throw new BadRequestError("ID KHÔNG HỢP LỆ");
+    }
+
+    const result = await PersonnelDAO.findPersonnelByAccountId(id);
     if (!result || result.length === 0)
-      throw new NotFoundError("TÀI KHOẢN KHÔNG TỒN TẠI TRONG NHÂN VIÊN");
+      throw new NotFoundError("TÀI KHOẢN NHÂN VIÊN KHÔNG TỒN TẠI");
 
     return result.toJSON?.() ?? result;
   }
 
   async getPersonnelByAccountIdLogin(id) {
-    const result = await PersonnelDAO.findByAccountId(Number(id));
+    const result = await PersonnelDAO.findPersonnelByAccountId(id);
 
     return result ? result.toJSON?.() : null;
   }
@@ -50,8 +62,7 @@ class CustomerBUS {
       oldData.cccd === data.cccd &&
       oldData.birthday === data.birthday &&
       oldData.address === data.address &&
-      oldData.avatar === data.avatar &&
-      Number(oldData.personnel_id) === Number(data.id);
+      oldData.avatar === data.avatar;
 
     if (isUnchanged) throw new ConflictError("KHÔNG CÓ GÌ THAY ĐỔI");
 
@@ -62,10 +73,16 @@ class CustomerBUS {
 
     return result.toJSON?.() ?? result;
   }
-  async deletePersonnel(id) {
+
+  async softDeletePersonnel(id) {
     await this.getPersonnelById(id);
-    await PersonnelDAO.delete(Number(id));
+    const result = await PersonnelDAO.softDeletePersonnel(id);
+
+    if (!result || result.length === 0)
+      throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
+
+    return result.toJSON?.() ?? result;
   }
 }
 
-module.exports = new CustomerBUS();
+module.exports = new PersonnelBUS();

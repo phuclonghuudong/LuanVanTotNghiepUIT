@@ -1,41 +1,44 @@
 const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
 const CustomerGroupDTO = require("../models/customerGroup.model");
+const prisma = new PrismaClient();
 
 class CustomerGroupDAO {
-  async findAll() {
+  async findAllCustomerGroups() {
     const result = await prisma.customerGroup.findMany();
     return result.map((x) => new CustomerGroupDTO(x));
   }
 
-  async findByStatus1() {
+  async findActiveCustomerGroups(status) {
     const result = await prisma.customerGroup.findMany({
       where: { status: 1 },
     });
-    return result.map((x) => new CustomerGroupDTO(x));
+    return result.map((c) => new CustomerGroupDTO(c));
   }
 
-  async findByNotMinus1() {
+  async findAvailableCustomerGroups() {
     const result = await prisma.customerGroup.findMany({
-      where: {
-        status: {
-          not: -1,
-        },
-      },
+      where: { status: { not: -1 } },
     });
-    return result.map((x) => new CustomerGroupDTO(x));
+    return result.map((c) => new CustomerGroupDTO(c));
   }
 
-  async findById(id) {
+  async findCustomerGroupByStatus(status = 1) {
+    const result = await prisma.customerGroup.findMany({
+      where: { status },
+    });
+    return result.map((c) => new CustomerGroupDTO(c));
+  }
+
+  async findCustomerGroupById(id) {
     const result = await prisma.customerGroup.findUnique({
-      where: { group_id: id },
+      where: { group_id: Number(id) },
     });
     return result ? new CustomerGroupDTO(result) : result;
   }
 
-  async findByName(value) {
+  async findCustomerGroupByName(name) {
     const result = await prisma.customerGroup.findUnique({
-      where: { group_name: value },
+      where: { group_name: name },
     });
     return result ? new CustomerGroupDTO(result) : result;
   }
@@ -44,8 +47,8 @@ class CustomerGroupDAO {
     const result = await prisma.customerGroup.create({
       data: {
         group_name: data.name,
-        description: data.description || "",
-        status: data.status || 1,
+        description: data.description || null,
+        status: Number(data.status) ?? 1,
       },
     });
     return new CustomerGroupDTO(result);
@@ -53,20 +56,29 @@ class CustomerGroupDAO {
 
   async update(id, data) {
     const result = await prisma.customerGroup.update({
-      where: { group_id: id },
+      where: { group_id: Number(id) },
       data: {
         group_name: data.name,
         description: data.description,
-        status: data.status,
+        status: Number(data.status),
       },
     });
     return new CustomerGroupDTO(result);
   }
 
-  async delete(id) {
-    return await prisma.customerGroup.delete({
-      where: { group_id: id },
+  async softDeleteCustomerGroup(id) {
+    const result = await prisma.customerGroup.update({
+      where: { group_id: Number(id) },
+      data: { status: -1 },
     });
+    return new CustomerGroupDTO(result);
+  }
+
+  async hardDeleteCustomerGroup(id) {
+    const result = await prisma.customerGroup.delete({
+      where: { group_id: Number(id) },
+    });
+    return new CustomerGroupDTO(result);
   }
 }
 
