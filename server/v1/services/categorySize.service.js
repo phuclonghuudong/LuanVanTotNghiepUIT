@@ -1,75 +1,48 @@
 const CategorySizeDAO = require("../repositories/categorySize.repository");
-const SizeBUS = require("./size.service");
-const CategoryBUS = require("./category.service");
+const CategoryBUS = require("../services/category.service");
+const SizeBUS = require("../services/size.service");
 const {
   NotFoundError,
-  ConflictError,
   BadRequestError,
+  ConflictError,
 } = require("../utils/errors");
 
 class CategorySizeBUS {
   async getAllCategorySize() {
-    const result = await CategorySizeDAO.findAll();
-
+    const result = await CategorySizeDAO.findAllCategorySize();
     if (!result || result.length === 0)
       throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
 
-    return result.map((c) => c.toJSON?.() ?? c);
+    return result.map((x) => x.toJSON?.() ?? x);
   }
 
   async getAllCategorySizeActive() {
-    const result = await CategorySizeDAO.findByStatus1();
-
+    const result = await CategorySizeDAO.findActiveCategorySize();
     if (!result || result.length === 0)
       throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
 
-    return result.map((c) => c.toJSON?.() ?? c);
+    return result.map((x) => x.toJSON?.() ?? x);
   }
 
-  async checkIfCreatedDataExists(category, size) {
-    const checkNew = await CategorySizeDAO.findByCategoryAndSize(
-      Number(category),
-      Number(size)
-    );
-    if (checkNew) throw new ConflictError("DỮ LIỆU ĐÃ TỒN TẠI");
-    return true;
-  }
-
-  async checkIfUpdatedDataExists(category, size, id) {
-    const checkNew = await CategorySizeDAO.findByCategoryAndSize(
-      Number(category),
-      Number(size)
-    );
-    if (checkNew && checkNew.id !== Number(id)) {
-      throw new ConflictError("DỮ LIỆU ĐÃ TỒN TẠI");
+  async getCategorySizeById(id) {
+    if (!id || isNaN(id)) {
+      throw new BadRequestError("ID KHÔNG HỢP LỆ");
     }
 
-    return true;
-  }
+    const result = await CategorySizeDAO.findCategorySizeById(id);
+    if (!result || result.length == 0)
+      throw new NotFoundError("DANH MỤC KHÔNG TỒN TẠI");
 
-  async checkActiveCategorySize(size, category) {
-    if (Number(size?.status) === -1)
-      throw new BadRequestError("KÍCH THƯỚC ĐÃ BỊ XÓA");
-    if (Number(category?.status) === -1)
-      throw new BadRequestError("DANH MỤC ĐÃ BỊ XÓA");
-
-    return true;
+    return result.toJSON?.() ?? result;
   }
 
   async createCategorySize(data) {
-    const { sizeId, categoryId } = data;
-    const checkSize = await SizeBUS.getSizeById(sizeId);
-    const checkCategory = await CategoryBUS.getCategoryById(categoryId);
+    const { categoryId, sizeId } = data;
+    await CategoryBUS.getCategoryById(categoryId);
+    await SizeBUS.getSizeById(sizeId);
 
-    await this.checkActiveCategorySize(checkSize.status, checkCategory.status);
+    const result = await CategorySizeDAO.create(data);
 
-    await this.checkIfCreatedDataExists(categoryId, sizeId);
-
-    const result = await CategorySizeDAO.create({
-      ...data,
-      categoryId: Number(categoryId),
-      sizeId: Number(sizeId),
-    });
     if (!result || result.length === 0)
       throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
 
@@ -77,20 +50,36 @@ class CategorySizeBUS {
   }
 
   async updateCategorySize(id, data) {
-    const { sizeId, categoryId, status } = data;
-    const checkSize = await SizeBUS.getSizeById(sizeId);
-    const checkCategory = await CategoryBUS.getCategoryById(categoryId);
+    const oldData = await this.getCategorySizeById(id);
 
-    await this.checkActiveCategorySize(checkSize.status, checkCategory.status);
+    const { categoryId, sizeId } = data;
+    await CategoryBUS.getCategoryById(categoryId);
+    await SizeBUS.getSizeById(sizeId);
 
-    await this.checkIfUpdatedDataExists(categoryId, sizeId);
+    await this.validateForUpdate(id, data);
 
-    const result = await CategorySizeDAO.update(id, {
-      ...data,
-      categoryId: Number(categoryId),
-      sizeId: Number(sizeId),
-      status: Number(status),
-    });
+    const isUnchanged =
+      Number(oldData.categoryId) === Number(categoryId) &&
+      Number(oldData.sizeId) === Number(sizeId) &&
+      oldData.description === (data.description || null) &&
+      Number(oldData.status) === Number(data.status);
+    if (isUnchanged) throw new ConflictError("KHÔNG CÓ GÌ THAY ĐỔI");
+
+    const result = await CategorySizeDAO.update(id, data);
+
+    if (!result || result.length === 0)
+      throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
+
+    return result.toJSON?.() ?? result;
+  }
+
+  async softDeleteCategorySize(id) {
+    const checkId = await this.getCategorySizeById(id);
+
+    if (Number(checkId.status) === -1)
+      throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, DỮ LIỆU ĐÃ BỊ XÓA");
+
+    const result = await CategorySizeDAO.softDeleteCategorySize(id);
     if (!result || result.length === 0)
       throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
 

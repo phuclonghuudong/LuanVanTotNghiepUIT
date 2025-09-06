@@ -3,95 +3,93 @@ const prisma = new PrismaClient();
 const CategoryDTO = require("../models/category.model");
 
 class CategoryDAO {
-  async findAll() {
-    const categories = await prisma.category.findMany();
-    return categories.map((c) => new CategoryDTO(c));
+  async findAllCategories() {
+    const result = await prisma.category.findMany();
+    return result.map((x) => new CategoryDTO(x));
   }
 
-  async findById(id) {
-    const category = await prisma.category.findUnique({
-      where: { category_id: id },
+  async findActiveCategories(status = 1) {
+    const result = await prisma.category.findMany({
+      where: { status },
     });
-    return category ? new CategoryDTO(category) : null;
+    return result.map((c) => new CategoryDTO(c));
   }
 
-  async findByName(id) {
-    const category = await prisma.category.findUnique({
-      where: { category_name: id },
+  async findAvailableCategories() {
+    const result = await prisma.category.findMany({
+      where: { status: { not: -1 } },
     });
-    return category ? new CategoryDTO(category) : null;
+    return result.map((c) => new CategoryDTO(c));
   }
 
-  async findBySlug(slug) {
-    const category = await prisma.category.findUnique({
+  async findCategoryByStatus(status = 1) {
+    const result = await prisma.category.findMany({
+      where: { status },
+    });
+    return result.map((c) => new CategoryDTO(c));
+  }
+
+  async findCategoryById(id) {
+    const result = await prisma.category.findUnique({
+      where: { category_id: Number(id) },
+    });
+    return result ? new CategoryDTO(result) : result;
+  }
+
+  async findCategoryByName(name) {
+    const result = await prisma.category.findUnique({
+      where: { category_name: name },
+    });
+    return result ? new CategoryDTO(result) : result;
+  }
+
+  async findCategoryBySlug(slug) {
+    const result = await prisma.category.findUnique({
       where: { category_slug: slug },
     });
-    return category ? new CategoryDTO(category) : null;
-  }
-
-  async findByStatus1() {
-    const categories = await prisma.category.findMany({
-      where: {
-        status: 1,
-      },
-    });
-    return categories.map((c) => new CategoryDTO(c));
-  }
-
-  async findByStatusNotMinus1() {
-    const categories = await prisma.category.findMany({
-      where: {
-        status: {
-          not: -1,
-        },
-      },
-    });
-    return categories.map((c) => new CategoryDTO(c));
-  }
-
-  async findByStatus12() {
-    const categories = await prisma.category.findMany({
-      where: {
-        status: {
-          in: [1, 2],
-        },
-      },
-    });
-    return categories.map((c) => new CategoryDTO(c));
+    return result ? new CategoryDTO(result) : result;
   }
 
   async create(data) {
-    const category = await prisma.category.create({
+    const result = await prisma.category.create({
       data: {
         category_name: data.name,
         category_slug: data.slug,
-        description: data.description,
-        image_url: data.imageUrl,
-        status: data.status || 1,
+        description: data.description || null,
+        image_url: data.imageUrl || null,
+        status: Number(data.status) ?? 1,
       },
     });
-    return new CategoryDTO(category);
+    return new CategoryDTO(result);
   }
 
   async update(id, data) {
-    const category = await prisma.category.update({
-      where: { category_id: id },
+    const result = await prisma.category.update({
+      where: { category_id: Number(id) },
       data: {
         category_name: data.name,
         category_slug: data.slug,
-        description: data.description,
-        image_url: data.imageUrl,
-        status: data.status,
+        description: data.description || null,
+        image_url: data.imageUrl || null,
+        status: Number(data.status),
       },
     });
-    return new CategoryDTO(category);
+    return new CategoryDTO(result);
   }
 
-  async delete(id) {
-    await prisma.category.delete({
-      where: { category_id: id },
+  async softDeleteCategory(id) {
+    const result = await prisma.category.update({
+      where: { category_id: Number(id) },
+      data: { status: -1 },
     });
+    return new CategoryDTO(result);
+  }
+
+  async hardDeleteCategory(id) {
+    const result = await prisma.category.delete({
+      where: { category_id: Number(id) },
+    });
+    return new CategoryDTO(result);
   }
 }
-
 module.exports = new CategoryDAO();

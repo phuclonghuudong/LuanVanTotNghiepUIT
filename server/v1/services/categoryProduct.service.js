@@ -1,105 +1,97 @@
 const CategoryProductDAO = require("../repositories/categoryProduct.repository");
-const CategoryDAO = require("./category.service");
+const CategoryBUS = require("../services/category.service");
 const {
   NotFoundError,
-  ConflictError,
   BadRequestError,
+  ConflictError,
 } = require("../utils/errors");
-const { isValidSlugInput } = require("../utils/isValidateInput");
 
 class CategoryProductBUS {
   async getAllCategoryProduct() {
-    const result = await CategoryProductDAO.findAll();
-
+    const result = await CategoryProductDAO.findAllCategoryProduct();
     if (!result || result.length === 0)
       throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
 
-    return result.map((c) => c.toJSON?.() ?? c);
+    return result.map((x) => x.toJSON?.() ?? x);
   }
 
   async getAllCategoryProductActive() {
-    const result = await CategoryProductDAO.findByStatus1();
-
+    const result = await CategoryProductDAO.findActiveCategoryProduct();
     if (!result || result.length === 0)
       throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
 
-    return result.map((c) => c.toJSON?.() ?? c);
+    return result.map((x) => x.toJSON?.() ?? x);
   }
 
   async getCategoryProductById(id) {
-    const result = await CategoryProductDAO.findById(Number(id));
-    if (!result) throw new NotFoundError("DANH MỤC SẢN PHẨM KHÔNG TỒN TẠI");
+    if (!id || isNaN(id)) {
+      throw new BadRequestError("ID KHÔNG HỢP LỆ");
+    }
+
+    const result = await CategoryProductDAO.findCategoryProductById(id);
+    if (!result || result.length == 0)
+      throw new NotFoundError("DANH MỤC KHÔNG TỒN TẠI");
+
+    return result.toJSON?.() ?? result;
+  }
+
+  async getCategoryProductByName(name) {
+    if (!name) {
+      throw new BadRequestError("TÊN DANH MỤC KHÔNG HỢP LỆ");
+    }
+
+    const result = await CategoryProductDAO.findCategoryProductByName(name);
+    if (!result) throw new NotFoundError("TÊN DANH MỤC KHÔNG TỒN TẠI");
 
     return result.toJSON?.() ?? result;
   }
 
   async getCategoryProductBySlug(slug) {
-    const result = await CategoryProductDAO.findBySlug(slug);
-    if (!result) throw new NotFoundError("ĐỊNH DANH KHÔNG TỒN TẠI DỮ LIỆU");
+    if (!slug) {
+      throw new BadRequestError("TÊN ĐỊNH DANH KHÔNG HỢP LỆ");
+    }
+
+    const result = await CategoryProductDAO.findCategoryProductBySlug(slug);
+    if (!result) throw new NotFoundError("ĐỊNH DANH DANH MỤC KHÔNG TỒN TẠI");
 
     return result.toJSON?.() ?? result;
   }
 
   async validateForCreate(data) {
     const { slug, name } = data;
-
-    const isValidSlug = await isValidSlugInput(slug);
-    if (!isValidSlug)
-      throw new BadRequestError(
-        "ĐỊNH DANH KHÔNG ĐÚNG ĐỊNH DẠNG (Ví dụ: thuc-the)"
-      );
-
     const [existingBySlug, existingByName] = await Promise.all([
-      CategoryProductDAO.findBySlug(slug),
-      CategoryProductDAO.findByName(name),
+      CategoryProductDAO.findCategoryProductBySlug(slug),
+      CategoryProductDAO.findCategoryProductByName(name),
     ]);
 
-    if (existingBySlug) throw new ConflictError("TÊN ĐỊNH DANH ĐÃ TỒN TẠI!");
-    if (existingByName) throw new ConflictError("TÊN LOẠI ĐÃ TỒN TẠI!");
+    if (existingBySlug) throw new ConflictError("TÊN ĐỊNH DANH ĐÃ TỒN TẠI");
+    if (existingByName) throw new ConflictError("TÊN DANH MỤC ĐÃ TỒN TẠI");
   }
 
-  async validateForUpdate(slug, name, excludeId) {
-    const isValidSlug = await isValidSlugInput(slug);
-    if (!isValidSlug)
-      throw new BadRequestError(
-        "ĐỊNH DANH KHÔNG ĐÚNG ĐỊNH DẠNG (Ví dụ: thuc-the)"
-      );
-
+  async validateForUpdate(excludeId, data) {
+    const { slug, name } = data;
     const [existingBySlug, existingByName] = await Promise.all([
-      CategoryProductDAO.findBySlug(slug),
-      CategoryProductDAO.findByName(name),
+      CategoryProductDAO.findCategoryProductBySlug(slug),
+      CategoryProductDAO.findCategoryProductByName(name),
     ]);
-
     if (
       existingBySlug &&
       Number(existingBySlug.category_id) !== Number(excludeId)
-    ) {
-      throw new ConflictError("TÊN ĐỊNH DANH ĐÃ TỒN TẠI Ở DANH MỤC KHÁC!");
-    }
-
+    )
+      throw new ConflictError("TÊN ĐỊNH DANH ĐÃ TỒN TẠI ");
     if (
       existingByName &&
       Number(existingByName.category_id) !== Number(excludeId)
-    ) {
-      throw new ConflictError("TÊN LOẠI ĐÃ TỒN TẠI Ở DANH MỤC KHÁC!");
-    }
+    )
+      throw new ConflictError(" TÊN DANH MỤC ĐÃ TỒN TẠI ");
   }
 
   async createCategoryProduct(data) {
-    const { categoryId, name, slug } = data;
-    const checkCategory = await CategoryDAO.getCategoryById(categoryId);
-
-    if (checkCategory?.status === -1)
-      throw new BadRequestError(
-        "KHÔNG THỂ THỰC HIỆN THAO TÁC, DANH MỤC ĐÃ BỊ XÓA"
-      );
-
     await this.validateForCreate(data);
 
-    const result = await CategoryProductDAO.create({
-      ...data,
-      categoryId: Number(categoryId),
-    });
+    await CategoryBUS.getCategoryById(data?.categoryId);
+
+    const result = await CategoryProductDAO.create(data);
 
     if (!result || result.length === 0)
       throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
@@ -108,33 +100,22 @@ class CategoryProductBUS {
   }
 
   async updateCategoryProduct(id, data) {
-    const { categoryId, name, slug, description, status, imageUrl } = data;
+    const oldData = await this.getCategoryProductById(id);
 
-    const checkCategory = await CategoryDAO.getCategoryById(categoryId);
+    await CategoryBUS.getCategoryById(data?.categoryId);
 
-    if (checkCategory?.status === -1)
-      throw new BadRequestError(
-        "KHÔNG THỂ THỰC HIỆN THAO TÁC, DANH MỤC ĐÃ BỊ XÓA"
-      );
-
-    const oldCategory = await this.getCategoryProductById(id);
-
-    await this.validateForUpdate(slug, name, id);
+    await this.validateForUpdate(id, data);
 
     const isUnchanged =
-      oldCategory.category_id === categoryId &&
-      oldCategory.category_product_slug === slug &&
-      oldCategory.category_product_name === name &&
-      oldCategory.description === description &&
-      oldCategory.image_url === imageUrl &&
-      Number(oldCategory.status) === Number(status);
+      oldData.name === data.name &&
+      Number(oldData.categoryId) === Number(data.categoryId) &&
+      oldData.slug === data.slug &&
+      oldData.description === (data.description || null) &&
+      oldData.imageUrl === (data.imageUrl || null) &&
+      Number(oldData.status) === Number(data.status);
+    if (isUnchanged) throw new ConflictError("KHÔNG CÓ GÌ THAY ĐỔI");
 
-    if (isUnchanged) throw new ConflictError("KHÔNG CÓ GÌ THAY ĐỔI!");
-
-    const result = await CategoryProductDAO.update(Number(id), {
-      ...data,
-      categoryId: Number(categoryId),
-    });
+    const result = await CategoryProductDAO.update(id, data);
 
     if (!result || result.length === 0)
       throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
@@ -142,9 +123,17 @@ class CategoryProductBUS {
     return result.toJSON?.() ?? result;
   }
 
-  async deleteCategoryProduct(id) {
-    await this.getCategoryProductById(id);
-    await CategoryProductDAO.delete(Number(id));
+  async softDeleteCategoryProduct(id) {
+    const checkId = await this.getCategoryProductById(id);
+
+    if (Number(checkId.status) === -1)
+      throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, DỮ LIỆU ĐÃ BỊ XÓA");
+
+    const result = await CategoryProductDAO.softDeleteCategoryProduct(id);
+    if (!result || result.length === 0)
+      throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
+
+    return result.toJSON?.() ?? result;
   }
 }
 

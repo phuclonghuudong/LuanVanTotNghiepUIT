@@ -1,56 +1,93 @@
 const { PrismaClient } = require("@prisma/client");
-const ColorDTO = require("../models/color.model");
 const prisma = new PrismaClient();
+const ColorDTO = require("../models/color.model");
 
 class ColorDAO {
-  async findAll() {
-    return (await prisma.color.findMany()).map((c) => new ColorDTO(c));
+  async findAllColors() {
+    const result = await prisma.color.findMany();
+    return result.map((x) => new ColorDTO(x));
   }
 
-  async findByStatus(status = 1) {
-    return (await prisma.color.findMany({ where: { status } })).map(
-      (c) => new ColorDTO(c)
-    );
+  async findActiveColors(status = 1) {
+    const result = await prisma.color.findMany({
+      where: { status },
+    });
+    return result.map((c) => new ColorDTO(c));
   }
 
-  async findById(id) {
-    const res = await prisma.color.findUnique({ where: { color_id: id } });
-    return res ? new ColorDTO(res) : res;
+  async findAvailableColors() {
+    const result = await prisma.color.findMany({
+      where: { status: { not: -1 } },
+    });
+    return result.map((c) => new ColorDTO(c));
   }
 
-  async findByName(value) {
-    const res = await prisma.color.findUnique({ where: { color_name: value } });
-    return res ? new ColorDTO(res) : res;
+  async findColorByStatus(status = 1) {
+    const result = await prisma.color.findMany({
+      where: { status },
+    });
+    return result.map((c) => new ColorDTO(c));
   }
 
-  async findByCode(value) {
-    const res = await prisma.color.findUnique({ where: { color_code: value } });
-    return res ? new ColorDTO(res) : res;
+  async findColorById(id) {
+    const result = await prisma.color.findUnique({
+      where: { color_id: Number(id) },
+    });
+    return result ? new ColorDTO(result) : result;
+  }
+
+  async findColorByName(name) {
+    const result = await prisma.color.findUnique({
+      where: { color_name: name },
+    });
+    return result ? new ColorDTO(result) : result;
+  }
+
+  async findColorByCode(code) {
+    const result = await prisma.color.findUnique({
+      where: { color_code: code },
+    });
+    return result ? new ColorDTO(result) : result;
   }
 
   async create(data) {
-    const res = await prisma.color.create({
+    const result = await prisma.color.create({
       data: {
         color_name: data.name,
         color_code: data.code,
-        display_order: data.displayOrder,
-        status: data.status ?? 1,
+        display_order: Number(data.displayOrder),
+        status: Number(data.status) ?? 1,
       },
     });
-    return new ColorDTO(res);
+    return new ColorDTO(result);
   }
 
   async update(id, data) {
-    const res = await prisma.color.update({
-      where: { color_id: id },
+    const result = await prisma.color.update({
+      where: { color_id: Number(id) },
       data: {
         color_name: data.name,
         color_code: data.code,
-        display_order: data.displayOrder,
-        status: data.status,
+        display_order: Number(data.displayOrder) ?? 1,
+        status: Number(data.status),
       },
     });
-    return new ColorDTO(res);
+    return new ColorDTO(result);
+  }
+
+  async softDeleteColor(id) {
+    const result = await prisma.color.update({
+      where: { color_id: Number(id) },
+      data: { status: -1 },
+    });
+    return new ColorDTO(result);
+  }
+
+  async hardDeleteColor(id) {
+    const result = await prisma.color.delete({
+      where: { color_id: Number(id) },
+    });
+    return new ColorDTO(result);
   }
 }
 

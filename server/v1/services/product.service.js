@@ -1,117 +1,115 @@
 const ProductDAO = require("../repositories/product.repository");
-const {
-  NotFoundError,
-  ConflictError,
-  BadRequestError,
-} = require("../utils/errors");
 const BrandBUS = require("../services/brand.service");
 const CategoryProductBUS = require("../services/categoryProduct.service");
 const {
-  isValidSlugInput,
-  isValidSkuInput,
-} = require("../utils/isValidateInput");
+  NotFoundError,
+  BadRequestError,
+  ConflictError,
+} = require("../utils/errors");
 
 class ProductBUS {
   async getAllProduct() {
-    const result = await ProductDAO.findAll();
+    const result = await ProductDAO.findAllProduct();
     if (!result || result.length === 0)
       throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
 
-    return result.map((c) => c.toJSON?.() ?? c);
+    return result.map((x) => x.toJSON?.() ?? x);
   }
 
   async getAllProductActive() {
-    const result = await ProductDAO.findAllStatus1();
+    const result = await ProductDAO.findActiveProduct();
     if (!result || result.length === 0)
       throw new NotFoundError("CHƯA CÓ DỮ LIỆU");
 
-    return result.map((c) => c.toJSON?.() ?? c);
+    return result.map((x) => x.toJSON?.() ?? x);
   }
 
   async getProductById(id) {
-    const result = await ProductDAO.findById(Number(id));
-    if (!result || result.length === 0)
-      throw new NotFoundError("KHÔNG TÌM THẤY DỮ LIỆU");
+    if (!id || isNaN(id)) {
+      throw new BadRequestError("ID KHÔNG HỢP LỆ");
+    }
+
+    const result = await ProductDAO.findProductById(id);
+    if (!result || result.length == 0)
+      throw new NotFoundError("DỮ LIỆU KHÔNG TỒN TẠI");
 
     return result.toJSON?.() ?? result;
   }
 
-  async getProductBySlug(value) {
-    const result = await ProductDAO.findBySlug(value);
-    if (!result || result.length === 0)
-      throw new NotFoundError("KHÔNG TÌM THẤY DỮ LIỆU");
+  async getProductByName(name) {
+    if (!name) {
+      throw new BadRequestError("TÊN SẢN PHẨM KHÔNG HỢP LỆ");
+    }
+
+    const result = await ProductDAO.findProductByName(name);
+    if (!result) throw new NotFoundError("TÊN SẢN PHẨM KHÔNG TỒN TẠI");
+
+    return result.toJSON?.() ?? result;
+  }
+
+  async getProductBySlug(slug) {
+    if (!slug) {
+      throw new BadRequestError("ĐỊNH DANH SẢN PHẨM KHÔNG HỢP LỆ");
+    }
+
+    const result = await ProductDAO.findProductBySlug(slug);
+    if (!result) throw new NotFoundError("ĐỊNH DANH SẢN PHẨM KHÔNG TỒN TẠI");
 
     return result.toJSON?.() ?? result;
   }
 
   async getProductBySku(sku) {
-    const result = await ProductDAO.findBySku(sku);
-    if (!result || result.length === 0)
-      throw new NotFoundError("KHÔNG TÌM THẤY DỮ LIỆU");
+    if (!sku) {
+      throw new BadRequestError("MÃ SẢN PHÂM KHÔNG HỢP LỆ");
+    }
+
+    const result = await ProductDAO.findProductBySlug(sku);
+    if (!result) throw new NotFoundError("MÃ SẢN PHẨM KHÔNG TỒN TẠI");
 
     return result.toJSON?.() ?? result;
   }
 
-  async validateForCreateProduct(data) {
+  async validateForCreate(data) {
     const { sku, slug, name } = data;
-
-    const isValidSlug = await isValidSlugInput(slug);
-    if (!isValidSlug)
-      throw new BadRequestError(
-        "ĐỊNH DANH KHÔNG ĐÚNG ĐỊNH DẠNG (Ví dụ: thuc-the)"
-      );
-
-    const isValidSku = await isValidSkuInput(sku);
-    if (!isValidSku)
-      throw new BadRequestError("SKU SẢN PHẨM KHÔNG ĐÚNG ĐỊNH DẠNG");
-
-    const [existingByName, existingBySlug, existingBySku] = await Promise.all([
-      ProductDAO.findByName(name),
-      ProductDAO.findBySlug(slug),
-      ProductDAO.findBySku(sku),
+    const [existingBySku, existingBySlug, existingByName] = await Promise.all([
+      ProductDAO.findProductBySku(sku),
+      ProductDAO.findProductBySlug(slug),
+      ProductDAO.findProductByName(name),
     ]);
+
+    if (existingBySku) throw new ConflictError("MÃ SẢN PHẨM ĐÃ TỒN TẠI");
+    if (existingBySlug)
+      throw new ConflictError("ĐỊNH DANH SẢN PHẨM ĐÃ TỒN TẠI");
     if (existingByName) throw new ConflictError("TÊN SẢN PHẨM ĐÃ TỒN TẠI");
-    if (existingBySlug) throw new ConflictError("TÊN ĐỊNH DANH ĐÃ TỒN TẠI");
-    if (existingBySku) throw new ConflictError("SKU ĐÃ TỒN TẠI");
   }
 
-  async validateForUpdateProduct(id, data) {
+  async validateForUpdate(excludeId, data) {
     const { sku, slug, name } = data;
-    const isValidSlug = await isValidSlugInput(slug);
-    if (!isValidSlug)
-      throw new BadRequestError(
-        "ĐỊNH DANH KHÔNG ĐÚNG ĐỊNH DẠNG (Ví dụ: thuc-the)"
-      );
-
-    const isValidSku = await isValidSkuInput(sku);
-    if (!isValidSku)
-      throw new BadRequestError("SKU SẢN PHẨM KHÔNG ĐÚNG ĐỊNH DẠNG");
-
-    const [existingByName, existingBySlug, existingBySku] = await Promise.all([
-      ProductDAO.findByName(name),
-      ProductDAO.findBySlug(slug),
-      ProductDAO.findBySku(sku),
+    const [existingBySku, existingBySlug, existingByName] = await Promise.all([
+      ProductDAO.findProductBySku(sku),
+      ProductDAO.findProductBySlug(slug),
+      ProductDAO.findProductByName(name),
     ]);
 
-    if (existingByName && Number(existingByName?.id) !== Number(id))
-      throw new ConflictError("TÊN SẢN PHẨM ĐÃ TỒN TẠI Ở DANH MỤC KHÁC");
-    if (existingBySlug && Number(existingBySlug?.id) !== Number(id))
-      throw new ConflictError("TÊN ĐỊNH DANH ĐÃ TỒN TẠI Ở DANH MỤC KHÁC");
-    if (existingBySku && Number(existingBySku?.id) !== Number(id))
-      throw new ConflictError("SKU ĐÃ TỒN TẠI Ở DANH MỤC KHÁC");
+    const productId = existingBySku.product_id;
+    if (existingBySku && Number(productId) !== Number(excludeId))
+      throw new ConflictError("MÃ SẢN PHẨM ĐÃ TỒN TẠI ");
+
+    if (existingBySlug && Number(productId) !== Number(excludeId))
+      throw new ConflictError("MÃ ĐỊNH DANH ĐÃ TỒN TẠI ");
+
+    if (existingByName && Number(productId) !== Number(excludeId))
+      throw new ConflictError(" TÊN SẢN PHẨM ĐÃ TỒN TẠI ");
   }
 
   async createProduct(data) {
-    const { brandId, categoryId, sku, slug, name } = data;
+    const { brandId, categoryProductId } = data;
 
     await BrandBUS.getBrandById(brandId);
-    await CategoryProductBUS.getCategoryProductById(categoryId);
+    await CategoryProductBUS.getCategoryProductById(categoryProductId);
 
-    await this.validateForCreateProduct(data);
-
-    const result = await ProductDAO.create({
-      ...data,
-    });
+    await this.validateForCreate(data);
+    const result = await ProductDAO.create(data);
 
     if (!result || result.length === 0)
       throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
@@ -120,19 +118,38 @@ class ProductBUS {
   }
 
   async updateProduct(id, data) {
-    const { brandId, categoryId, sku, slug, name } = data;
-
-    await this.getProductById(id);
+    const { brandId, categoryProductId } = data;
 
     await BrandBUS.getBrandById(brandId);
-    await CategoryProductBUS.getCategoryProductById(categoryId);
+    await CategoryProductBUS.getCategoryProductById(categoryProductId);
 
-    await this.validateForUpdateProduct(id, data);
+    const oldData = await this.getProductById(id);
 
-    const result = await ProductDAO.update(id, {
-      ...data,
-    });
+    await this.validateForUpdate(id, data);
 
+    const isUnchanged =
+      oldData.name === data.name &&
+      oldData.code === data.code &&
+      oldData.type === (data.type || null) &&
+      Number(oldData.displayOrder) === Number(data.displayOrder) &&
+      Number(oldData.status) === Number(data.status);
+    if (isUnchanged) throw new ConflictError("KHÔNG CÓ GÌ THAY ĐỔI");
+
+    const result = await ProductDAO.update(id, data);
+
+    if (!result || result.length === 0)
+      throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
+
+    return result.toJSON?.() ?? result;
+  }
+
+  async softDeleteProduct(id) {
+    const checkId = await this.getProductById(id);
+
+    if (Number(checkId.status) === -1)
+      throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, DỮ LIỆU ĐÃ BỊ XÓA");
+
+    const result = await ProductDAO.softDeleteProduct(id);
     if (!result || result.length === 0)
       throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
 

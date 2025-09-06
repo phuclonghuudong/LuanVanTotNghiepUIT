@@ -393,9 +393,9 @@ model Inventory {
 
 model News {
   news_id       Int       @id @default(autoincrement())           
-  news_title    String    @db.VarChar(100) @unique               
+  news_title    String    @db.VarChar(255) @unique               
   summary       String    @db.Text                
-  news_slug     String    @db.VarChar(100) @unique               
+  news_slug     String    @db.VarChar(255) @unique               
   content       String?   @db.Text                                  
   image_url         String?   @db.Text 
   view_count        Int       @default(0)
@@ -582,7 +582,7 @@ model Product {
     productVariant  ProductVariant[]
     productComment  ProductComment[]
     productReview   ProductReview[]
-    imgProductFK    ImgProduct[]
+    imgProduct    ImgProduct[]
     favorite        FavoriteProduct[]
 }
 
@@ -629,6 +629,7 @@ model ProductReview {
 
 model ProductVariant {
     variant_id      Int         @id @default (autoincrement())
+    name             String      @db.VarChar(100)     @unique  
     sku             String      @db.VarChar(100)     @unique  
     description     String      @db.VarChar(255)
     avg_cost        Decimal      @db.Decimal(10,2)

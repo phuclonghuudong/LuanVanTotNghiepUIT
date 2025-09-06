@@ -3,90 +3,95 @@ const prisma = new PrismaClient();
 const CategoryProductDTO = require("../models/categoryProduct.model");
 
 class CategoryProductDAO {
-  async findAll() {
-    const categories = await prisma.categoryProduct.findMany();
-    return categories.map((c) => new CategoryProductDTO(c));
+  async findAllCategoryProduct() {
+    const result = await prisma.categoryProduct.findMany();
+    return result.map((x) => new CategoryProductDTO(x));
   }
 
-  async findByStatus1() {
-    const categories = await prisma.categoryProduct.findMany({
-      where: { status: 1 },
+  async findActiveCategoryProduct(status = 1) {
+    const result = await prisma.categoryProduct.findMany({
+      where: { status },
     });
-    return categories.map((c) => new CategoryProductDTO(c));
+    return result.map((c) => new CategoryProductDTO(c));
   }
 
-  async findByStatusNotMinus1() {
-    const categories = await prisma.categoryProduct.findMany({
+  async findAvailableCategoryProduct() {
+    const result = await prisma.categoryProduct.findMany({
       where: { status: { not: -1 } },
     });
-    return categories.map((c) => new CategoryProductDTO(c));
+    return result.map((c) => new CategoryProductDTO(c));
   }
 
-  async findById(id) {
-    const category = await prisma.categoryProduct.findUnique({
-      where: { category_product_id: id },
+  async findCategoryProductByStatus(status = 1) {
+    const result = await prisma.categoryProduct.findMany({
+      where: { status },
     });
-    return category ? new CategoryProductDTO(category) : null;
+    return result.map((c) => new CategoryProductDTO(c));
   }
 
-  async findByName(id) {
-    const category = await prisma.categoryProduct.findUnique({
-      where: { category_product_name: id },
+  async findCategoryProductById(id) {
+    const result = await prisma.categoryProduct.findUnique({
+      where: { category_product_id: Number(id) },
     });
-    return category ? new CategoryProductDTO(category) : null;
+    return result ? new CategoryProductDTO(result) : result;
   }
 
-  async findBySlug(slug) {
-    const category = await prisma.categoryProduct.findUnique({
+  async findCategoryProductByName(name) {
+    const result = await prisma.categoryProduct.findUnique({
+      where: { category_product_name: name },
+    });
+    return result ? new CategoryProductDTO(result) : result;
+  }
+
+  async findCategoryProductBySlug(slug) {
+    const result = await prisma.categoryProduct.findUnique({
       where: { category_product_slug: slug },
     });
-    return category ? new CategoryProductDTO(category) : null;
-  }
-
-  async findByStatus12() {
-    const categories = await prisma.categoryProduct.findMany({
-      where: {
-        status: {
-          in: [1, 2],
-        },
-      },
-    });
-    return categories.map((c) => new CategoryProductDTO(c));
+    return result ? new CategoryProductDTO(result) : result;
   }
 
   async create(data) {
-    const category = await prisma.categoryProduct.create({
+    const result = await prisma.categoryProduct.create({
       data: {
-        category_id: data.categoryId,
+        category_id: Number(data.categoryId),
         category_product_name: data.name,
         category_product_slug: data.slug,
-        description: data.description,
-        image_url: data.imageUrl,
-        status: data.status || 1,
+        description: data.description || null,
+        image_url: data.imageUrl || null,
+        status: Number(data.status) ?? 1,
       },
     });
-    return new CategoryProductDTO(category);
+    return new CategoryProductDTO(result);
   }
 
   async update(id, data) {
-    const category = await prisma.categoryProduct.update({
-      where: { category_product_id: id },
+    const result = await prisma.categoryProduct.update({
+      where: { category_product_id: Number(id) },
       data: {
-        category_id: data.categoryId,
+        category_id: Number(data.categoryId),
         category_product_name: data.name,
         category_product_slug: data.slug,
-        description: data.description,
-        image_url: data.imageUrl,
-        status: data.status,
+        description: data.description || null,
+        image_url: data.imageUrl || null,
+        status: Number(data.status),
       },
     });
-    return new CategoryProductDTO(category);
+    return new CategoryProductDTO(result);
   }
 
-  async delete(id) {
-    await prisma.categoryProduct.delete({
-      where: { category_product_id: id },
+  async softDeleteCategoryProduct(id) {
+    const result = await prisma.categoryProduct.update({
+      where: { category_product_id: Number(id) },
+      data: { status: -1 },
     });
+    return new CategoryProductDTO(result);
+  }
+
+  async hardDeleteCategoryProduct(id) {
+    const result = await prisma.categoryProduct.delete({
+      where: { category_product_id: Number(id) },
+    });
+    return new CategoryProductDTO(result);
   }
 }
 

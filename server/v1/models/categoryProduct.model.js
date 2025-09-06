@@ -33,8 +33,8 @@ class CategoryProductDTO {
       imageUrl: this.image_url,
       status: this.status,
       createdAt: this.createdAt,
-      updatedAt: this.createdAt,
-      product: this.product,
+      updatedAt: this.updatedAt,
+      // product: this.product,
     };
   }
 }

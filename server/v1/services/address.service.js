@@ -16,28 +16,27 @@ class AddressBUS {
   }
 
   async getAddressById(id) {
-    const result = await AddressDAO.findById(Number(id));
+    const result = await AddressDAO.findById(id);
     if (!result || result.length === 0)
-      throw new NotFoundError("ID KHÔNG TỒN TẠI DỮ LIỆU");
+      throw new NotFoundError("ĐỊA CHỈ KHÔNG TỒN TẠI ");
 
     return result.toJSON?.() ?? result;
   }
 
   async getAddressByCustomer(id) {
-    const result = await AddressDAO.findByCustomerId(Number(id));
+    const result = await AddressDAO.findByCustomerId(id);
     if (!result || result.length === 0)
-      throw new NotFoundError("ID KHÔNG TỒN TẠI DỮ LIỆU");
+      throw new NotFoundError("ĐỊA CHỈ KHÔNG TỒN TẠI ");
 
     return result.toJSON?.() ?? result;
   }
 
   async getAddressByIdAndCustomer(id, customer) {
-    const result = await AddressDAO.findByIdAndCustomer(
-      Number(id),
-      Number(customer)
-    );
+    await CustomerBUS.getCustomerById(customer);
+
+    const result = await AddressDAO.findByIdAndCustomer(id, customer);
     if (!result || result.length === 0)
-      throw new NotFoundError("KHÔNG THỂ THỰC HIỆN THAO TÁC NÀY");
+      throw new NotFoundError("ĐỊA CHỈ KHÔNG TỒN TẠI ");
 
     return result.toJSON?.() ?? result;
   }
@@ -55,10 +54,7 @@ class AddressBUS {
 
     await CustomerBUS.getCustomerById(customer);
 
-    const result = await AddressDAO.create({
-      ...data,
-      customer_id: Number(customer),
-    });
+    const result = await AddressDAO.create(data);
     if (!result || result.length === 0)
       throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
 
@@ -66,8 +62,8 @@ class AddressBUS {
   }
 
   async updateAddress(user, id, data) {
-    await this.validateInput(data);
     await this.getAddressByIdAndCustomer(id, user);
+    await this.validateInput(data);
 
     const oldData = await this.getAddressById(id);
 
@@ -80,10 +76,20 @@ class AddressBUS {
 
     if (!isChanged) throw new ConflictError("DỮ LIỆU KHÔNG CÓ GÌ THAY ĐỔI");
 
-    const result = await AddressDAO.update(Number(id), {
-      ...data,
-      status: Number(data.status),
-    });
+    const result = await AddressDAO.update(id, data);
+    if (!result || result.length === 0)
+      throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
+
+    return result.toJSON?.() ?? result;
+  }
+
+  async softDeleteAddress(id) {
+    const checkId = await this.getAddressById(id);
+
+    if (Number(checkId.status) === -1)
+      throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, DỮ LIỆU ĐÃ BỊ XÓA");
+
+    const result = await AddressDAO.softDelete(id);
     if (!result || result.length === 0)
       throw new BadRequestError("THAO TÁC KHÔNG THÀNH CÔNG, VUI LÒNG THỬ LẠI");
 

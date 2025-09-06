@@ -1,5 +1,6 @@
 model ProductVariant {
     variant_id      Int         @id @default (autoincrement())
+    name             String      @db.VarChar(100)     @unique  
     sku             String      @db.VarChar(100)     @unique  
     description     String      @db.VarChar(255)
     avg_cost        Decimal      @db.Decimal(10,2)

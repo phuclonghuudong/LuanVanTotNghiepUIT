@@ -1,8 +1,8 @@
 model News {
   news_id       Int       @id @default(autoincrement())           
-  news_title    String    @db.VarChar(100) @unique               
+  news_title    String    @db.VarChar(255) @unique               
   summary       String    @db.Text                
-  news_slug     String    @db.VarChar(100) @unique               
+  news_slug     String    @db.VarChar(255) @unique               
   content       String?   @db.Text                                  
   image_url         String?   @db.Text 
   view_count        Int       @default(0)

@@ -3,25 +3,25 @@ const ImageProductDTO = require("../models/imageProduct.model");
 const prisma = new PrismaClient();
 
 class ImageProductDAO {
-  async findAll() {
+  async findAllImage() {
     return (await prisma.imgProduct.findMany()).map(
       (c) => new ImageProductDTO(c)
     );
   }
 
-  async findByStatus1(status = 1) {
+  async findActiveImage(status = 1) {
     return (await prisma.imgProduct.findMany({ where: { status } })).map(
       (c) => new ImageProductDTO(c)
     );
   }
 
-  async findByNotMinus1() {
+  async findAvailableImage() {
     return (
       await prisma.imgProduct.findMany({ where: { status: { not: -1 } } })
     ).map((c) => new ImageProductDTO(c));
   }
 
-  async findById(id) {
+  async findImageById(id) {
     const result = await prisma.imgProduct.findUnique({
       where: { img_id: Number(id) },
     });
@@ -40,8 +40,8 @@ class ImageProductDAO {
       data: {
         product_id: Number(data.productId),
         image_url: data.imageUrl,
-        is_main: data.is_main,
-        status: Number(data.status),
+        is_main: data.isMain ?? 1,
+        status: Number(data.status) ?? 1,
       },
     });
 
@@ -54,7 +54,7 @@ class ImageProductDAO {
       data: {
         product_id: Number(data.productId),
         image_url: data.imageUrl,
-        is_main: data.is_main,
+        is_main: data.isMain,
         status: Number(data.status),
       },
     });
@@ -62,7 +62,15 @@ class ImageProductDAO {
     return new ImageProductDTO(result);
   }
 
-  async delete(id) {
+  async softDeleteImage(id) {
+    const result = await prisma.imgProduct.update({
+      where: { img_id: Number(id) },
+      data: { status: -1 },
+    });
+    return new ImageProductDTO(result);
+  }
+
+  async hardDeleteImage(id) {
     const result = await prisma.imgProduct.delete({
       where: { img_id: Number(id) },
     });

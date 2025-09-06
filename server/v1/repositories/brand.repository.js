@@ -3,50 +3,51 @@ const prisma = new PrismaClient();
 const BrandDTO = require("../models/brand.model");
 
 class BrandDAO {
-  async findAll() {
+  async findAllBrands() {
     const result = await prisma.brand.findMany();
     return result.map((x) => new BrandDTO(x));
   }
 
-  async findByStatus1() {
+  async findActiveBrands(status = 1) {
     const result = await prisma.brand.findMany({
-      where: {
-        status: 1,
-      },
+      where: { status },
     });
-    return result.map((x) => new BrandDTO(x));
+    return result.map((c) => new BrandDTO(c));
   }
 
-  async findByStatusNotMinus1() {
+  async findAvailableBrands() {
     const result = await prisma.brand.findMany({
-      where: {
-        status: {
-          not: -1,
-        },
-      },
+      where: { status: { not: -1 } },
     });
-    return result.map((x) => new BrandDTO(x));
+    return result.map((c) => new BrandDTO(c));
   }
 
-  async findById(id) {
+  async findBrandByStatus(status = 1) {
+    const result = await prisma.brand.findMany({
+      where: { status },
+    });
+    return result.map((c) => new BrandDTO(c));
+  }
+
+  async findBrandById(id) {
     const result = await prisma.brand.findUnique({
-      where: { brand_id: id },
+      where: { brand_id: Number(id) },
     });
-    return result ? new BrandDTO(result) : null;
+    return result ? new BrandDTO(result) : result;
   }
 
-  async findByName(id) {
+  async findBrandByName(name) {
     const result = await prisma.brand.findUnique({
-      where: { brand_name: id },
+      where: { brand_name: name },
     });
-    return result ? new BrandDTO(result) : null;
+    return result ? new BrandDTO(result) : result;
   }
 
-  async findBySlug(slug) {
+  async findBrandBySlug(slug) {
     const result = await prisma.brand.findUnique({
       where: { brand_slug: slug },
     });
-    return result ? new BrandDTO(result) : null;
+    return result ? new BrandDTO(result) : result;
   }
 
   async create(data) {
@@ -54,9 +55,9 @@ class BrandDAO {
       data: {
         brand_name: data.name,
         brand_slug: data.slug,
-        description: data.description,
-        image_url: data.imageUrl,
-        status: data.status ?? 1,
+        description: data.description || null,
+        image_url: data.imageUrl || null,
+        status: Number(data.status) ?? 1,
       },
     });
     return new BrandDTO(result);
@@ -64,23 +65,31 @@ class BrandDAO {
 
   async update(id, data) {
     const result = await prisma.brand.update({
-      where: { brand_id: id },
+      where: { brand_id: Number(id) },
       data: {
         brand_name: data.name,
         brand_slug: data.slug,
-        description: data.description,
-        image_url: data.imageUrl,
-        status: data.status,
+        description: data.description || null,
+        image_url: data.imageUrl || null,
+        status: Number(data.status),
       },
     });
     return new BrandDTO(result);
   }
 
-  async delete(id) {
-    await prisma.brand.delete({
-      where: { brand_id: id },
+  async softDeleteBrand(id) {
+    const result = await prisma.brand.update({
+      where: { brand_id: Number(id) },
+      data: { status: -1 },
     });
+    return new BrandDTO(result);
+  }
+
+  async hardDeleteBrand(id) {
+    const result = await prisma.brand.delete({
+      where: { brand_id: Number(id) },
+    });
+    return new BrandDTO(result);
   }
 }
-
 module.exports = new BrandDAO();

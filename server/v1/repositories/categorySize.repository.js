@@ -3,78 +3,68 @@ const prisma = new PrismaClient();
 const CategorySizeDTO = require("../models/categorySize.model");
 
 class CategorySizeDAO {
-  async findAll() {
-    const result = await prisma.categorySize.findMany();
-    return result.map((x) => new CategorySizeDTO(x));
-  }
-
-  async findByCategoryAndSize(ca, si) {
-    const result = await prisma.categorySize.findFirst({
-      where: {
-        category_id: ca,
-        size_id: si,
+  async findAllCategorySize() {
+    const result = await prisma.categorySize.findMany({
+      include: {
+        category: true,
+        size: true,
       },
     });
-    return result ? new CategorySizeDTO(result) : null;
-  }
-
-  async findByStatus1() {
-    const result = await prisma.categorySize.findMany({
-      where: { status: 1 },
-    });
     return result.map((x) => new CategorySizeDTO(x));
   }
 
-  async findByStatusNotMinus1() {
+  async findActiveCategorySize(status = 1) {
     const result = await prisma.categorySize.findMany({
-      where: { status: { not: -1 } },
+      where: { status },
     });
-    return result.map((x) => new CategorySizeDTO(x));
+    return result.map((c) => new CategorySizeDTO(c));
   }
 
-  async findById(id) {
+  async findCategorySizeById(id) {
     const result = await prisma.categorySize.findUnique({
-      where: { id: id },
+      where: { id: Number(id) },
     });
-    return result ? new CategorySizeDTO(result) : null;
+    return result ? new CategorySizeDTO(result) : result;
   }
 
   async create(data) {
     const result = await prisma.categorySize.create({
       data: {
-        category_id: data.categoryId,
-        size_id: data.sizeId,
-        description: data.description,
-        status: data.status ?? 1,
+        category_id: Number(data.categoryId),
+        size_id: Number(data.sizeId),
+        description: data.name,
+        status: Number(data.status) ?? 1,
       },
     });
     return new CategorySizeDTO(result);
   }
 
   async update(id, data) {
-    const result = await prisma.categorySize.update({
-      where: { id: id },
+    const result = await prisma.categorySize.create({
+      where: { id: Number(id) },
       data: {
-        category_id: data.categoryId,
-        size_id: data.sizeId,
-        description: data.description,
-        status: data.status,
+        category_id: Number(data.categoryId),
+        size_id: Number(data.sizeId),
+        description: data.name,
+        status: Number(data.status),
       },
     });
     return new CategorySizeDTO(result);
   }
 
-  async delete(id) {
-    await prisma.categorySize.delete({
-      where: { id: id },
+  async softDeleteCategorySize(id) {
+    const result = await prisma.categorySize.update({
+      where: { id: Number(id) },
+      data: { status: -1 },
     });
+    return new CategorySizeDTO(result);
   }
 
-  async findByCategory(id) {
-    const result = await prisma.categorySize.findUnique({
-      where: { category_id: id },
+  async hardDeleteCategorySize(id) {
+    const result = await prisma.categorySize.delete({
+      where: { id: Number(id) },
     });
-    return result ? new CategorySizeDTO(result) : null;
+    return new CategorySizeDTO(result);
   }
 }
 

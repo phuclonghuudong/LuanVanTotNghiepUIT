@@ -1,95 +1,125 @@
-const { PrismaClient } = require("@prisma/client");
 const ProductDTO = require("../models/product.model");
-
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 class ProductDAO {
-  async findAll() {
-    return (await prisma.product.findMany()).map((c) => new ProductDTO(c));
-  }
-
-  async findAllStatus1(status = 1) {
-    return (await prisma.product.findMany({ where: { status } })).map(
-      (c) => new ProductDTO(c)
-    );
-  }
-
-  async findAllNotMinus1() {
-    return (
-      await prisma.product.findMany({ where: { status: { not: -1 } } })
-    ).map((c) => new ProductDTO(c));
-  }
-
-  async findById(id, options = {}) {
-    const res = await prisma.product.findUnique({
-      where: { product_id: id },
+  async findAllProduct() {
+    const result = await prisma.product.findMany({
       include: {
-        brand: options.includeBrand ?? false,
-        categoryProduct: options.includeCategory ?? false,
-        imgProductFK: options.includeImages ?? false,
+        brand: true,
+        categoryProduct: true,
+        productVariant: { include: { color: true, size: true } },
+        imgProduct: true,
       },
     });
-    return res ? new ProductDTO(res) : res;
+    return result.map((c) => new ProductDTO(c));
   }
 
-  async findBySlug(value) {
-    const res = await prisma.product.findUnique({
-      where: { product_slug: value },
+  async findActiveProduct(status = 1) {
+    const result = await prisma.product.findMany({
+      where: { status },
     });
-    return res ? new ProductDTO(res) : res;
+    return result.map((c) => new ProductDTO(c));
   }
 
-  async findByName(value) {
-    const res = await prisma.product.findUnique({
-      where: { product_name: value },
+  async findAvailableProduct() {
+    const result = await prisma.product.findMany({
+      where: { status: { not: -1 } },
     });
-    return res ? new ProductDTO(res) : res;
+    return result.map((c) => new ProductDTO(c));
   }
 
-  async findBySku(value) {
-    const res = await prisma.product.findUnique({
+  async findProductByStatus(status) {
+    const result = await prisma.product.findMany({
+      where: { status },
+    });
+    return result.map((c) => new ProductDTO(c));
+  }
+
+  async findProductById(id) {
+    const result = await prisma.product.findUnique({
+      where: { product_id: Number(id) },
+    });
+    return result ? new ProductDTO(result) : result;
+  }
+
+  async findProductByName(name) {
+    const result = await prisma.product.findUnique({
+      where: { product_name: name },
+    });
+    return result ? new ProductDTO(result) : result;
+  }
+
+  async findProductBySlug(slug) {
+    const result = await prisma.product.findUnique({
+      where: { product_slug: slug },
+    });
+    return result ? new ProductDTO(result) : result;
+  }
+
+  async findProductBySku(value) {
+    const result = await prisma.product.findUnique({
       where: { product_sku: value },
     });
-    return res ? new ProductDTO(res) : res;
+    return result ? new ProductDTO(result) : result;
   }
 
   async create(data) {
-    const res = await prisma.product.create({
+    const result = await prisma.product.create({
       data: {
-        category_product_id: Number(data.categoryId),
-        brand_id: Number(data.brandId),
         product_name: data.name,
         product_slug: data.slug,
         product_sku: data.sku,
-        views: data.views ?? 0,
         description: data.description,
+        view: Number(data.view) ?? 0,
+        brand_id: Number(data.brandId),
+        category_product_id: Number(data.categoryProductId),
         status: Number(data.status) ?? 1,
       },
     });
-    return new ProductDTO(res);
+    return new ProductDTO(result);
   }
 
   async update(id, data) {
-    const res = await prisma.product.update({
+    const result = await prisma.product.update({
       where: { product_id: Number(id) },
       data: {
-        category_product_id: Number(data.categoryId),
-        brand_id: Number(data.brandId),
         product_name: data.name,
         product_slug: data.slug,
         product_sku: data.sku,
-        views: Number(data.views || null),
         description: data.description,
-        status: Number(data.status),
+        view: Number(data.view) ?? 0,
+        brand_id: Number(data.brandId),
+        category_product_id: Number(data.categoryProductId),
+        status: Number(data.status) ?? 1,
       },
     });
-    return new ProductDTO(res);
+    return new ProductDTO(result);
   }
 
-  async delete(id) {
-    await prisma.product.delete({
-      where: { product_id: id },
+  async updateViews(id) {
+    const result = await prisma.product.update({
+      where: { product_id: Number(id) },
+      data: {
+        view: Number(data.view) + 1,
+      },
     });
+    return new ProductDTO(result);
+  }
+
+  async softDeleteProduct(id) {
+    const result = await prisma.product.update({
+      where: { product_id: Number(id) },
+      data: { status: -1 },
+    });
+    return new ProductDTO(result);
+  }
+
+  async hardDeleteProduct(id) {
+    const result = await prisma.product.delete({
+      where: { product_id: Number(id) },
+    });
+    return new ProductDTO(result);
   }
 }
 
